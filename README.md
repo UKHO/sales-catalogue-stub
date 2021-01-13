@@ -1,0 +1,1 @@
+# sales-catalogue-stub
