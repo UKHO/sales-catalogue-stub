@@ -1,0 +1,125 @@
+trigger:
+  branches:
+    include:
+      - main
+      - features/*
+  paths:
+    include:
+      - src/*
+
+schedules:
+- cron: "0 0 * * Mon-Fri"
+  displayName: Nightly build
+  branches:
+    include:
+    - main
+  always: true
+
+stages:
+  - stage: Build
+    jobs:
+      - job: RestoreBuildAndDeploy
+        pool: NautilusBuild
+
+        workspace:
+          clean: all
+
+        steps:
+          - task: UseDotNet@2
+            displayName: "Use .NET Core 3.1.x SDK"
+            inputs:
+              packageType: sdk
+              version: 3.1.x
+              installationPath: $(Agent.ToolsDirectory)\\dotnet
+
+          - task: DownloadSecureFile@1
+            inputs:
+              secureFile: "SalesCatalogueStub_Nuget_Config"
+            name: "SalesCatalogueStub_Nuget_Config"
+            displayName: "Download Nuget.config from Secure Files"
+
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: "restore"
+              arguments: "--runtime win10-x64"
+              projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api\\UKHO.SalesCatalogueStub.Api.csproj'
+              feedsToUse: "config"
+              nugetConfigPath: "$(SalesCatalogueStub_Nuget_Config.secureFilePath)"
+            displayName: "dotnet restore UKHO.SalesCatalogueStub.Api"
+
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: "build"
+              arguments: "--configuration Release --no-restore --runtime win10-x64 --framework netcoreapp3.1"
+              projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api\\UKHO.SalesCatalogueStub.Api.csproj'
+            displayName: "dotnet build UKHO.SalesCatalogueStub.Api"
+
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: "publish"
+              publishWebProjects: true
+              zipAfterPublish: false
+              arguments: '--configuration Release --no-restore --no-build --runtime win10-x64 --framework netcoreapp3.1 --self-contained true --output "$(Build.ArtifactStagingDirectory)\\"'
+              projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api\\UKHO.SalesCatalogueStub.Api.csproj'
+            displayName: "dotnet publish UKHO.SalesCatalogueStub.Api"
+
+          - publish: '$(Build.ArtifactStagingDirectory)\\UKHO.SalesCatalogueStub.Api\\'
+            artifact: "UKHO.SalesCatalogueStub.Api"
+
+          - publish: '$(Build.SourcesDirectory)\\NVDSuppressions.xml'
+            artifact: "NVD Suppressions"
+
+      - job: DependencyCheck
+        dependsOn: RestoreBuildAndDeploy
+        pool: NautilusBuild
+
+        workspace:
+          clean: all
+
+        steps:
+          - checkout: none
+
+          - download: current
+            artifact: UKHO.SalesCatalogueStub.Api
+
+          - download: current
+            artifact: NVD Suppressions
+
+          - task: UseDotNet@2
+            displayName: "Use .NET Core 3.1.x SDK"
+            inputs:
+              packageType: sdk
+              version: 3.1.x
+              installationPath: $(Agent.ToolsDirectory)\\dotnet
+
+          - task: PowerShell@2
+            inputs:
+              targetType: "inline"
+              script: |
+                $maxAttempts = 2
+                $outPath = "$(Build.SourcesDirectory)\DCReport"
+                for ($i = 0; $i -lt $maxAttempts; $i++) {
+                    write-host "Attempt $i"
+                    dependency-check --project "UKHO.SalesCatalogueStub.Api - $(Build.SourceBranchName)" --scan '$(Pipeline.Workspace)\\UKHO.SalesCatalogueStub.Api\\' --out "$outPath" --suppression "$(Pipeline.Workspace)\\NVD Suppressions\NVDSuppressions.xml"
+                    if ((test-path $outPath) -and (get-childitem $outPath | Measure-Object | select-object -ExpandProperty Count) -gt 0) {
+                        write-host "Attempt $i successful"
+                        break
+                    }
+                    write-host "Attempt $i failed, so purge dependency-check database"
+                    dependency-check --purge
+                    start-sleep -seconds 5
+                }
+              pwsh: true
+            displayName: "Run NVD Checker"
+
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '$(Build.SourcesDirectory)\DCReport'
+              artifact: "NVD report"
+              publishLocation: "pipeline"
+
+          - task: PowerShell@2
+            displayName: "Fail build if dependency checker has vulnerabilities"
+            inputs:
+              targetType: inline
+              script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
