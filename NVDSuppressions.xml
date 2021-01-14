@@ -1,3 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.AspNetCore.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Microsoft\.AspNetCore@.*$</packageUrl>
+    <cpe>cpe:/a:microsoft:asp.net</cpe>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.DiaSymReader.Native.amd64.dll
+   ]]>
+    </notes>
+    <sha1>36ed049328fe585f2053a7e20be4b98a3c3a1f24</sha1>
+    <cpe>cpe:/a:dia:dia</cpe>
+  </suppress>
 </suppressions>
