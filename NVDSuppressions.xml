@@ -7,7 +7,16 @@
    ]]>
     </notes>
     <packageUrl regex="true">^pkg:generic/Microsoft\.AspNetCore@.*$</packageUrl>
-    <cpe>cpe:/a:microsoft:asp.net</cpe>
+    <cve>CVE-2005-2224</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.AspNetCore.dll
+   ]]>
+    </notes>
+    <packageUrl regex="true">^pkg:generic/Microsoft\.AspNetCore@.*$</packageUrl>
+    <cve>CVE-2008-0333</cve>
   </suppress>
   <suppress>
     <notes>
@@ -16,6 +25,6 @@
    ]]>
     </notes>
     <sha1>36ed049328fe585f2053a7e20be4b98a3c3a1f24</sha1>
-    <cpe>cpe:/a:dia:dia</cpe>
+    <cve>CVE-2006-2453</cve>
   </suppress>
 </suppressions>
