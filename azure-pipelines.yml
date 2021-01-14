@@ -41,7 +41,7 @@ stages:
           - task: DotNetCoreCLI@2
             inputs:
               command: "build"
-              arguments: "--configuration Debug --no-restore --runtime win10-x64 --framework netcoreapp3.1"
+              arguments: "--configuration Release --no-restore --runtime win10-x64 --framework netcoreapp3.1"
               projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api\\UKHO.SalesCatalogueStub.Api.csproj'
             displayName: "dotnet build UKHO.SalesCatalogueStub.Api"
 
@@ -50,7 +50,7 @@ stages:
               command: "publish"
               publishWebProjects: true
               zipAfterPublish: false
-              arguments: '--configuration Debug --no-restore --no-build --runtime win10-x64 --framework netcoreapp3.1 --self-contained false --output "$(Build.ArtifactStagingDirectory)\\"'
+              arguments: '--configuration Release --no-restore --no-build --runtime win10-x64 --framework netcoreapp3.1 --self-contained true --output "$(Build.ArtifactStagingDirectory)\\"'
               projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api\\UKHO.SalesCatalogueStub.Api.csproj'
             displayName: "dotnet publish UKHO.SalesCatalogueStub.Api"
 
