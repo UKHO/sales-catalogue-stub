@@ -7,6 +7,14 @@ trigger:
     include:
       - src/*
 
+schedules:
+- cron: "0 0 * * Mon-Fri"
+  displayName: Nightly build
+  branches:
+    include:
+    - main
+  always: true
+
 stages:
   - stage: Build
     jobs:
