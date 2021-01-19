@@ -42,16 +42,13 @@ namespace UKHO.SalesCatalogueStub.Api
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .AddMvc(options =>
+            services.AddControllers().AddNewtonsoftJson(options =>
                 {
-                    options.InputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter>();
-                    options.OutputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter>();
-                })
-                .AddNewtonsoftJson(opts =>
-                {
-                    opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                    opts.SerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
+                    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter
+                    {
+                        NamingStrategy = new CamelCaseNamingStrategy()
+                    });
                 })
                 .AddXmlSerializerFormatters();
 
@@ -78,8 +75,6 @@ namespace UKHO.SalesCatalogueStub.Api
                     // Use [ValidateModelState] on Actions to actually validate it in C# as well!
                     c.OperationFilter<GeneratePathParamsValidationFilter>();
                 });
-
-            services.AddControllers();
 
             services.AddHealthChecks();
         }
