@@ -120,10 +120,6 @@ namespace UKHO.SalesCatalogueStub.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-            });
-
-            app.UseEndpoints(endpoints =>
-            {
                 endpoints.MapHealthChecks("/health");
             });
         }
