@@ -1,0 +1,470 @@
+openapi: "3.0.0"
+info:
+  version: "1"
+  title: Sales Catalogue Service API
+  description: |
+    This API is for Sales Catalogue Service
+    
+servers:
+  - url: https://salescatalogue.admiralty.co.uk/v1/productData
+security:
+  - jwtBearerAuth: []
+
+paths:
+  /{productType}/products/productIdentifiers:
+    post:
+      summary: Get the latest, releasable versions for requested products or changes to requested products since a date
+      operationId: postProductIdentifiers
+      tags:
+        - Exchange Service
+      parameters:
+        - $ref: '#/components/parameters/productType'
+        - $ref: '#/components/parameters/sinceDateTime'
+       
+       
+      requestBody:
+        description: | 
+            The JSON body containing product identifiers.  
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/productIdentifiers'
+  
+      responses:
+        '200':
+          description: A JSON body of product objects
+          headers:
+            schema:
+                $ref: "#/components/schemas/Last-Modified"
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/products"
+        '304':
+          description: Not modified.
+          headers:
+            schema:
+                $ref: "#/components/schemas/Last-Modified"
+         
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+        '401':
+          description: Unauthorised.
+          
+        '403':
+          description: Forbidden.
+          
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
+        '406':
+          description: Not acceptable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'      
+                
+  /{productType}/products/productVersions:
+    post:
+      summary: Get the latest, releasable versions of requested products since a specified version
+      operationId: postProductVersions
+      tags:
+        - Exchange Service
+      parameters:
+        - $ref: '#/components/parameters/productType'
+       
+       
+      requestBody:
+        description: | 
+            The JSON body containing product versions.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/productVersions'
+  
+      responses:
+        '200':
+          description: A JSON body of product objects
+          headers:
+            schema:
+                $ref: "#/components/schemas/Last-Modified"
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/products"
+        '304':
+          description: Not modified.
+          headers:
+            schema:
+                $ref: "#/components/schemas/Last-Modified"
+         
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+        '401':
+          description: Unauthorised.
+          
+        '403':
+          description: Forbidden.
+          
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
+        '406':
+          description: Not acceptable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'    
+  
+    
+  /{productType}/catalogue/{catalogueType}:
+    get:   
+      summary: Get the data for a catalogue
+      operationId: getCatalogue
+      tags:
+        - Catalogue
+        
+      parameters:
+        - $ref: '#/components/parameters/productType'
+        - $ref: '#/components/parameters/catalogueType'
+        - $ref: '#/components/parameters/If-Modified-Since'
+        
+      responses:
+        '200':
+          description: A JSON body of data for the requested catalogue
+          headers:
+            schema:
+                $ref: "#/components/schemas/Last-Modified"
+          content:
+            application/json:    
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/productstxt"
+                  - $ref: "#/components/schemas/products"
+                
+        '304':
+          description: Not modified.
+          headers:
+            schema:
+                $ref: "#/components/schemas/Last-Modified"
+         
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+        '401':
+          description: Unauthorised.
+          
+        '403':
+          description: Forbidden.
+         
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
+        '406':
+          description: Not acceptable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'     
+       
+
+components:
+
+  ################################################################################
+  #                              Parameter Definitions                              #
+  ################################################################################
+  
+  parameters:
+    productType:
+      in: path
+      name: productType
+      required: true
+      description: |
+        The type of product        
+      schema:
+        type: string 
+      example: encS57, encS100, arcs, paperchart
+      
+    sinceDateTime:
+      in: query
+      name: sinceDateTime
+      required: false
+      description: |
+        The date and time from which changes are requested. Any changes since the date will be returned.  
+      schema:
+        type: string
+        format: date-time
+      example: Wed, 21 Oct 2015 07:28:00 GMT
+      
+    If-Modified-Since:
+      in: header
+      name: If-Modified-Since
+      required: false
+      description: |
+        The date and time since items have changed.
+      schema:
+        type: string
+        format: date-time
+      example: Wed, 21 Oct 2015 07:28:00 GMT
+      
+    catalogueType:
+      in: path
+      name: catalogueType
+      required: true
+      description: |
+        The type of catalogue data requested       
+      schema:
+        type: string 
+      example: productstxt
+  
+  
+  ################################################################################
+  #                              Object Definitions                              #
+  ################################################################################
+  
+  schemas:
+  
+    ####################################
+    #      Request Objects      #
+    #################################### 
+    
+    productIdentifiers:
+      type: array
+      items: 
+        type: string
+              
+            
+    productVersions:
+        type: array
+        items: 
+          type: object
+          properties:
+            productName:
+              type: string
+              description: The unique product identifiers
+            editionNumber:
+              type: number
+              description: The edition number
+            updateNumber:
+              type: number
+              description: The update number, if applicable
+        example:   {"productName": "AU895561",  "editionNumber": 4,  "updateNumber": 1} 
+        
+    ####################################
+    #      Response Objects      #
+    #################################### 
+    
+    products:
+      type: array
+      items: 
+          type: object
+          properties:
+            productName:
+              type: string
+              description: The unique product identifiers
+            editionNumber:
+              type: number
+              description: The edition number
+            updateNumber:
+              type: array
+              description: an array of update numbers
+              items: 
+                type: number
+                description: The update number, if applicable
+      
+      example:   {"productName": "AU895561",  "editionNumber": 4,  "updateNumber": [5,6,7]}      
+        
+    productstxt:
+      type: array
+      items: 
+          type: object
+          properties:
+            productName:
+              type: string
+              description: |
+                Name of product
+              example: "GB202400"
+            baseCellIssueDate:
+              type: string
+              format: date
+              description: |
+                The date that a base cell (new cell, new edition or re-issue) was issued.
+              example: "2005-02-22" 
+            baseCellEditionNumber:
+              type: number
+              description: The edition number
+            issueDateLatestUpdate:
+              type: string
+              format: date
+              description: |
+                The date that the latest update was issued.
+              example: "2005-02-22" 
+            latestUpdateNumber:
+              type: number
+              description: |
+                The update number of the latest update.  Blank when no update.
+              example: 4
+            fileSize:
+              type: number
+              description: |
+                The total file size in kilobytes for all files issued for the product.
+                Currently blank. 
+            cellLimitSouthernmostLatitude:
+              type: number
+              description: |
+                Southernmost latitude of data coverage in the ENC product.
+              example: 49.898773299986 
+            cellLimitWesternmostLatitude:
+              type: number
+              description: |
+                Westernmost longitude of data coverage in the ENC product.
+              example: -1.927277300003 
+            cellLimitNorthernmostLatitude:
+              type: number
+              description: |
+                Northernmost latitude of data coverage in the ENC product.
+              example: 50.922828000014 
+            cellLimitEasternmostLatitude:
+              type: number
+              description: |
+                Easternmost longitude of data coverage in the ENC product
+              example: 0.000166700008 
+            dataCoverageCoordinates:
+              type: array
+              items:
+                type: object
+                properties:
+                  latitude:
+                    type: number
+                  longitude:
+                    type: number
+              description: |
+                  Optional. Currently blank.
+                  10 coordinate pairs can be supplied to indicate the data coverage within the ENC cell. It will be provided as repeating Y-coordinate and X-coordinate pairs. 
+            compression:
+              type: boolean
+              description: |
+                Indicator of compression of dataset.  
+              example: true
+            encryption: 
+              type: boolean
+              description: |
+                Indicator of encryption of dataset.  
+              example: true
+            baseCellUpdateNumber:
+              type: number
+              description: |
+                  The update number current at the time of a cell reissue. If a cell edition does not have a re-issue then this field is blank or zero filled 
+              example: 1
+            lastUpdateNumberPreviousEdition:
+              type: number
+              description: |
+                  Last update number of previous edition, if previous editions are available.  
+                  Currently blank.
+            baseCellLocation:
+              type: string
+              description: |
+                  DVDs This field is divided into two subfields delimited by a “;” (semi colon). The first subfield contains the media number ID and the second the exchange set number. The Media ID is designated with a “M” followed by a number. 
+              example: base cell “M1;B3”, Updates “M2;U1”
+            cancelledCellReplacements:
+              type: array
+              items:
+                type: string
+              description: |
+                  List of replacement cells, if relevant, when a cell is cancelled.  Semi-colon separated.
+              example: ["FR312345","FR323456"]
+      
+    
+    
+    Last-Modified:
+      type: string
+      format: date-time
+      example: Wed, 21 Oct 2015 07:28:00 GMT
+        
+  
+  
+ 
+    ####################################
+    #      Error Response Objects      #
+    ####################################  
+    
+    
+    DefaultErrorResponse:
+      type: object
+      title: Error
+      properties:
+        correlationId:
+          type: string
+        detail:
+          type: string
+   
+    errorDescription:
+      type: object
+      properties:
+        correlationId:
+         type: string
+        errors:
+          type: array
+          items:
+             $ref: "#/components/schemas/fieldError"
+
+    fieldError:
+      type: object
+      properties:
+        source:
+          type: string
+        description:
+          type: string
+
+      
+   
+    ####################################
+    #      Security Objects      #
+    ####################################     
+    
+  securitySchemes:
+ 
+    jwtBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+ 
+  
