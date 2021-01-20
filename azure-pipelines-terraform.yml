@@ -1,0 +1,119 @@
+trigger:
+  - main
+
+pr: none
+
+stages:
+  - stage: Dev
+    dependsOn: []
+    variables:
+      - group: SalesCatStubDev
+    jobs:
+      - deployment: Terraform
+        environment: SalesCatStubDev
+        pool:
+          #vmImage: 'ubuntu-latest' use when hosted agent needed
+          name: UKHO Ubuntu 1804
+        container: ukhydrographicoffice/terraform-azure-make:latest
+        workspace:
+          clean: all
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - bash: |
+                    echo "$STORAGE_ACCOUNT_NAME"
+                    echo "$RESOURCE_GROUP_NAME"
+
+                    echo "Execute Terraform init"
+                    terraform init -backend-config="storage_account_name=${STORAGE_ACCOUNT_NAME}" -backend-config="resource_group_name=${RESOURCE_GROUP_NAME}"
+
+                    echo "Execute Terraform plan"
+                    terraform plan -refresh=true -out=tfplan -input=false
+                  displayName: Terraform Plan
+                  failOnStderr: true
+                  env:
+                    ARM_SUBSCRIPTION_ID: $(TERRAFORM-SUBSCRIPTION-ID)
+                    ARM_TENANT_ID: $(TERRAFORM-TENANT-ID)
+                    ARM_ACCESS_KEY: $(TERRAFORM-ACCESS-KEY)
+                    ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
+                    ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
+                    TF_VAR_DEPLOY_ENVIRONMENT: Dev
+                    TF_VAR_ENV_CONTEXT: AzureDev
+                    TF_VAR_WEBSITE_DNS_SERVER: $(TERRAFORM-WEBSITE-DNS-SERVER)
+                    STORAGE_ACCOUNT_NAME: $(STORAGE_ACCOUNT_NAME)
+                    RESOURCE_GROUP_NAME: $(RESOURCE_GROUP_NAME)
+                - bash: |
+                    echo "Execute Terraform apply"
+                    terraform apply "tfplan"
+                  displayName: Terraform Apply
+                  # Only alow terraform in LIVE from main
+                  # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+                  failOnStderr: true
+                  env:
+                    ARM_SUBSCRIPTION_ID: $(TERRAFORM-SUBSCRIPTION-ID)
+                    ARM_TENANT_ID: $(TERRAFORM-TENANT-ID)
+                    ARM_ACCESS_KEY: $(TERRAFORM-ACCESS-KEY)
+                    ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
+                    ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
+                    TF_VAR_DEPLOY_ENVIRONMENT: Dev
+                    TF_VAR_ENV_CONTEXT: AzureDev
+                    TF_VAR_WEBSITE_DNS_SERVER: $(TERRAFORM-WEBSITE-DNS-SERVER)
+
+  # - stage: QA
+  #   dependsOn: []
+  #   variables:
+  #   - group: SalesCatStubQA
+  #   jobs:
+  #     - deployment: Terraform
+  #       environment: SalesCatStubQA
+  #       pool:
+  #         #vmImage: 'ubuntu-latest' use when hosted agent needed
+  #         name: UKHO Ubuntu 1804
+  #       container: ukhydrographicoffice/terraform-azure-make:latest
+  #       workspace:
+  #         clean: all
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #             - checkout: self
+  #             - bash: |
+  #                   echo "$STORAGE_ACCOUNT_NAME"
+  #                   echo "$RESOURCE_GROUP_NAME"
+
+  #                   echo "Execute Terraform init"
+  #                   terraform init -backend-config="storage_account_name=${STORAGE_ACCOUNT_NAME}" -backend-config="resource_group_name=${RESOURCE_GROUP_NAME}"
+  #
+  #                   echo "Execute Terraform plan"
+  #                   terraform plan -refresh=true -out=tfplan -input=false
+  #               displayName: Terraform Plan
+  #               failOnStderr: true
+  #               env:
+  #                 ARM_SUBSCRIPTION_ID: $(TERRAFORM-SUBSCRIPTION-ID)
+  #                 ARM_TENANT_ID: $(TERRAFORM-TENANT-ID)
+  #                 ARM_ACCESS_KEY: $(TERRAFORM-ACCESS-KEY)
+  #                 ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
+  #                 ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
+  #                 TF_VAR_DEPLOY_ENVIRONMENT: QA
+  #                 TF_VAR_ENV_CONTEXT: AzureQA
+  #                 TF_VAR_WEBSITE_DNS_SERVER: $(TERRAFORM-WEBSITE-DNS-SERVER)
+  #                 STORAGE_ACCOUNT_NAME: $(STORAGE_ACCOUNT_NAME)
+  #                 RESOURCE_GROUP_NAME: $(RESOURCE_GROUP_NAME)
+  #             - bash: |
+  #                  echo "Execute Terraform apply"
+  #                  terraform apply "tfplan"
+  #               displayName: Terraform Apply
+  #               # Only allow terraform in LIVE from main
+  #               # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  #               failOnStderr: true
+  #               env:
+  #                 ARM_SUBSCRIPTION_ID: $(TERRAFORM-SUBSCRIPTION-ID)
+  #                 ARM_TENANT_ID: $(TERRAFORM-TENANT-ID)
+  #                 ARM_ACCESS_KEY: $(TERRAFORM-ACCESS-KEY)
+  #                 ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
+  #                 ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
+  #                 TF_VAR_DEPLOY_ENVIRONMENT: QA
+  #                 TF_VAR_ENV_CONTEXT: AzureQA
+  #                 TF_VAR_WEBSITE_DNS_SERVER: $(TERRAFORM-WEBSITE-DNS-SERVER)
