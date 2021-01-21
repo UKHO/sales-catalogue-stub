@@ -32,6 +32,7 @@ stages:
                     echo "Execute Terraform plan"
                     terraform plan -refresh=true -out=tfplan -input=false
                   displayName: Terraform Plan
+                  workingDirectory: deployment/
                   failOnStderr: true
                   env:
                     ARM_SUBSCRIPTION_ID: $(TERRAFORM-SUBSCRIPTION-ID)
@@ -48,6 +49,7 @@ stages:
                     echo "Execute Terraform apply"
                     terraform apply "tfplan"
                   displayName: Terraform Apply
+                  workingDirectory: deployment/
                   # Only alow terraform in LIVE from main
                   # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
                   failOnStderr: true
