@@ -1,0 +1,1 @@
+# Sales Catalogue Stub Terraform
