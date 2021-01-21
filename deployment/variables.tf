@@ -7,7 +7,7 @@ variable "MAIN_LOCATION" {
 #   default = ""
 # }
 variable "DEPLOY_ENVIRONMENT" {
-  default = "Dev"
+  default = "DEV"
 }
 variable "ENV_CONTEXT" {
   type = string  
