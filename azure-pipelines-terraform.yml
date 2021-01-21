@@ -4,13 +4,13 @@ trigger:
 pr: none
 
 stages:
-  - stage: Dev
+  - stage: DEV
     dependsOn: []
     variables:
-      - group: SalesCatStubDev
+      - group: SalesCatStubDEV
     jobs:
       - deployment: Terraform
-        environment: SalesCatStubDev
+        environment: SalesCatStubDEV
         pool:
           #vmImage: 'ubuntu-latest' use when hosted agent needed
           name: UKHO Ubuntu 1804
@@ -40,8 +40,8 @@ stages:
                     ARM_ACCESS_KEY: $(TERRAFORM-ACCESS-KEY)
                     ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
                     ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
-                    TF_VAR_DEPLOY_ENVIRONMENT: Dev
-                    TF_VAR_ENV_CONTEXT: AzureDev
+                    TF_VAR_DEPLOY_ENVIRONMENT: DEV
+                    TF_VAR_ENV_CONTEXT: AzureDEV
                     TF_VAR_WEBSITE_DNS_SERVER: $(TERRAFORM-WEBSITE-DNS-SERVER)
                     STORAGE_ACCOUNT_NAME: $(TERRAFORM-STORAGE-ACCOUNT-NAME)
                     RESOURCE_GROUP_NAME: $(TERRAFORM-RESOURCE-GROUP-NAME)
@@ -59,8 +59,8 @@ stages:
                     ARM_ACCESS_KEY: $(TERRAFORM-ACCESS-KEY)
                     ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
                     ARM_CLIENT_SECRET: $(TERRAFORM-CLIENT-SECRET)
-                    TF_VAR_DEPLOY_ENVIRONMENT: Dev
-                    TF_VAR_ENV_CONTEXT: AzureDev
+                    TF_VAR_DEPLOY_ENVIRONMENT: DEV
+                    TF_VAR_ENV_CONTEXT: AzureDEV
                     TF_VAR_WEBSITE_DNS_SERVER: $(TERRAFORM-WEBSITE-DNS-SERVER)
 
   # - stage: QA
