@@ -1,32 +1,34 @@
 variable "MAIN_LOCATION" {
   type    = string
-  default = "uksouth"
 }
-# variable "KEYVAULTADDRESS" {
-#   type = string
-#   default = ""
-# }
 variable "DEPLOY_ENVIRONMENT" {
-  default = "DEV"
+  type    = string
 }
 variable "ENV_CONTEXT" {
-  type = string  
-  default = "Azure"
-}
-# variable "ENG_OUTGOING_IP" {
-#   type= string
-# }
-# variable "UKHO_MAIN_OUTGOING_IP" {
-#   type= string
-# }
-variable "APPCONFIGURATION" {
-  type = string  
-  default = ""
+  type    = string
 }
 variable "SERVICENAME" {
-  type = string
-  default = "SalesCatStub"
+  type    = string
 }
-# variable "WEBSITE_DNS_SERVER" {
-#   type = string  
-# }
+
+variable "WEBSITE_DNS_SERVER" {
+  type    = string
+}
+variable "API_ENG_OUTGOING_IP" {
+  type = string
+}
+variable "API_UKHO_MAIN_OUTGOING_IP" {
+  type = string
+}
+
+variable "SPOKE_VNET_NAME" {
+  type = string
+}
+
+variable "SPOKE_SUBNET_NAME" {
+  type = string
+}
+
+variable "SPOKE_RG" {
+  type = string
+}
