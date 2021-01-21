@@ -42,8 +42,8 @@ stages:
                     TF_VAR_DEPLOY_ENVIRONMENT: Dev
                     TF_VAR_ENV_CONTEXT: AzureDev
                     TF_VAR_WEBSITE_DNS_SERVER: $(TERRAFORM-WEBSITE-DNS-SERVER)
-                    STORAGE_ACCOUNT_NAME: $(STORAGE_ACCOUNT_NAME)
-                    RESOURCE_GROUP_NAME: $(RESOURCE_GROUP_NAME)
+                    STORAGE_ACCOUNT_NAME: $(TERRAFORM-STORAGE-ACCOUNT-NAME)
+                    RESOURCE_GROUP_NAME: $(TERRAFORM-RESOURCE-GROUP-NAME)
                 - bash: |
                     echo "Execute Terraform apply"
                     terraform apply "tfplan"
