@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
@@ -7,13 +8,23 @@ namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
     public class HealthcheckTest
     {
         [Test]
-        public void Test_HealthcheckTest()
+        public async Task Test_HealthcheckTest()
         {
             var healthcheckUrl = new Uri("https://localhost:44325/health", UriKind.Absolute);
-            var httpClient = new HttpClient();
-            httpClient.GetAsync(healthcheckUrl.ToString());
+            var isSuccess = false;
+            var returnedValue = "";
 
-            Assert.Pass();
+            using (var httpClient = new HttpClient())
+            {
+
+                var expectedResult = await httpClient.GetAsync(healthcheckUrl.ToString());
+
+                isSuccess = expectedResult.IsSuccessStatusCode;
+                returnedValue = await expectedResult.Content.ReadAsStringAsync();
+            }
+
+            Assert.IsTrue(isSuccess);
+            Assert.AreEqual(returnedValue, "Healthy");
         }
     }
 }
