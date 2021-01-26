@@ -17,7 +17,7 @@ namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
             using (var httpClient = new HttpClient())
             {
 
-                var expectedResult = await httpClient.GetAsync(healthcheckUrl.ToString());
+                var expectedResult = await httpClient.GetAsync(healthcheckUrl);
 
                 isSuccess = expectedResult.IsSuccessStatusCode;
                 returnedValue = await expectedResult.Content.ReadAsStringAsync();
