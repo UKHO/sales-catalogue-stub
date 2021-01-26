@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.SalesCatalogueStub.Api", "UKHO.SalesCatalogueStub.Api\UKHO.SalesCatalogueStub.Api.csproj", "{1FC6AA95-B08D-4D8A-9285-ECFA236F1F70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.SalesCatalogueStub.Api", "UKHO.SalesCatalogueStub.Api\UKHO.SalesCatalogueStub.Api.csproj", "{1FC6AA95-B08D-4D8A-9285-ECFA236F1F70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.SalesCatalogueStub.Api.IntegrationTests", "UKHO.SalesCatalogueStub.Api.IntegrationTests\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj", "{7F099E6E-D8DE-4CF6-9C82-4385560756AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{1FC6AA95-B08D-4D8A-9285-ECFA236F1F70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FC6AA95-B08D-4D8A-9285-ECFA236F1F70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FC6AA95-B08D-4D8A-9285-ECFA236F1F70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F099E6E-D8DE-4CF6-9C82-4385560756AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F099E6E-D8DE-4CF6-9C82-4385560756AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F099E6E-D8DE-4CF6-9C82-4385560756AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F099E6E-D8DE-4CF6-9C82-4385560756AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
