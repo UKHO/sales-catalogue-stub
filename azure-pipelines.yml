@@ -23,6 +23,9 @@ resources:
     endpoint: UKHO
     ref: refs/heads/master
 
+variables:
+  - group: Covscan-vars
+
 stages:
   - stage: Build
     jobs:
