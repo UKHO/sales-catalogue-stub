@@ -41,8 +41,8 @@ stages:
               CovUser: "$(CovUser)"
               CovPwd: "$(CovPwd)"
               StreamName: "sales-catalogue-api-stub"
-              BuildCommand: "$(Build.Repository.LocalPath)/src/UKHO.SalesCatalogueStub.Api/UKHO.SalesCatalogueStub.Api.csproj"
-              StripPath: $(Build.Repository.LocalPath)/src/UKHO.SalesCatalogueStub.Api
+              BuildCommand: "$(Build.Repository.LocalPath)/sales-catalogue-stub/src/UKHO.SalesCatalogueStub.Api/UKHO.SalesCatalogueStub.Api.csproj"
+              StripPath: $(Build.Repository.LocalPath)/sales-catalogue-stub/src/UKHO.SalesCatalogueStub.Api
               CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
         # condition: or(eq(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/main')))
       - job: RestoreBuildAndDeploy
