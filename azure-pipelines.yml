@@ -30,6 +30,7 @@ stages:
   - stage: Build
     jobs:
       - job: Coverity
+        pool: NautilusBuild
         steps:
           - checkout: self
             submodules: recursive
