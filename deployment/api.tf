@@ -83,3 +83,21 @@ module "app_service" {
   spoke_subnet_name        = var.SPOKE_SUBNET_NAME
   spoke_rg                 = var.SPOKE_RG
 }
+
+module "eventhub_rg" {
+  source             = "./modules/ResourceGroup"
+  deploy_environment = var.DEPLOY_ENVIRONMENT
+  servicename        = var.SERVICENAME
+  role               = local.eventhub_role
+  mainlocation       = var.MAIN_LOCATION
+}
+
+module "eventhub" {
+  source                  = "./modules/EventHub"
+  deploy_environment      = var.DEPLOY_ENVIRONMENT
+  servicename             = var.SERVICENAME
+  role                    = local.api_role
+  resource_group_name     = module.eventhub_rg.name
+  resource_group_location = module.eventhub_rg.location
+  sku                     = "Standard"
+}
