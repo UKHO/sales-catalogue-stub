@@ -30,9 +30,9 @@ resource "azurerm_eventhub_authorization_rule" "logstash_rule" {
 
 resource "azurerm_eventhub_authorization_rule" "api_rule" {
   name                = "RootManageSharedAccessKey"
-  namespace_name      = azurerm_eventhub_namespace.tf.name
+  namespace_name      = azurerm_eventhub_namespace.eventhub_namespace.name
   eventhub_name       = azurerm_eventhub.eventhub.name
-  resource_group_name = data.azurerm_resource_group.tf.name
+  resource_group_name = var.resource_group_name
   listen              = false
   send                = true
   manage              = false
