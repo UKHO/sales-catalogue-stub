@@ -151,10 +151,22 @@ stages:
               targetType: inline
               script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
 
-  - stage: DeployDev
+  - stage: DeploymentApproval
     dependsOn: 
       - Build
-    condition: eq(variables['Build.Reason'], 'Manual')
+    jobs:  
+    - job: waitForValidation
+      displayName: Wait for external validation  
+      pool: NautilusBuild    
+      steps:   
+      - task: ManualValidation@0
+        timeoutInMinutes: 1440 # task times out in 1 day
+        inputs:
+          instructions: 'Please validate the build configuration and resume'
+          
+  - stage: DeployDev
+    dependsOn: 
+      - DeploymentApproval
     jobs:    
       - deployment: DeploySalesCatalogueStubApiDev
         displayName: Deploy Sales Catalogue Stub API Dev
@@ -223,7 +235,7 @@ stages:
   - stage: DeployQA
     dependsOn: 
       - IntegrationTestsDev
-    #condition: eq(variables['Build.Reason'], 'Manual')
+    condition: eq(variables['Build.Reason'], 'Manual')
     jobs:    
       - deployment: DeploySalesCatalogueStubApiQa
         displayName: Deploy Sales Catalogue Stub API QA
