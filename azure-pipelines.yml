@@ -29,22 +29,23 @@ variables:
 stages:
   - stage: Build
     jobs:
-      # - job: Coverity
-      #   pool: NautilusBuild
-      #   steps:
-      #     - checkout: self
-      #       submodules: recursive
-      #     - checkout: covscan
-      #     - template: dotnet-cov.yml@covScan
-      #       parameters:
-      #         CovHostUrl: "$(CovHostUrl)"
-      #         CovUser: "$(CovUser)"
-      #         CovPwd: "$(CovPwd)"
-      #         StreamName: "sales-catalogue-api-stub"
-      #         BuildCommand: "$(Build.Repository.LocalPath)/sales-catalogue-stub/src/UKHO.SalesCatalogueStub.Api/UKHO.SalesCatalogueStub.Api.csproj"
-      #         StripPath: $(Build.Repository.LocalPath)/sales-catalogue-stub/src/UKHO.SalesCatalogueStub.Api
-      #         CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
-        # condition: or(eq(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/main')))
+      - job: Coverity
+        pool: NautilusBuild
+        steps:
+          - checkout: self
+            submodules: recursive
+          - checkout: covscan
+          - template: dotnet-cov.yml@covScan
+            parameters:
+              CovHostUrl: "$(CovHostUrl)"
+              CovUser: "$(CovUser)"
+              CovPwd: "$(CovPwd)"
+              StreamName: "sales-catalogue-api-stub"
+              BuildCommand: "$(Build.Repository.LocalPath)/sales-catalogue-stub/src/UKHO.SalesCatalogueStub.Api/UKHO.SalesCatalogueStub.Api.csproj"
+              StripPath: $(Build.Repository.LocalPath)/sales-catalogue-stub/src/UKHO.SalesCatalogueStub.Api
+              CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
+        #condition: or(eq(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/main')))
+
       - job: RestoreBuildAndDeploy
         pool: NautilusBuild
 
