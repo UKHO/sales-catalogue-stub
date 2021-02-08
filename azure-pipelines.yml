@@ -154,7 +154,7 @@ stages:
   - stage: DeployDev
     dependsOn: 
       - Build
-    #condition: eq(variables['Build.Reason'], 'Manual')
+    condition: eq(variables['Build.Reason'], 'Manual')
     jobs:    
       - deployment: DeploySalesCatalogueStubApiDev
         displayName: Deploy Sales Catalogue Stub API Dev
