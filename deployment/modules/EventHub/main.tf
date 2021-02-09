@@ -1,9 +1,5 @@
-locals {
-  basename = "M-${var.servicename}-${var.role}-${var.deploy_environment}-eh"
-}
-
 resource "azurerm_eventhub_namespace" "eventhub_namespace" {
-  name                = local.basename
+  name                = "M-${var.servicename}-${var.role}-${var.deploy_environment}-ns"
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
   sku                 = var.sku
@@ -11,7 +7,7 @@ resource "azurerm_eventhub_namespace" "eventhub_namespace" {
 }
 
 resource "azurerm_eventhub" "eventhub" {
-  name                = local.basename
+  name                = "M-${var.servicename}-${var.role}-${var.deploy_environment}-eh"
   namespace_name      = azurerm_eventhub_namespace.eventhub_namespace.name
   resource_group_name = var.resource_group_name
   partition_count     = 2
