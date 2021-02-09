@@ -84,20 +84,28 @@ module "app_service" {
   spoke_rg                 = var.SPOKE_RG
 }
 
-module "eventhub_rg" {
+module "event_hub_rg" {
   source             = "./modules/ResourceGroup"
   deploy_environment = var.DEPLOY_ENVIRONMENT
   servicename        = var.SERVICENAME
-  role               = local.eventhub_role
+  role               = local.event_hub_role
   mainlocation       = var.MAIN_LOCATION
 }
 
-module "eventhub" {
+module "event_hub" {
   source                  = "./modules/EventHub"
   deploy_environment      = var.DEPLOY_ENVIRONMENT
   servicename             = var.SERVICENAME
-  role                    = local.api_role
-  resource_group_name     = module.eventhub_rg.name
-  resource_group_location = module.eventhub_rg.location
+  role                    = local.event_hub_role
+  resource_group_name     = module.event_hub_rg.name
+  resource_group_location = module.event_hub_rg.location
   sku                     = "Standard"
+}
+module "storage_account" {
+  source                  = "./modules/StorageAccount"
+  deploy_environment      = var.DEPLOY_ENVIRONMENT
+  servicename             = var.SERVICENAME
+  role                    = local.event_hub_role
+  resource_group_name     = module.event_hub_rg.name
+  resource_group_location = module.event_hub_rg.location
 }
