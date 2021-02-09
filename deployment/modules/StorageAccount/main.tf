@@ -1,5 +1,5 @@
 locals {
-  basename = lower("m${var.servicename}${var.role}${var.deploy_environment}sa")
+  basename = lower("m${var.servicename}${var.role}${var.deploy_environment}")
 }
 
 resource "azurerm_storage_account" "logstashStorage" {
