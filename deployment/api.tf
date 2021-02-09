@@ -72,9 +72,9 @@ module "app_service" {
   resource_group_location  = module.api_rg.location
   resource_group_id        = module.api_rg.id
   app_service_plan_id      = module.app_service_plan.this_id
-  https_only               = "true"
+  https_only               = true
   dotnet_framework_version = "v4.0"
-  always_on                = "true"
+  always_on                = true
   run_from_package         = "0"
   identity_type            = "SystemAssigned"
   eng_outgoing_ip          = var.API_ENG_OUTGOING_IP
@@ -102,10 +102,15 @@ module "event_hub" {
   sku                     = "Standard"
 }
 module "storage_account" {
-  source                  = "./modules/StorageAccount"
-  deploy_environment      = var.DEPLOY_ENVIRONMENT
-  servicename             = var.SERVICENAME
-  role                    = local.event_hub_role
-  resource_group_name     = module.event_hub_rg.name
-  resource_group_location = module.event_hub_rg.location
+  source                    = "./modules/StorageAccount"
+  deploy_environment        = var.DEPLOY_ENVIRONMENT
+  servicename               = var.SERVICENAME
+  role                      = local.event_hub_role
+  resource_group_name       = module.event_hub_rg.name
+  resource_group_location   = module.event_hub_rg.location
+  account_kind              = "StorageV2"
+  account_tier              = "Standard"
+  account_replication_type  = "LRS"
+  access_tier               = "Hot"
+  enable_https_traffic_only = true
 }
