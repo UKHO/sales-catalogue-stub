@@ -1,5 +1,5 @@
 locals {
-  basename = "M-${var.servicename}$-{var.role}$-{var.deploy_environment}-eh"
+  basename = "M-${var.servicename}-${var.role}-${var.deploy_environment}-eh"
 }
 
 resource "azurerm_eventhub_namespace" "eventhub_namespace" {
