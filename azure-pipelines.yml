@@ -8,20 +8,20 @@ trigger:
       - src/*
 
 schedules:
-- cron: "0 0 * * Mon-Fri"
-  displayName: Nightly build
-  branches:
-    include:
-    - main
-  always: true
+  - cron: "0 0 * * Mon-Fri"
+    displayName: Nightly build
+    branches:
+      include:
+        - main
+    always: true
 
 resources:
   repositories:
-  - repository: covscan
-    type: github
-    name: UKHO/coverityscan-buildtemplates
-    endpoint: UKHO
-    ref: refs/heads/master
+    - repository: covscan
+      type: github
+      name: UKHO/coverityscan-buildtemplates
+      endpoint: UKHO
+      ref: refs/heads/master
 
 variables:
   - group: Covscan-vars
@@ -153,29 +153,31 @@ stages:
               script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
 
   - stage: DeployDev
-    dependsOn: 
+    dependsOn:
       - Build
+    variables:
+      - group: SalesCatStubDEV
     condition: or(eq(variables['Build.Reason'], 'Manual'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-    jobs:    
+    jobs:
       - deployment: DeploySalesCatalogueStubApiDev
         displayName: Deploy Sales Catalogue Stub API Dev
         pool: "UKHO Ubuntu 1804"
-        environment: 'SalesCatStubDev'
+        environment: "SalesCatStubDev"
         strategy:
           runOnce:
             deploy:
               steps:
-              - download: current
-                artifact: UKHO.SalesCatalogueStub.Api
-              - task: AzureRmWebAppDeployment@4
-                displayName: 'Azure App Service Deploy'
-                inputs:
-                  azureSubscription: 'M-SalesCatStub-DEV-SC'
-                  WebAppName: 'M-SalesCatStub-api-DEV-appservice'
-                  packageForLinux: '$(Pipeline.Workspace)/UKHO.SalesCatalogueStub.Api'
+                - download: current
+                  artifact: UKHO.SalesCatalogueStub.Api
+                - task: AzureRmWebAppDeployment@4
+                  displayName: "Azure App Service Deploy"
+                  inputs:
+                    ConnectedServiceName: $(PIPELINE-CONNECTED-SERVICE-NAME)
+                    WebAppName: $(PIPELINE-APP-SERVICE-NAME)
+                    packageForLinux: "$(Pipeline.Workspace)/UKHO.SalesCatalogueStub.Api"
 
   - stage: IntegrationTestsDev
-    dependsOn: 
+    dependsOn:
       - DeployDev
     jobs:
       - job: IntegrationTests
@@ -213,38 +215,39 @@ stages:
               arguments: "--configuration Release --no-restore --runtime win10-x64 --framework netcoreapp3.1"
               projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
             displayName: "dotnet build UKHO.SalesCatalogueStub.Api.IntegrationTests"
-          
+
           - task: DotNetCoreCLI@2
             inputs:
-              command: 'test'
+              command: "test"
               projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
               arguments: "--configuration Release --no-build --runtime win10-x64"
-            displayName: 'dotnet test UKHO.SalesCatalogueStub.Api.IntegrationTests'
+            displayName: "dotnet test UKHO.SalesCatalogueStub.Api.IntegrationTests"
 
   - stage: DeployQA
-    dependsOn: 
+    dependsOn:
       - IntegrationTestsDev
-    #condition: eq(variables['Build.Reason'], 'Manual')
-    jobs:    
+    variables:
+      - group: SalesCatStubQA
+    jobs:
       - deployment: DeploySalesCatalogueStubApiQa
         displayName: Deploy Sales Catalogue Stub API QA
         pool: "UKHO Ubuntu 1804"
-        environment: 'SalesCatStubQA'
+        environment: "SalesCatStubQA"
         strategy:
           runOnce:
             deploy:
               steps:
-              - download: current
-                artifact: UKHO.SalesCatalogueStub.Api
-              - task: AzureRmWebAppDeployment@4
-                displayName: 'Azure App Service Deploy'
-                inputs:
-                  azureSubscription: 'M-SalesCatStub-QA-SC'
-                  WebAppName: 'M-SalesCatStub-api-QA-appservice'
-                  packageForLinux: '$(Pipeline.Workspace)/UKHO.SalesCatalogueStub.Api'
+                - download: current
+                  artifact: UKHO.SalesCatalogueStub.Api
+                - task: AzureRmWebAppDeployment@4
+                  displayName: "Azure App Service Deploy"
+                  inputs:
+                    ConnectedServiceName: $(PIPELINE-CONNECTED-SERVICE-NAME)
+                    WebAppName: $(PIPELINE-APP-SERVICE-NAME)
+                    packageForLinux: "$(Pipeline.Workspace)/UKHO.SalesCatalogueStub.Api"
 
   - stage: IntegrationTestsQA
-    dependsOn: 
+    dependsOn:
       - DeployQA
     jobs:
       - job: IntegrationTests
@@ -282,12 +285,10 @@ stages:
               arguments: "--configuration Release --no-restore --runtime win10-x64 --framework netcoreapp3.1"
               projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
             displayName: "dotnet build UKHO.SalesCatalogueStub.Api.IntegrationTests"
-          
+
           - task: DotNetCoreCLI@2
             inputs:
-              command: 'test'
+              command: "test"
               projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
               arguments: "--configuration Release --no-build --runtime win10-x64"
-            displayName: 'dotnet test UKHO.SalesCatalogueStub.Api.IntegrationTests'
-
-
+            displayName: "dotnet test UKHO.SalesCatalogueStub.Api.IntegrationTests"
