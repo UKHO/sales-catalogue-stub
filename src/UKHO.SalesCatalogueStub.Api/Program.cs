@@ -34,9 +34,9 @@ namespace UKHO.SalesCatalogueStub.Api
                     webBuilder.UseStartup<Startup>();
                 }).ConfigureAppConfiguration(builder =>
                 {
-                    var azureAppConfConnectionString = Environment.GetEnvironmentVariable("AZURE_APP_CONFIGURATION_CONNECTION_STRING");
+                    var azureAppConfConnectionString = Environment.GetEnvironmentVariable("SCS_AZURE_APP_CONFIGURATION_CONNECTION_STRING");
 
-                    var keyVaultAddress = Environment.GetEnvironmentVariable("KEY_VAULT_ADDRESS");
+                    var keyVaultAddress = Environment.GetEnvironmentVariable("SCS_KEY_VAULT_ADDRESS");
                     var tokenProvider = new AzureServiceTokenProvider();
 
                     var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));

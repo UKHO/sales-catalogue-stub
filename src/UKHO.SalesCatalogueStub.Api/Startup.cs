@@ -16,6 +16,7 @@ using System.Linq;
 using System.Reflection;
 using UKHO.Logging.EventHubLogProvider;
 using UKHO.SalesCatalogueStub.Api.Config;
+using UKHO.SalesCatalogueStub.Api.Configuration;
 using UKHO.SalesCatalogueStub.Api.Filters;
 
 namespace UKHO.SalesCatalogueStub.Api
@@ -125,6 +126,16 @@ namespace UKHO.SalesCatalogueStub.Api
             });
 
             services.AddHealthChecks();
+
+
+            var azureAdConfiguration = new AzureADConfiguration();
+            Configuration.Bind("AzureADConfiguration", azureAdConfiguration);
+
+            if (string.IsNullOrWhiteSpace(azureAdConfiguration.ClientId))
+            {
+                throw new ApplicationException("Failed to get AD Configuration");
+            }
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
