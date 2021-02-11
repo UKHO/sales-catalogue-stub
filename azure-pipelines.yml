@@ -248,8 +248,8 @@ stages:
                     APP-SERVICE-NAME: $(PIPELINE-APP-SERVICE-NAME)
                   displayName: "Azure App Service Deploy"
                   inputs:
-                    ConnectedServiceName: '$(CONNECTED_SERVICE_NAME)'
-                    WebAppName: '$(APP-SERVICE-NAME)'
+                    ConnectedServiceName: $(CONNECTED_SERVICE_NAME)
+                    WebAppName: $(APP-SERVICE-NAME)
                     packageForLinux: "$(Pipeline.Workspace)/UKHO.SalesCatalogueStub.Api"
 
   - stage: IntegrationTestsQA
