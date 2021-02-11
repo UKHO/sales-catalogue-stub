@@ -174,7 +174,7 @@ stages:
                     APP-SERVICE-NAME: $(PIPELINE-APP-SERVICE-NAME)
                   displayName: "Azure App Service Deploy"
                   inputs:
-                    ConnectedServiceName: $(serviceConnection)
+                    ConnectedServiceName: M-SalesCatStub-Dev-SC
                     WebAppName: $(APP-SERVICE-NAME)
                     packageForLinux: "$(Pipeline.Workspace)/UKHO.SalesCatalogueStub.Api"
 
@@ -243,11 +243,10 @@ stages:
                   artifact: UKHO.SalesCatalogueStub.Api
                 - task: AzureRmWebAppDeployment@4
                   env:
-                    CONNECTED_SERVICE_NAME: $(PIPELINE-CONNECTED-SERVICE-NAME-DEV)
                     APP-SERVICE-NAME: $(PIPELINE-APP-SERVICE-NAME)
                   displayName: "Azure App Service Deploy"
                   inputs:
-                    ConnectedServiceName: $(CONNECTED_SERVICE_NAME)
+                    ConnectedServiceName: M-SalesCatStub-QA-SC
                     WebAppName: $(APP-SERVICE-NAME)
                     packageForLinux: "$(Pipeline.Workspace)/UKHO.SalesCatalogueStub.Api"
 
