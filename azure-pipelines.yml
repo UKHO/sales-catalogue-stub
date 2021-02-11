@@ -155,6 +155,7 @@ stages:
     dependsOn:
       - Build
     variables:
+      serviceConnection: $(PIPELINE-APP-SERVICE-NAME)
       - group: SalesCatStubDEV
     condition: or(eq(variables['Build.Reason'], 'Manual'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
     jobs:
@@ -170,12 +171,11 @@ stages:
                   artifact: UKHO.SalesCatalogueStub.Api
                 - task: AzureRmWebAppDeployment@4
                   env:
-                    CONNECTED_SERVICE_NAME: $(PIPELINE-APP-SERVICE-NAME)
                     APP-SERVICE-NAME: $(PIPELINE-APP-SERVICE-NAME)
                   displayName: "Azure App Service Deploy"
                   inputs:
-                    ConnectedServiceName: '$(CONNECTED_SERVICE_NAME)'
-                    WebAppName: '$(APP-SERVICE-NAME)'
+                    ConnectedServiceName: $(serviceConnection)
+                    WebAppName: $(APP-SERVICE-NAME)
                     packageForLinux: "$(Pipeline.Workspace)/UKHO.SalesCatalogueStub.Api"
 
   - stage: IntegrationTestsDev
