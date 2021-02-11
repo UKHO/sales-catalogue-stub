@@ -172,7 +172,7 @@ stages:
                 - task: AzureRmWebAppDeployment@4
                   displayName: "Azure App Service Deploy"
                   inputs:
-                    ConnectedServiceName: $(PIPELINE-CONNECTED-SERVICE-NAME)
+                    azureSubscription: $(PIPELINE-CONNECTED-SERVICE-NAME)
                     WebAppName: $(PIPELINE-APP-SERVICE-NAME)
                     # ConnectedServiceName: M-SalesCatStub-Dev-SC
                     # WebAppName: M-SalesCatStub-api-Dev-appservice
@@ -244,7 +244,7 @@ stages:
                 - task: AzureRmWebAppDeployment@4
                   displayName: "Azure App Service Deploy"
                   inputs:
-                    ConnectedServiceName: $(PIPELINE-CONNECTED-SERVICE-NAME)
+                    azureSubscription: $(PIPELINE-CONNECTED-SERVICE-NAME)
                     WebAppName: $(PIPELINE-APP-SERVICE-NAME)
                     #ConnectedServiceName: M-SalesCatStub-QA-SC
                     #WebAppName: M-SalesCatStub-api-QA-appservice
