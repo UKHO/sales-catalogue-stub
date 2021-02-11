@@ -155,8 +155,8 @@ stages:
     dependsOn:
       - Build
     variables:
-      serviceConnection: $(PIPELINE-APP-SERVICE-NAME)
       - group: SalesCatStubDEV
+      serviceConnection: $(PIPELINE-APP-SERVICE-NAME)
     condition: or(eq(variables['Build.Reason'], 'Manual'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
     jobs:
       - deployment: DeploySalesCatalogueStubApiDev
