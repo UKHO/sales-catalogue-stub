@@ -169,12 +169,13 @@ stages:
                 - download: current
                   artifact: UKHO.SalesCatalogueStub.Api
                 - task: AzureRmWebAppDeployment@4
+                  env:
+                    CONNECTED_SERVICE_NAME: $(PIPELINE-APP-SERVICE-NAME)
+                    APP-SERVICE-NAME: $(PIPELINE-APP-SERVICE-NAME)
                   displayName: "Azure App Service Deploy"
                   inputs:
-                    #ConnectedServiceName: $(PIPELINE-CONNECTED-SERVICE-NAME)
-                    WebAppName: $(PIPELINE-APP-SERVICE-NAME)
-                    ConnectedServiceName: M-SalesCatStub-Dev-SC
-                    # WebAppName: M-SalesCatStub-api-Dev-appservice
+                    ConnectedServiceName: '$(CONNECTED_SERVICE_NAME)'
+                    WebAppName: '$(APP-SERVICE-NAME)'
                     packageForLinux: "$(Pipeline.Workspace)/UKHO.SalesCatalogueStub.Api"
 
   - stage: IntegrationTestsDev
@@ -241,12 +242,13 @@ stages:
                 - download: current
                   artifact: UKHO.SalesCatalogueStub.Api
                 - task: AzureRmWebAppDeployment@4
+                  env:
+                    CONNECTED_SERVICE_NAME: $(PIPELINE-APP-SERVICE-NAME)
+                    APP-SERVICE-NAME: $(PIPELINE-APP-SERVICE-NAME)
                   displayName: "Azure App Service Deploy"
                   inputs:
-                    #ConnectedServiceName: $(PIPELINE-CONNECTED-SERVICE-NAME)
-                    WebAppName: $(PIPELINE-APP-SERVICE-NAME)
-                    ConnectedServiceName: M-SalesCatStub-QA-SC
-                    #WebAppName: M-SalesCatStub-api-QA-appservice
+                    ConnectedServiceName: '$(CONNECTED_SERVICE_NAME)'
+                    WebAppName: '$(APP-SERVICE-NAME)'
                     packageForLinux: "$(Pipeline.Workspace)/UKHO.SalesCatalogueStub.Api"
 
   - stage: IntegrationTestsQA
