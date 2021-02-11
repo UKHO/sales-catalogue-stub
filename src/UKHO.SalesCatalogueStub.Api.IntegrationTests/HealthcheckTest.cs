@@ -10,7 +10,7 @@ namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
         [Test]
         public async Task Test_HealthcheckTest()
         {
-            var healthcheckUrl = new Uri("https://localhost:44325/health", UriKind.Absolute);
+            var healthcheckUrl = new Uri("https://m-salescatstub-api-dev-appservice.azurewebsites.net/health", UriKind.Absolute);
             var isSuccess = false;
             var returnedValue = "";
 

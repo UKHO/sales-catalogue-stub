@@ -13,6 +13,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DocumentationFile>obj\Debug\netcoreapp3.1\UKHO.SalesCatalogueStub.Api.xml\UKHO.SalesCatalogueStub.Api.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
