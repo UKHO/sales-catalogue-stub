@@ -243,7 +243,8 @@ stages:
                   artifact: UKHO.SalesCatalogueStub.Api
                 - task: AzureRmWebAppDeployment@4
                   env:
-                    CONNECTED_SERVICE_NAME: $(PIPELINE-APP-SERVICE-NAME)
+                    #CONNECTED_SERVICE_NAME: $(PIPELINE-APP-SERVICE-NAME)
+                    CONNECTED_SERVICE_NAME: M-SalesCatStub-Dev-SC
                     APP-SERVICE-NAME: $(PIPELINE-APP-SERVICE-NAME)
                   displayName: "Azure App Service Deploy"
                   inputs:
