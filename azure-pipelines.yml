@@ -8,20 +8,20 @@ trigger:
       - src/*
 
 schedules:
-- cron: "0 0 * * Mon-Fri"
-  displayName: Nightly build
-  branches:
-    include:
-    - main
-  always: true
+  - cron: "0 0 * * Mon-Fri"
+    displayName: Nightly build
+    branches:
+      include:
+        - main
+    always: true
 
 resources:
   repositories:
-  - repository: covscan
-    type: github
-    name: UKHO/coverityscan-buildtemplates
-    endpoint: UKHO
-    ref: refs/heads/master
+    - repository: covscan
+      type: github
+      name: UKHO/coverityscan-buildtemplates
+      endpoint: UKHO
+      ref: refs/heads/master
 
 variables:
   - group: Covscan-vars
@@ -44,7 +44,7 @@ stages:
               BuildCommand: "$(Build.Repository.LocalPath)/sales-catalogue-stub/src/UKHO.SalesCatalogueStub.Api/UKHO.SalesCatalogueStub.Api.csproj"
               StripPath: $(Build.Repository.LocalPath)/sales-catalogue-stub/src/UKHO.SalesCatalogueStub.Api
               CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
-        # condition: or(eq(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/main')))
+
       - job: RestoreBuildAndDeploy
         pool: NautilusBuild
 
@@ -150,3 +150,144 @@ stages:
             inputs:
               targetType: inline
               script: Invoke-VulnerabilityCheck -ReportLocation $(Build.SourcesDirectory)\DCReport\*
+
+  - stage: DeployDev
+    dependsOn:
+      - Build
+    variables:
+      - group: SalesCatStubDEV
+    condition: or(eq(variables['Build.Reason'], 'Manual'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: DeploySalesCatalogueStubApiDev
+        displayName: Deploy Sales Catalogue Stub API Dev
+        pool: "UKHO Ubuntu 1804"
+        environment: "SalesCatStubDev"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: UKHO.SalesCatalogueStub.Api
+                - task: AzureRmWebAppDeployment@4
+                  displayName: "Azure App Service Deploy"
+                  inputs:
+                    ConnectedServiceName: M-SalesCatStub-Dev-SC
+                    WebAppName: $(PIPELINE-APP-SERVICE-NAME)
+                    packageForLinux: "$(Pipeline.Workspace)/UKHO.SalesCatalogueStub.Api"
+
+  - stage: IntegrationTestsDev
+    dependsOn:
+      - DeployDev
+    jobs:
+      - job: IntegrationTests
+        pool: NautilusBuild
+
+        workspace:
+          clean: all
+
+        steps:
+          - task: UseDotNet@2
+            displayName: "Use .NET Core 3.1.x SDK"
+            inputs:
+              packageType: sdk
+              version: 3.1.x
+              installationPath: $(Agent.ToolsDirectory)\\dotnet
+
+          - task: DownloadSecureFile@1
+            inputs:
+              secureFile: "SalesCatalogueStub_Nuget_Config"
+            name: "SalesCatalogueStub_Nuget_Config"
+            displayName: "Download Nuget.config from Secure Files"
+
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: "restore"
+              arguments: "--configuration Release --runtime win10-x64"
+              projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
+              feedsToUse: "config"
+              nugetConfigPath: "$(SalesCatalogueStub_Nuget_Config.secureFilePath)"
+            displayName: "dotnet restore UKHO.SalesCatalogueStub.Api.IntegrationTests"
+
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: "build"
+              arguments: "--configuration Release --no-restore --runtime win10-x64 --framework netcoreapp3.1"
+              projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
+            displayName: "dotnet build UKHO.SalesCatalogueStub.Api.IntegrationTests"
+
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: "test"
+              projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
+              arguments: "--configuration Release --no-build --runtime win10-x64"
+            displayName: "dotnet test UKHO.SalesCatalogueStub.Api.IntegrationTests"
+
+  - stage: DeployQA
+    dependsOn:
+      - IntegrationTestsDev
+    variables:
+      - group: SalesCatStubQA
+    jobs:
+      - deployment: DeploySalesCatalogueStubApiQa
+        displayName: Deploy Sales Catalogue Stub API QA
+        pool: "UKHO Ubuntu 1804"
+        environment: "SalesCatStubQA"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: UKHO.SalesCatalogueStub.Api
+                - task: AzureRmWebAppDeployment@4
+                  displayName: "Azure App Service Deploy"
+                  inputs:
+                    ConnectedServiceName: M-SalesCatStub-QA-SC
+                    WebAppName: $(PIPELINE-APP-SERVICE-NAME)
+                    packageForLinux: "$(Pipeline.Workspace)/UKHO.SalesCatalogueStub.Api"
+
+  - stage: IntegrationTestsQA
+    dependsOn:
+      - DeployQA
+    jobs:
+      - job: IntegrationTests
+        pool: NautilusBuild
+
+        workspace:
+          clean: all
+
+        steps:
+          - task: UseDotNet@2
+            displayName: "Use .NET Core 3.1.x SDK"
+            inputs:
+              packageType: sdk
+              version: 3.1.x
+              installationPath: $(Agent.ToolsDirectory)\\dotnet
+
+          - task: DownloadSecureFile@1
+            inputs:
+              secureFile: "SalesCatalogueStub_Nuget_Config"
+            name: "SalesCatalogueStub_Nuget_Config"
+            displayName: "Download Nuget.config from Secure Files"
+
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: "restore"
+              arguments: "--configuration Release --runtime win10-x64"
+              projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
+              feedsToUse: "config"
+              nugetConfigPath: "$(SalesCatalogueStub_Nuget_Config.secureFilePath)"
+            displayName: "dotnet restore UKHO.SalesCatalogueStub.Api.IntegrationTests"
+
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: "build"
+              arguments: "--configuration Release --no-restore --runtime win10-x64 --framework netcoreapp3.1"
+              projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
+            displayName: "dotnet build UKHO.SalesCatalogueStub.Api.IntegrationTests"
+
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: "test"
+              projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
+              arguments: "--configuration Release --no-build --runtime win10-x64"
+            displayName: "dotnet test UKHO.SalesCatalogueStub.Api.IntegrationTests"
