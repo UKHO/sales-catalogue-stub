@@ -65,6 +65,18 @@ resource "azurerm_key_vault_access_policy" "kvpolicy" {
     "list",
   ]
 }
+
+resource "azurerm_key_vault_access_policy" "kvpolicygroup" {
+  key_vault_id = var.key_vault_id
+  tenant_id = azurerm_app_service.main.identity.0.tenant_id
+  object_id = var.kv_access_policy_group_object_id
+  secret_permissions = [
+    "get",
+    "list",
+    "set",
+  ]
+}
+
 resource "azurerm_app_service_virtual_network_swift_connection" "main" {
   app_service_id = azurerm_app_service.main.id
   subnet_id      = data.azurerm_subnet.subnet.id

@@ -59,29 +59,30 @@ module "app_service_plan" {
 }
 
 module "app_service" {
-  source                   = "./modules/AppService"
-  deploy_environment       = var.DEPLOY_ENVIRONMENT
-  appconfiguration         = module.app_config.this_connection_string
-  key_vault_address        = module.key_vault.vault_uri
-  key_vault_id             = module.key_vault.id
-  servicename              = var.SERVICENAME
-  role                     = local.api_role
-  env_context              = var.ENV_CONTEXT
-  website_dns_server       = var.WEBSITE_DNS_SERVER
-  resource_group_name      = module.api_rg.name
-  resource_group_location  = module.api_rg.location
-  resource_group_id        = module.api_rg.id
-  app_service_plan_id      = module.app_service_plan.this_id
-  https_only               = true
-  dotnet_framework_version = "v4.0"
-  always_on                = true
-  run_from_package         = "0"
-  identity_type            = "SystemAssigned"
-  eng_outgoing_ip          = var.API_ENG_OUTGOING_IP
-  ukho_main_outgoing_ip    = var.API_UKHO_MAIN_OUTGOING_IP
-  spoke_vnet_name          = var.SPOKE_VNET_NAME
-  spoke_subnet_name        = var.SPOKE_SUBNET_NAME
-  spoke_rg                 = var.SPOKE_RG
+  source                           = "./modules/AppService"
+  deploy_environment               = var.DEPLOY_ENVIRONMENT
+  appconfiguration                 = module.app_config.this_connection_string
+  key_vault_address                = module.key_vault.vault_uri
+  key_vault_id                     = module.key_vault.id
+  servicename                      = var.SERVICENAME
+  role                             = local.api_role
+  env_context                      = var.ENV_CONTEXT
+  website_dns_server               = var.WEBSITE_DNS_SERVER
+  resource_group_name              = module.api_rg.name
+  resource_group_location          = module.api_rg.location
+  resource_group_id                = module.api_rg.id
+  app_service_plan_id              = module.app_service_plan.this_id
+  https_only                       = true
+  dotnet_framework_version         = "v4.0"
+  always_on                        = true
+  run_from_package                 = "0"
+  identity_type                    = "SystemAssigned"
+  eng_outgoing_ip                  = var.API_ENG_OUTGOING_IP
+  ukho_main_outgoing_ip            = var.API_UKHO_MAIN_OUTGOING_IP
+  spoke_vnet_name                  = var.SPOKE_VNET_NAME
+  spoke_subnet_name                = var.SPOKE_SUBNET_NAME
+  spoke_rg                         = var.SPOKE_RG
+  kv_access_policy_group_object_id = var.KV_ACCESS_POLICY_GROUP_OBJECT_ID
 }
 
 module "event_hub_rg" {
