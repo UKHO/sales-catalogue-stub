@@ -3,10 +3,10 @@
 namespace UKHO.SalesCatalogueStub.Api.Configuration
 {
     /// <summary>
-    /// AzureADConfiguration: Getting connection setting for KV and App config
+    /// 
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class AzureADConfiguration
+    public class AppRegistrationConfig
     {
         /// <summary>
         /// 

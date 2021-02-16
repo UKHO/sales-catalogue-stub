@@ -1,9 +1,12 @@
-﻿namespace UKHO.SalesCatalogueStub.Api.Config
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace UKHO.SalesCatalogueStub.Api.Configuration
 {
     /// <summary>
     /// 
     /// </summary>
-    public class EventHubLoggingConfiguration
+    [ExcludeFromCodeCoverage]
+    public class EventHubLoggingConfig
     {
         /// <summary>
         /// 
