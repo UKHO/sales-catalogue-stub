@@ -18,6 +18,7 @@ locals {
   api_role       = "api"
   appconfig_role = "appconfig"
   keyvault_role  = "keyvault"
+  event_hub_role = "logstash"
   tenant_id      = data.azurerm_client_config.current.tenant_id
 
 }

@@ -32,13 +32,13 @@ variable "app_service_plan_id" {
   type = string
 }
 variable "https_only" {
-  type = string
+  type = bool
 }
 variable "dotnet_framework_version" {
   type = string
 }
 variable "always_on" {
-  type = string
+  type = bool
 }
 variable "run_from_package" {
   type = string
