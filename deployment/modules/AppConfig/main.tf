@@ -14,10 +14,3 @@ resource "azurerm_app_configuration" "appconf" {
     ]
   }
 }
-
-resource "azurerm_management_lock" "appconflock" {
-  name       = "${local.basename}lock"
-  scope      = azurerm_app_configuration.appconf.id
-  lock_level = "CanNotDelete"
-  notes      = "Locked because we do not want to lose configuration values"
-}
