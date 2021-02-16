@@ -7,9 +7,10 @@ resource "azurerm_app_configuration" "appconf" {
   resource_group_name = var.resource_group_name
   sku                 = var.sku
 
-  lifecycle {
-    ignore_changes = [
-      tags
+   lifecycle {
+     prevent_destroy = true
+     ignore_changes = [
+      tags["COST_CENTRE"],
     ]
   }
 }

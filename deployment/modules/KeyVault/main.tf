@@ -9,9 +9,10 @@ resource "azurerm_key_vault" "keyvault" {
   sku_name            = var.sku_name
   tenant_id           = var.tenant_id
 
-  lifecycle {
-    ignore_changes = [
-      tags
+   lifecycle {
+     prevent_destroy = true
+     ignore_changes = [
+      tags["COST_CENTRE"],
     ]
   }
 }
