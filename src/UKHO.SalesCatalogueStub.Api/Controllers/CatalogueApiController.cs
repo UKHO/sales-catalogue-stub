@@ -8,6 +8,7 @@
  */
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
@@ -23,6 +24,17 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
     [ApiController]
     public class CatalogueApiController : ControllerBase
     {
+        private readonly ILogger _logger;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="logger"></param>
+        public CatalogueApiController(ILogger<CatalogueApiController> logger)
+        {
+            _logger = logger;
+        }
+
         /// <summary>
         /// Get the data for a catalogue
         /// </summary>
@@ -72,6 +84,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
 
             //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(500, default(DefaultErrorResponse));
+            _logger.LogInformation("Test");
             string exampleJson = null;
             exampleJson = "\"\"";
 

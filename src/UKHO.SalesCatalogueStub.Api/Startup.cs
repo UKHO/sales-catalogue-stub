@@ -1,13 +1,21 @@
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using UKHO.Logging.EventHubLogProvider;
+using UKHO.SalesCatalogueStub.Api.Config;
 using UKHO.SalesCatalogueStub.Api.Filters;
 
 namespace UKHO.SalesCatalogueStub.Api
@@ -17,6 +25,8 @@ namespace UKHO.SalesCatalogueStub.Api
     /// </summary>
     public class Startup
     {
+        private IHttpContextAccessor _httpContextAccessor;
+
         private readonly IWebHostEnvironment _hostingEnvironment;
 
         /// <summary>
@@ -67,7 +77,8 @@ namespace UKHO.SalesCatalogueStub.Api
                         }
                     });
                     c.CustomSchemaIds(type => type.FullName);
-                    c.IncludeXmlComments($"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}{_hostingEnvironment.ApplicationName}.xml");
+                    c.IncludeXmlComments(
+                        $"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}{_hostingEnvironment.ApplicationName}.xml");
                     // Sets the basePath property in the Swagger document generated
                     c.DocumentFilter<BasePathFilter>("/v1/productData");
 
@@ -75,6 +86,43 @@ namespace UKHO.SalesCatalogueStub.Api
                     // Use [ValidateModelState] on Actions to actually validate it in C# as well!
                     c.OperationFilter<GeneratePathParamsValidationFilter>();
                 });
+
+
+            var eventhubLoggingConfig = new EventHubLoggingConfiguration();
+            Configuration.GetSection("EventHubLoggingConfiguration").Bind(eventhubLoggingConfig);
+
+            services.AddHttpContextAccessor();
+
+            services.AddLogging(builder =>
+            {
+
+                builder.AddAzureWebAppDiagnostics();
+                builder.AddEventHub(options =>
+                {
+                    options.Environment = eventhubLoggingConfig.Environment;
+                    options.DefaultMinimumLogLevel =
+                        (LogLevel)Enum.Parse(typeof(LogLevel),
+                            eventhubLoggingConfig
+                                .MinimumLoggingLevel, true);
+
+                    options.MinimumLogLevels["UKHO"] =
+                        (LogLevel)Enum.Parse(typeof(LogLevel),
+                            eventhubLoggingConfig
+                                .UkhoMinimumLoggingLevel,
+                            true);
+
+                    options.EventHubConnectionString =
+                        eventhubLoggingConfig.EventHubConnectionString;
+
+                    options.EventHubEntityPath =
+                        eventhubLoggingConfig.EntityPath;
+
+                    options.System = eventhubLoggingConfig.System;
+                    options.Service = eventhubLoggingConfig.Service;
+                    options.NodeName = eventhubLoggingConfig.NodeName;
+                    options.AdditionalValuesProvider = ConfigAdditionalValuesProvider;
+                });
+            });
 
             services.AddHealthChecks();
         }
@@ -85,7 +133,8 @@ namespace UKHO.SalesCatalogueStub.Api
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        /// <param name="httpContextAccessor"></param>
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHttpContextAccessor httpContextAccessor)
         {
             if (env.IsDevelopment())
             {
@@ -109,7 +158,6 @@ namespace UKHO.SalesCatalogueStub.Api
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/1/swagger.json", "Sales Catalogue Service API Stub");
-
             });
 
             app.UseEndpoints(endpoints =>
@@ -117,6 +165,28 @@ namespace UKHO.SalesCatalogueStub.Api
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/health");
             });
+
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private void ConfigAdditionalValuesProvider(IDictionary<string, object> additionalValues)
+        {
+            if (_httpContextAccessor.HttpContext != null)
+            {
+                additionalValues["_RemoteIPAddress"] =
+                    _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
+
+                additionalValues["_User-Agent"] =
+                    _httpContextAccessor.HttpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? string.Empty;
+
+                additionalValues["_AssemblyVersion"] = Assembly
+                    .GetExecutingAssembly()
+                    .GetCustomAttributes<AssemblyFileVersionAttribute>().Single()
+                    .Version;
+
+                additionalValues["_X-Correlation-ID"] =
+                    _httpContextAccessor.HttpContext.Request.Headers?[""].FirstOrDefault() ?? string.Empty;
+            }
         }
     }
 }
