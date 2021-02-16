@@ -10,7 +10,7 @@ resource "azurerm_app_configuration" "appconf" {
    lifecycle {
      prevent_destroy = true
      ignore_changes = [
-      tags["COST_CENTRE"],
+      tags
     ]
   }
 }

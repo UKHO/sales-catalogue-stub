@@ -12,7 +12,7 @@ resource "azurerm_key_vault" "keyvault" {
    lifecycle {
      prevent_destroy = true
      ignore_changes = [
-      tags["COST_CENTRE"],
+      tags
     ]
   }
 }
