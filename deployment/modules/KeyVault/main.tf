@@ -16,3 +16,10 @@ resource "azurerm_key_vault" "keyvault" {
     ]
   }
 }
+
+resource "azurerm_management_lock" "keyvaultlock" {
+  name       = "${local.basename}lock"
+  scope      = azurerm_key_vault.keyvault.id
+  lock_level = "CanNotDelete"
+  notes      = "Locked because we do not want to lose configuration values"
+}
