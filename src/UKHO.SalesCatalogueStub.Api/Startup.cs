@@ -128,11 +128,11 @@ namespace UKHO.SalesCatalogueStub.Api
 
 
             var appRegistrationConfig = new AppRegistrationConfig();
-            Configuration.GetSection("AzureAD").Bind(appRegistrationConfig);
+            Configuration.GetSection("AppRegistration").Bind(appRegistrationConfig);
 
             if (string.IsNullOrWhiteSpace(appRegistrationConfig.ClientId))
             {
-                throw new ApplicationException("Failed to get AD Configuration");
+                throw new ApplicationException("Failed to get App Registration Config");
             }
 
         }
