@@ -70,3 +70,7 @@ variable "spoke_subnet_name" {
 variable "spoke_rg" {
   type = string
 }
+
+variable "kv_access_policy_group_object_id" {
+  type = string
+}

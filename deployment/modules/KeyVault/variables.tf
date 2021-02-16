@@ -19,7 +19,3 @@ variable "resource_group_location" {
 variable "sku_name" {
   type = string
 }
-
-variable "kv_access_policy_group_object_id" {
-  type = string
-}
