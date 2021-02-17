@@ -178,6 +178,8 @@ stages:
   - stage: IntegrationTestsDev
     dependsOn:
       - DeployDev
+    variables:
+      - group: SalesCatStubDEV
     jobs:
       - job: IntegrationTests
         pool: NautilusBuild
@@ -251,6 +253,8 @@ stages:
   - stage: IntegrationTestsQA
     dependsOn:
       - DeployQA
+    variables:
+      - group: SalesCatStubQA
     jobs:
       - job: IntegrationTests
         pool: NautilusBuild
