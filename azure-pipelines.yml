@@ -219,7 +219,7 @@ stages:
 
           - task: AzureCLI@2
             inputs:
-              azureSubscription: 'M-SalesCatStub-QA-SC'
+              azureSubscription: 'M-SalesCatStub-Dev-SC'
               scriptLocation: 'inlineScript'
               scriptType: 'pscore'
               inlineScript: |
