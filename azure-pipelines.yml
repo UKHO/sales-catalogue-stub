@@ -201,6 +201,14 @@ stages:
             name: "SalesCatalogueStub_Nuget_Config"
             displayName: "Download Nuget.config from Secure Files"
 
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: 'M-SalesCatStub-Dev-SC'
+              scriptLocation: 'pscore'
+              inlineScript: |
+                az login --allow-no-subscription
+            displayName: 'Login to Azure CLI'
+
           - task: DotNetCoreCLI@2
             inputs:
               command: "restore"
@@ -275,6 +283,14 @@ stages:
               secureFile: "SalesCatalogueStub_Nuget_Config"
             name: "SalesCatalogueStub_Nuget_Config"
             displayName: "Download Nuget.config from Secure Files"
+            
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: 'M-SalesCatStub-QA-SC'
+              scriptLocation: 'pscore'
+              inlineScript: |
+                az login --allow-no-subscription
+            displayName: 'Login to Azure CLI'
 
           - task: DotNetCoreCLI@2
             inputs:
