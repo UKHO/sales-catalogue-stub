@@ -207,7 +207,8 @@ stages:
               scriptLocation: 'inlineScript'
               scriptType: 'pscore'
               inlineScript: |
-                az login --allow-no-subscription
+                az --version
+                az account show
             displayName: 'Login to Azure CLI'
 
           - task: DotNetCoreCLI@2
@@ -291,7 +292,8 @@ stages:
               scriptLocation: 'inlineScript'
               scriptType: 'pscore'
               inlineScript: |
-                az login --allow-no-subscription
+                az --version
+                az account show
             displayName: 'Login to Azure CLI'
 
           - task: DotNetCoreCLI@2
