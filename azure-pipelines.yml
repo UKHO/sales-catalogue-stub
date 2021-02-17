@@ -221,6 +221,9 @@ stages:
               projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
               arguments: "--configuration Release --no-build --runtime win10-x64"
             displayName: "dotnet test UKHO.SalesCatalogueStub.Api.IntegrationTests"
+            env:
+              SCS_AZURE_APP_CONFIGURATION_CONNECTION_STRING: $(PIPELINE-SCS-AZURE-APP-CONFIGURATION-CONNECTION-STRING)
+              SCS_KEY_VAULT_ADDRESS: $(PIPELINE-SCS-KEY-VAULT-ADDRESS)
 
   - stage: DeployQA
     dependsOn:
@@ -291,3 +294,6 @@ stages:
               projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
               arguments: "--configuration Release --no-build --runtime win10-x64"
             displayName: "dotnet test UKHO.SalesCatalogueStub.Api.IntegrationTests"
+            env:
+              SCS_AZURE_APP_CONFIGURATION_CONNECTION_STRING: $(PIPELINE-SCS-AZURE-APP-CONFIGURATION-CONNECTION-STRING)
+              SCS_KEY_VAULT_ADDRESS: $(PIPELINE-SCS-KEY-VAULT-ADDRESS)
