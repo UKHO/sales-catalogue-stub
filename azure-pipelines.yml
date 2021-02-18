@@ -230,6 +230,14 @@ stages:
             env:
               SCS_AZURE_APP_CONFIGURATION_CONNECTION_STRING: $(PIPELINE-SCS-AZURE-APP-CONFIGURATION-CONNECTION-STRING)
               SCS_KEY_VAULT_ADDRESS: $(PIPELINE-SCS-KEY-VAULT-ADDRESS)
+              
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'VSTest'
+              testResultsFiles: '**/*.trx'
+              testRunTitle: 'IntegrationTests - $(System.StageName)'
 
   - stage: DeployQA
     dependsOn:
@@ -308,3 +316,11 @@ stages:
             env:
               SCS_AZURE_APP_CONFIGURATION_CONNECTION_STRING: $(PIPELINE-SCS-AZURE-APP-CONFIGURATION-CONNECTION-STRING)
               SCS_KEY_VAULT_ADDRESS: $(PIPELINE-SCS-KEY-VAULT-ADDRESS)
+
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'VSTest'
+              testResultsFiles: '**/*.trx'
+              testRunTitle: 'IntegrationTests - $(System.StageName)'
