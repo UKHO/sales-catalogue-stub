@@ -30,6 +30,7 @@ stages:
   - stage: Build
     jobs:
       - job: Coverity
+        condition: and(false, true)
         pool: NautilusBuild
         steps:
           - checkout: self
