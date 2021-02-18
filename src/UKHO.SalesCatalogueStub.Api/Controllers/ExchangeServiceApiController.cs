@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using IO.Swagger.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
@@ -22,6 +23,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
     /// <summary>
     /// </summary>
     [ApiController]
+    [Authorize(Roles = "ExchangeServiceReader")]
     public class ExchangeServiceApiController : ControllerBase
     {
         /// <summary>

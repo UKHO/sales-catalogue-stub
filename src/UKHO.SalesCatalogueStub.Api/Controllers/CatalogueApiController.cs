@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using UKHO.SalesCatalogueStub.Api.Attributes;
 using UKHO.SalesCatalogueStub.Api.Models;
 
@@ -22,6 +23,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
     /// 
     /// </summary>
     [ApiController]
+    [Authorize(Roles = "CatalogueReader")]
     public class CatalogueApiController : ControllerBase
     {
         private readonly ILogger _logger;

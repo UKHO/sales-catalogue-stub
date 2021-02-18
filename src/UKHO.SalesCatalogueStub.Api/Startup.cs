@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -85,8 +86,24 @@ namespace UKHO.SalesCatalogueStub.Api
                     // Include DataAnnotation attributes on Controller Action parameters as Swagger validation rules (e.g required, pattern, ..)
                     // Use [ValidateModelState] on Actions to actually validate it in C# as well!
                     c.OperationFilter<GeneratePathParamsValidationFilter>();
+
+                    c.AddSecurityDefinition("jwtBearerAuth", new OpenApiSecurityScheme
+                    {
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "bearer",
+                        BearerFormat = "JWT"
+                    });
                 });
 
+            var appRegistrationConfig = new AppRegistrationConfig();
+            Configuration.GetSection("AppRegistration").Bind(appRegistrationConfig);
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.Audience = appRegistrationConfig.ClientId;
+                    options.Authority = $"{appRegistrationConfig.MicrosoftOnlineLoginUrl}{appRegistrationConfig.TenantId}";
+                });
 
             var eventhubLoggingConfig = new EventHubLoggingConfig();
             Configuration.GetSection("EventHubLogging").Bind(eventhubLoggingConfig);
@@ -125,16 +142,6 @@ namespace UKHO.SalesCatalogueStub.Api
             });
 
             services.AddHealthChecks();
-
-
-            var appRegistrationConfig = new AppRegistrationConfig();
-            Configuration.GetSection("AppRegistration").Bind(appRegistrationConfig);
-
-            if (string.IsNullOrWhiteSpace(appRegistrationConfig.ClientId))
-            {
-                throw new ApplicationException("Failed to get App Registration Config");
-            }
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -161,7 +168,7 @@ namespace UKHO.SalesCatalogueStub.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseSwagger();
