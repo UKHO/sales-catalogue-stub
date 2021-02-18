@@ -36,3 +36,7 @@ variable "SPOKE_RG" {
 variable "KV_ACCESS_POLICY_GROUP_OBJECT_ID" {
   type = string
 }
+
+variable "KV_ACCESS_POLICY_PIPELINE_OBJECT_ID" {
+  type = string
+}

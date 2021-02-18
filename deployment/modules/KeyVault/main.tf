@@ -16,3 +16,24 @@ resource "azurerm_key_vault" "keyvault" {
     ]
   }
 }
+
+resource "azurerm_key_vault_access_policy" "kvpolicygroup" {
+  key_vault_id       = azurerm_key_vault.keyvault.id
+  tenant_id          = azurerm_key_vault.keyvault.tenant_id
+  object_id          = var.kv_access_policy_group_object_id
+  secret_permissions = [
+    "get",
+    "list",
+    "set",
+  ]
+}
+
+resource "azurerm_key_vault_access_policy" "kvpolicypipeline" {
+  key_vault_id       = azurerm_key_vault.keyvault.id
+  tenant_id          = azurerm_key_vault.keyvault.tenant_id
+  object_id          = var.kv_access_policy_pipeline_object_id
+  secret_permissions = [
+    "get",
+    "list",
+  ]
+}

@@ -16,6 +16,8 @@ module "key_vault" {
   resource_group_location = module.key_vault_rg.location
   resource_group_name     = module.key_vault_rg.name
   sku_name                = "standard"
+  kv_access_policy_group_object_id = var.KV_ACCESS_POLICY_GROUP_OBJECT_ID
+  kv_access_policy_pipeline_object_id = var.KV_ACCESS_POLICY_PIPELINE_OBJECT_ID
 }
 
 module "app_config_rg" {
@@ -82,7 +84,6 @@ module "app_service" {
   spoke_vnet_name                  = var.SPOKE_VNET_NAME
   spoke_subnet_name                = var.SPOKE_SUBNET_NAME
   spoke_rg                         = var.SPOKE_RG
-  kv_access_policy_group_object_id = var.KV_ACCESS_POLICY_GROUP_OBJECT_ID
 }
 
 module "event_hub_rg" {
