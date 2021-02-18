@@ -32,3 +32,11 @@ variable "SPOKE_SUBNET_NAME" {
 variable "SPOKE_RG" {
   type = string
 }
+
+variable "KV_ACCESS_POLICY_GROUP_OBJECT_ID" {
+  type = string
+}
+
+variable "KV_ACCESS_POLICY_PIPELINE_OBJECT_ID" {
+  type = string
+}

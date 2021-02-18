@@ -30,6 +30,7 @@ stages:
   - stage: Build
     jobs:
       - job: Coverity
+        condition: and(false, true)
         pool: NautilusBuild
         steps:
           - checkout: self
@@ -178,6 +179,8 @@ stages:
   - stage: IntegrationTestsDev
     dependsOn:
       - DeployDev
+    variables:
+      - group: SalesCatStubDEV
     jobs:
       - job: IntegrationTests
         pool: NautilusBuild
@@ -215,12 +218,26 @@ stages:
               projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
             displayName: "dotnet build UKHO.SalesCatalogueStub.Api.IntegrationTests"
 
-          - task: DotNetCoreCLI@2
+          - task: AzureCLI@2
             inputs:
-              command: "test"
-              projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
-              arguments: "--configuration Release --no-build --runtime win10-x64"
-            displayName: "dotnet test UKHO.SalesCatalogueStub.Api.IntegrationTests"
+              azureSubscription: 'M-SalesCatStub-Dev-SC'
+              scriptLocation: 'inlineScript'
+              scriptType: 'pscore'
+              inlineScript: |
+                dotnet test '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj' `
+                            --configuration Release --no-build --runtime win10-x64 --logger:trx
+            displayName: 'dotnet test UKHO.SalesCatalogueStub.Api.IntegrationTests'
+            env:
+              SCS_AZURE_APP_CONFIGURATION_CONNECTION_STRING: $(PIPELINE-SCS-AZURE-APP-CONFIGURATION-CONNECTION-STRING)
+              SCS_KEY_VAULT_ADDRESS: $(PIPELINE-SCS-KEY-VAULT-ADDRESS)
+              
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'VSTest'
+              testResultsFiles: '**/*.trx'
+              testRunTitle: 'IntegrationTests - $(System.StageName)'
 
   - stage: DeployQA
     dependsOn:
@@ -248,6 +265,8 @@ stages:
   - stage: IntegrationTestsQA
     dependsOn:
       - DeployQA
+    variables:
+      - group: SalesCatStubQA
     jobs:
       - job: IntegrationTests
         pool: NautilusBuild
@@ -285,9 +304,23 @@ stages:
               projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
             displayName: "dotnet build UKHO.SalesCatalogueStub.Api.IntegrationTests"
 
-          - task: DotNetCoreCLI@2
+          - task: AzureCLI@2
             inputs:
-              command: "test"
-              projects: '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj'
-              arguments: "--configuration Release --no-build --runtime win10-x64"
-            displayName: "dotnet test UKHO.SalesCatalogueStub.Api.IntegrationTests"
+              azureSubscription: 'M-SalesCatStub-QA-SC'
+              scriptLocation: 'inlineScript'
+              scriptType: 'pscore'
+              inlineScript: |
+                dotnet test '$(Build.SourcesDirectory)\\src\\UKHO.SalesCatalogueStub.Api.IntegrationTests\\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj' `
+                            --configuration Release --no-build --runtime win10-x64 --logger:trx
+            displayName: 'dotnet test UKHO.SalesCatalogueStub.Api.IntegrationTests'
+            env:
+              SCS_AZURE_APP_CONFIGURATION_CONNECTION_STRING: $(PIPELINE-SCS-AZURE-APP-CONFIGURATION-CONNECTION-STRING)
+              SCS_KEY_VAULT_ADDRESS: $(PIPELINE-SCS-KEY-VAULT-ADDRESS)
+
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'VSTest'
+              testResultsFiles: '**/*.trx'
+              testRunTitle: 'IntegrationTests - $(System.StageName)'

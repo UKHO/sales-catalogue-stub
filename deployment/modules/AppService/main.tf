@@ -38,11 +38,11 @@ resource "azurerm_app_service" "main" {
   }
 
   app_settings = {
-    "ENVIRONMENT"                               = var.env_context
-    "KEY_VAULT_ADDRESS"                         = var.key_vault_address
-    "AZURE_APP_CONFIGURATION_CONNECTION_STRING" = var.appconfiguration
-    "WEBSITE_RUN_FROM_PACKAGE"                  = var.run_from_package
-    "WEBSITE_DNS_SERVER"                        = var.website_dns_server
+    "ENVIRONMENT"                                   = var.env_context
+    "SCS_KEY_VAULT_ADDRESS"                         = var.key_vault_address
+    "SCS_AZURE_APP_CONFIGURATION_CONNECTION_STRING" = var.appconfiguration
+    "WEBSITE_RUN_FROM_PACKAGE"                      = var.run_from_package
+    "WEBSITE_DNS_SERVER"                            = var.website_dns_server
   }
 
   identity {
@@ -65,6 +65,7 @@ resource "azurerm_key_vault_access_policy" "kvpolicy" {
     "list",
   ]
 }
+
 resource "azurerm_app_service_virtual_network_swift_connection" "main" {
   app_service_id = azurerm_app_service.main.id
   subnet_id      = data.azurerm_subnet.subnet.id

@@ -4,6 +4,12 @@ resource "azurerm_eventhub_namespace" "eventhub_namespace" {
   resource_group_name = var.resource_group_name
   sku                 = var.sku
   capacity            = 2
+  
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_eventhub" "eventhub" {

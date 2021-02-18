@@ -1,4 +1,9 @@
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,13 +14,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using UKHO.Logging.EventHubLogProvider;
-using UKHO.SalesCatalogueStub.Api.Config;
+using UKHO.SalesCatalogueStub.Api.Configuration;
 using UKHO.SalesCatalogueStub.Api.Filters;
 
 namespace UKHO.SalesCatalogueStub.Api
@@ -88,8 +88,8 @@ namespace UKHO.SalesCatalogueStub.Api
                 });
 
 
-            var eventhubLoggingConfig = new EventHubLoggingConfiguration();
-            Configuration.GetSection("EventHubLoggingConfiguration").Bind(eventhubLoggingConfig);
+            var eventhubLoggingConfig = new EventHubLoggingConfig();
+            Configuration.GetSection("EventHubLogging").Bind(eventhubLoggingConfig);
 
             services.AddHttpContextAccessor();
 
@@ -125,6 +125,16 @@ namespace UKHO.SalesCatalogueStub.Api
             });
 
             services.AddHealthChecks();
+
+
+            var appRegistrationConfig = new AppRegistrationConfig();
+            Configuration.GetSection("AppRegistration").Bind(appRegistrationConfig);
+
+            if (string.IsNullOrWhiteSpace(appRegistrationConfig.ClientId))
+            {
+                throw new ApplicationException("Failed to get App Registration Config");
+            }
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
