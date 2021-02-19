@@ -3,12 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UKHO.SalesCatalogueStub.EF.Models
 {
-    public class ProductEditions
+    [Table("ProductEditions")]
+    public class ProductEditionsDto
     {
         [Column("ID")]
         public Guid Id { get; set; }
 
-        public virtual Products Product { get; set; }
+        public virtual ProductsDto Product { get; set; }
 
         public string EditionIdentifier { get; set; }
 

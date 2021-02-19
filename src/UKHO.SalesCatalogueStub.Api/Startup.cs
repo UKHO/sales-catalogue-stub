@@ -18,9 +18,9 @@ using System.Linq;
 using System.Reflection;
 using UKHO.Logging.EventHubLogProvider;
 using UKHO.SalesCatalogueStub.Api.Configuration;
-using UKHO.SalesCatalogueStub.Api.Database;
 using UKHO.SalesCatalogueStub.Api.Filters;
 using UKHO.SalesCatalogueStub.EF;
+using UKHO.SalesCatalogueStub.EF.Repositories;
 
 namespace UKHO.SalesCatalogueStub.Api
 {
@@ -149,6 +149,8 @@ namespace UKHO.SalesCatalogueStub.Api
 
             services.AddDbContext<SalesCatalogueStubDbContext>((serviceProvider, options) =>
                 options.UseLazyLoadingProxies().UseSqlServer(dbConnectionString));
+
+            services.AddScoped<IProductEditionRepository, ProductEditionRepository>();
 
             services.AddHealthChecks();
         }

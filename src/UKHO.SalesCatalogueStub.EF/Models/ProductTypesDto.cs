@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UKHO.SalesCatalogueStub.EF.Models
 {
-    public class ProductTypes
+    [Table("ProductTypes")]
+    public class ProductTypesDto
     {
         [Column("ID")]
         public Guid Id { get; set; }

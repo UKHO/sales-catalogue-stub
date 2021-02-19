@@ -4,7 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UKHO.SalesCatalogueStub.EF.Models
 {
-    public class Products
+    [Table("Products")]
+    public class ProductsDto
     {
         [Column("ID")]
         public Guid Id { get; set; }
@@ -17,9 +18,9 @@ namespace UKHO.SalesCatalogueStub.EF.Models
 
         public DateTime? LastUpdated { get; set; }
 
-        public virtual ProductTypes ProductType { get; set; }
+        public virtual ProductTypesDto ProductType { get; set; }
 
-        public virtual ICollection<ProductEditions> ProductEditions { get; set; }
+        public virtual ICollection<ProductEditionsDto> ProductEditions { get; set; }
 
 
     }

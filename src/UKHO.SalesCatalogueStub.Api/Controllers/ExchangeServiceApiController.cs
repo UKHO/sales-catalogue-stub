@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using UKHO.SalesCatalogueStub.Api.Attributes;
 using UKHO.SalesCatalogueStub.Api.Models;
-using UKHO.SalesCatalogueStub.EF;
+using UKHO.SalesCatalogueStub.EF.Repositories;
 using Products = UKHO.SalesCatalogueStub.Api.Models.Products;
 
 namespace UKHO.SalesCatalogueStub.Api.Controllers
@@ -18,12 +18,12 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
     [Authorize(Roles = "ExchangeServiceReader")]
     public class ExchangeServiceApiController : ControllerBase
     {
-        private readonly SalesCatalogueStubDbContext _dbContext;
+        private readonly IProductEditionRepository _productEditionRepository;
 
         /// <inheritdoc />
-        public ExchangeServiceApiController(SalesCatalogueStubDbContext dbContext)
+        public ExchangeServiceApiController(IProductEditionRepository productEditionRepository)
         {
-            _dbContext = dbContext;
+            _productEditionRepository = productEditionRepository;
         }
 
         /// <summary>
@@ -132,14 +132,9 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
 
             //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(500, default(DefaultErrorResponse));
-            string exampleJson = null;
-            exampleJson =
-                "{\n  \"productName\" : \"AU895561\",\n  \"editionNumber\" : 4,\n  \"updateNumber\" : [ 5, 6, 7 ]\n}";
+            var productVersions = _productEditionRepository.GetProductEditions(body);
 
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<Products>(exampleJson)
-            : default(Products);            //TODO: Change the data returned
-            return new ObjectResult(example);
+            return new ObjectResult(JsonConvert.SerializeObject(productVersions, Formatting.Indented));
         }
 
         /// <summary>
