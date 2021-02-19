@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using UKHO.SalesCatalogueStub.Api.Attributes;
 using UKHO.SalesCatalogueStub.Api.Models;
+using UKHO.SalesCatalogueStub.EF;
+using Products = UKHO.SalesCatalogueStub.Api.Models.Products;
 
 namespace UKHO.SalesCatalogueStub.Api.Controllers
 {
@@ -16,6 +18,14 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
     [Authorize(Roles = "ExchangeServiceReader")]
     public class ExchangeServiceApiController : ControllerBase
     {
+        private readonly SalesCatalogueStubDbContext _dbContext;
+
+        /// <inheritdoc />
+        public ExchangeServiceApiController(SalesCatalogueStubDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         /// <summary>
         /// Get the all releasable changes to products since a date
         /// </summary>

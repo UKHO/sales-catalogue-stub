@@ -1,13 +1,9 @@
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,9 +11,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using UKHO.Logging.EventHubLogProvider;
 using UKHO.SalesCatalogueStub.Api.Configuration;
+using UKHO.SalesCatalogueStub.Api.Database;
 using UKHO.SalesCatalogueStub.Api.Filters;
+using UKHO.SalesCatalogueStub.EF;
 
 namespace UKHO.SalesCatalogueStub.Api
 {
@@ -140,6 +143,12 @@ namespace UKHO.SalesCatalogueStub.Api
                     options.AdditionalValuesProvider = ConfigAdditionalValuesProvider;
                 });
             });
+
+            //TODO: Get from keyvault
+            var dbConnectionString = ConnectionString.Build("", "");
+
+            services.AddDbContext<SalesCatalogueStubDbContext>((serviceProvider, options) =>
+                options.UseLazyLoadingProxies().UseSqlServer(dbConnectionString));
 
             services.AddHealthChecks();
         }
