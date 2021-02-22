@@ -69,12 +69,6 @@ namespace UKHO.SalesCatalogueStub.EF.Models
             var upperLimit = LatestUpdateNumber;
             var lowerLimit = ReissueUpdateNumber == 0 ? ReissueUpdateNumber + 1 : ReissueUpdateNumber;
 
-            //Cancelled status count as an additional update
-            if (Status == ProductEditionStatusEnum.Cancelled)
-            {
-                upperLimit++;
-            }
-
             for (var i = lowerLimit; i <= upperLimit; i++)
             {
                 productUpdates.Add(i);
