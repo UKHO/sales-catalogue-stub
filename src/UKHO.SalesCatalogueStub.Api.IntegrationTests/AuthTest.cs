@@ -34,7 +34,7 @@ namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
         }
 
         [Test]
-        public async Task Test_AuthTest()
+        public async Task Test_When_Catalogue_Resource_Is_Requested_Then_Authorization_Is_Successful_And_Status_Code_Is_Successful()
         {
             var catalogueUrl = new Uri($"{_integrationTestConfig.SiteBaseUrl}/v1/productData/productType/catalogue/catalogueType", UriKind.Absolute);
 
@@ -49,6 +49,27 @@ namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
 
                 var result = await httpClient.GetAsync(catalogueUrl);
+
+                Assert.IsTrue(result.IsSuccessStatusCode);
+            }
+        }
+
+        [Test]
+        public async Task Test_When_ExchangeService_Resource_Is_Requested_Then_Authorization_Is_Successful_And_Status_Code_Is_Successful()
+        {
+            var exchangeService = new Uri($"{_integrationTestConfig.SiteBaseUrl}/v1/productData/productType/products/productIdentifiers", UriKind.Absolute);
+
+            using (var httpClient = new HttpClient())
+            {
+                var credential = new ClientSecretCredential(_appRegistrationClientConfig.TenantId, _appRegistrationClientConfig.ClientId, _appRegistrationClientConfig.ClientSecret);
+
+                var tokenRequest = new TokenRequestContext(new[] { $"{_appRegistrationConfig.ClientId}/.default" });
+
+                var token = await credential.GetTokenAsync(tokenRequest, CancellationToken.None);
+
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
+
+                var result = await httpClient.PostAsync(exchangeService, new StringContent("[\"string\"]"));
 
                 Assert.IsTrue(result.IsSuccessStatusCode);
             }
