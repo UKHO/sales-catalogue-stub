@@ -1,4 +1,4 @@
-﻿namespace UKHO.SalesCatalogueStub.EF.Models
+﻿namespace UKHO.SalesCatalogueStub.Api.EF.Models
 {
     public enum ProductTypeNameEnum
     {

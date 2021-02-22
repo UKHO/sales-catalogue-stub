@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UKHO.SalesCatalogueStub.EF.Models;
+using UKHO.SalesCatalogueStub.Api.EF.Models;
 
-namespace UKHO.SalesCatalogueStub.EF.Repositories
+namespace UKHO.SalesCatalogueStub.Api.EF.Repositories
 {
     public class ProductEditionRepository : IProductEditionRepository
     {

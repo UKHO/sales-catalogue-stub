@@ -1,6 +1,6 @@
 ﻿using System.Data.SqlClient;
 
-namespace UKHO.SalesCatalogueStub.EF
+namespace UKHO.SalesCatalogueStub.Api.EF
 {
     /// <summary>
     /// 

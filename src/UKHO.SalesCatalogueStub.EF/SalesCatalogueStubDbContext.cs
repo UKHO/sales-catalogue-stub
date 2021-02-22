@@ -2,9 +2,9 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
-using UKHO.SalesCatalogueStub.EF.Models;
+using UKHO.SalesCatalogueStub.Api.EF.Models;
 
-namespace UKHO.SalesCatalogueStub.EF
+namespace UKHO.SalesCatalogueStub.Api.EF
 {
     public sealed class SalesCatalogueStubDbContext : DbContext
     {

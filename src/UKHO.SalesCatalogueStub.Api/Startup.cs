@@ -18,10 +18,10 @@ using System.Linq;
 using System.Reflection;
 using UKHO.Logging.EventHubLogProvider;
 using UKHO.SalesCatalogueStub.Api.Configuration;
+using UKHO.SalesCatalogueStub.Api.EF;
+using UKHO.SalesCatalogueStub.Api.EF.Repositories;
 using UKHO.SalesCatalogueStub.Api.Filters;
 using UKHO.SalesCatalogueStub.Api.Middleware;
-using UKHO.SalesCatalogueStub.EF;
-using UKHO.SalesCatalogueStub.EF.Repositories;
 
 namespace UKHO.SalesCatalogueStub.Api
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace UKHO.SalesCatalogueStub.EF.Models
+namespace UKHO.SalesCatalogueStub.Api.EF.Models
 {
     [Table("Products")]
     public class ProductsDto

@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using UKHO.SalesCatalogueStub.Api.Attributes;
+using UKHO.SalesCatalogueStub.Api.EF.Repositories;
 using UKHO.SalesCatalogueStub.Api.Models;
-using UKHO.SalesCatalogueStub.EF.Repositories;
 using Products = UKHO.SalesCatalogueStub.Api.Models.Products;
 
 namespace UKHO.SalesCatalogueStub.Api.Controllers

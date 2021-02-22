@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using UKHO.SalesCatalogueStub.EF.Models;
+using UKHO.SalesCatalogueStub.Api.EF.Models;
 
-namespace UKHO.SalesCatalogueStub.EF.Repositories
+namespace UKHO.SalesCatalogueStub.Api.EF.Repositories
 {
     public interface IProductEditionRepository
     {

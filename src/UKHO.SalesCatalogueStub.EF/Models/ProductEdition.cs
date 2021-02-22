@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace UKHO.SalesCatalogueStub.EF.Models
+namespace UKHO.SalesCatalogueStub.Api.EF.Models
 {
     /// <summary>
     /// 

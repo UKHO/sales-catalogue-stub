@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UKHO.SalesCatalogueStub.EF\UKHO.SalesCatalogueStub.EF.csproj" />
+    <ProjectReference Include="..\UKHO.SalesCatalogueStub.EF\UKHO.SalesCatalogueStub.Api.EF.csproj" />
   </ItemGroup>
 
 </Project>

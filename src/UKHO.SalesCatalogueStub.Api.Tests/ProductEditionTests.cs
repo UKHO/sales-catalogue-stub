@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using UKHO.SalesCatalogueStub.EF.Models;
+using UKHO.SalesCatalogueStub.Api.EF.Models;
 
 namespace UKHO.SalesCatalogueStub.Api.Tests
 {
