@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
@@ -36,7 +37,7 @@ namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
         }
 
         [Test]
-        public async Task Test_When_Catalogue_Resource_Is_Requested_Then_Authorization_Is_Successful_And_Status_Code_Is_Successful()
+        public async Task Test_Given_Valid_Credentials_When_Catalogue_Resource_Is_Requested_Then_Authorization_Is_Successful_And_Status_Code_Is_Successful()
         {
             var catalogueUrl = new Uri($"{_integrationTestConfig.SiteBaseUrl}/v1/productData/productType/catalogue/catalogueType", UriKind.Absolute);
 
@@ -57,7 +58,7 @@ namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
         }
 
         [Test]
-        public async Task Test_When_ExchangeService_Resource_Is_Requested_Then_Authorization_Is_Successful_And_Status_Code_Is_Successful()
+        public async Task Test_Given_Valid_Credentials_When_ExchangeService_Resource_Is_Requested_Then_Authorization_Is_Successful_And_Status_Code_Is_Successful()
         {
             var exchangeService = new Uri($"{_integrationTestConfig.SiteBaseUrl}/v1/productData/productType/products/productIdentifiers", UriKind.Absolute);
 
@@ -74,6 +75,36 @@ namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
                 var result = await httpClient.PostAsync(exchangeService, new StringContent("[\"string\"]", Encoding.UTF8, MediaTypeNames.Application.Json));
 
                 Assert.IsTrue(result.IsSuccessStatusCode);
+            }
+        }
+
+        [Test]
+        public async Task Test_Given_Invalid_Token_When_Catalogue_Resource_Is_Requested_Then_Authorization_Is_Unsuccessful_And_Status_Code_Is_Unauthorized()
+        {
+            var catalogueUrl = new Uri($"{_integrationTestConfig.SiteBaseUrl}/v1/productData/productType/catalogue/catalogueType", UriKind.Absolute);
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "INVALID_TOKEN");
+
+                var result = await httpClient.GetAsync(catalogueUrl);
+
+                Assert.AreEqual(HttpStatusCode.Unauthorized, result.StatusCode);
+            }
+        }
+
+        [Test]
+        public async Task Test_Given_Invalid_Token_When_ExchangeService_Resource_Is_Requested_Then_Authorization_Is_Unsuccessful_And_Status_Code_Is_Unauthorized()
+        {
+            var exchangeService = new Uri($"{_integrationTestConfig.SiteBaseUrl}/v1/productData/productType/products/productIdentifiers", UriKind.Absolute);
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "INVALID_TOKEN");
+
+                var result = await httpClient.PostAsync(exchangeService, new StringContent("[\"string\"]", Encoding.UTF8, MediaTypeNames.Application.Json));
+
+                Assert.AreEqual(HttpStatusCode.Unauthorized, result.StatusCode);
             }
         }
     }
