@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
