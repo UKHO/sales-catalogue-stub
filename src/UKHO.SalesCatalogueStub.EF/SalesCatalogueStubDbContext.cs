@@ -11,7 +11,6 @@ namespace UKHO.SalesCatalogueStub.EF
         public SalesCatalogueStubDbContext(DbContextOptions<SalesCatalogueStubDbContext> options)
             : base(options)
         {
-            //TODO: Do we need to determine if Azure DevOps Build
             if (Database.GetDbConnection() is SqlConnection dbConnection)
             {
                 dbConnection.AccessToken = new AzureServiceTokenProvider()
