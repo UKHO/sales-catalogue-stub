@@ -83,7 +83,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
             // return StatusCode(500, default(DefaultErrorResponse));
             string exampleJson = null;
             exampleJson =
-                "{\n  \"productName\" : \"AU895561\",\n  \"editionNumber\" : 4,\n  \"updateNumber\" : [ 5, 6, 7 ]\n}";
+                "[{\n  \"productName\" : \"AU895561\",\n  \"editionNumber\" : 4,\n  \"updateNumber\" : [ 5, 6, 7 ]\n}]";
 
             var example = exampleJson != null
                 ? JsonConvert.DeserializeObject<Products>(exampleJson)

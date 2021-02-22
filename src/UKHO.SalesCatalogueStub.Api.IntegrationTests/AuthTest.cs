@@ -1,6 +1,8 @@
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mime;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Core;
@@ -69,7 +71,7 @@ namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
 
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
 
-                var result = await httpClient.PostAsync(exchangeService, new StringContent("[\"string\"]"));
+                var result = await httpClient.PostAsync(exchangeService, new StringContent("[\"string\"]", Encoding.UTF8, MediaTypeNames.Application.Json));
 
                 Assert.IsTrue(result.IsSuccessStatusCode);
             }
