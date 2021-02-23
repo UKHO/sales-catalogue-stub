@@ -107,5 +107,61 @@ namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
                 Assert.AreEqual(HttpStatusCode.Unauthorized, result.StatusCode);
             }
         }
+
+        [Test]
+        public async Task Test_Given_Empty_Token_When_Catalogue_Resource_Is_Requested_Then_Authorization_Is_Unsuccessful_And_Status_Code_Is_Unauthorized()
+        {
+            var catalogueUrl = new Uri($"{_integrationTestConfig.SiteBaseUrl}/v1/productData/productType/catalogue/catalogueType", UriKind.Absolute);
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", string.Empty);
+
+                var result = await httpClient.GetAsync(catalogueUrl);
+
+                Assert.AreEqual(HttpStatusCode.Unauthorized, result.StatusCode);
+            }
+        }
+
+        [Test]
+        public async Task Test_Given_Empty_Token_When_ExchangeService_Resource_Is_Requested_Then_Authorization_Is_Unsuccessful_And_Status_Code_Is_Unauthorized()
+        {
+            var exchangeService = new Uri($"{_integrationTestConfig.SiteBaseUrl}/v1/productData/productType/products/productIdentifiers", UriKind.Absolute);
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", string.Empty);
+
+                var result = await httpClient.PostAsync(exchangeService, new StringContent("[\"string\"]", Encoding.UTF8, MediaTypeNames.Application.Json));
+
+                Assert.AreEqual(HttpStatusCode.Unauthorized, result.StatusCode);
+            }
+        }
+
+        [Test]
+        public async Task Test_Given_Unpopulated_Authorization_Header_When_Catalogue_Resource_Is_Requested_Then_Authorization_Is_Unsuccessful_And_Status_Code_Is_Unauthorized()
+        {
+            var catalogueUrl = new Uri($"{_integrationTestConfig.SiteBaseUrl}/v1/productData/productType/catalogue/catalogueType", UriKind.Absolute);
+
+            using (var httpClient = new HttpClient())
+            {
+                var result = await httpClient.GetAsync(catalogueUrl);
+
+                Assert.AreEqual(HttpStatusCode.Unauthorized, result.StatusCode);
+            }
+        }
+
+        [Test]
+        public async Task Test_Given_Unpopulated_Authorization_Header_When_ExchangeService_Resource_Is_Requested_Then_Authorization_Is_Unsuccessful_And_Status_Code_Is_Unauthorized()
+        {
+            var exchangeService = new Uri($"{_integrationTestConfig.SiteBaseUrl}/v1/productData/productType/products/productIdentifiers", UriKind.Absolute);
+
+            using (var httpClient = new HttpClient())
+            {
+                var result = await httpClient.PostAsync(exchangeService, new StringContent("[\"string\"]", Encoding.UTF8, MediaTypeNames.Application.Json));
+
+                Assert.AreEqual(HttpStatusCode.Unauthorized, result.StatusCode);
+            }
+        }
     }
 }
