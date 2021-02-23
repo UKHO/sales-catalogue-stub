@@ -16,6 +16,7 @@ namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
         public void OneTimeSetUp()
         {
             var keyVaultConfigRoot = AzureKeyVaultConfigConfigurationRoot.Instance;
+
             _integrationTestConfig = new IntegrationTestConfig();
             keyVaultConfigRoot.GetSection("IntegrationTest").Bind(_integrationTestConfig);
         }

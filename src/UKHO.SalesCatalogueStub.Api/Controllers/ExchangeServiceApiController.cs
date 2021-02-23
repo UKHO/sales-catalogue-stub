@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using IO.Swagger.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
@@ -22,6 +23,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
     /// <summary>
     /// </summary>
     [ApiController]
+    [Authorize(Roles = "ExchangeServiceReader")]
     public class ExchangeServiceApiController : ControllerBase
     {
         /// <summary>
@@ -81,7 +83,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
             // return StatusCode(500, default(DefaultErrorResponse));
             string exampleJson = null;
             exampleJson =
-                "{\n  \"productName\" : \"AU895561\",\n  \"editionNumber\" : 4,\n  \"updateNumber\" : [ 5, 6, 7 ]\n}";
+                "[{\n  \"productName\" : \"AU895561\",\n  \"editionNumber\" : 4,\n  \"updateNumber\" : [ 5, 6, 7 ]\n}]";
 
             var example = exampleJson != null
                 ? JsonConvert.DeserializeObject<Products>(exampleJson)
