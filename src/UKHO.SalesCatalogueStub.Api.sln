@@ -6,10 +6,16 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.SalesCatalogueStub.Api", "UKHO.SalesCatalogueStub.Api\UKHO.SalesCatalogueStub.Api.csproj", "{1FC6AA95-B08D-4D8A-9285-ECFA236F1F70}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.SalesCatalogueStub.Api.IntegrationTests", "UKHO.SalesCatalogueStub.Api.IntegrationTests\UKHO.SalesCatalogueStub.Api.IntegrationTests.csproj", "{7F099E6E-D8DE-4CF6-9C82-4385560756AB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1FC6AA95-B08D-4D8A-9285-ECFA236F1F70} = {1FC6AA95-B08D-4D8A-9285-ECFA236F1F70}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.SalesCatalogueStub.Api.EF", "UKHO.SalesCatalogueStub.EF\UKHO.SalesCatalogueStub.Api.EF.csproj", "{39478967-DDAA-407D-BD5D-BC4AC48607AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.SalesCatalogueStub.Api.Tests", "UKHO.SalesCatalogueStub.Api.Tests\UKHO.SalesCatalogueStub.Api.Tests.csproj", "{36DF6A6B-C84D-41AC-B5F3-3CB163677E48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UKHO.SalesCatalogueStub.Api.Tests", "UKHO.SalesCatalogueStub.Api.Tests\UKHO.SalesCatalogueStub.Api.Tests.csproj", "{36DF6A6B-C84D-41AC-B5F3-3CB163677E48}"
+	ProjectSection(ProjectDependencies) = postProject
+		{39478967-DDAA-407D-BD5D-BC4AC48607AC} = {39478967-DDAA-407D-BD5D-BC4AC48607AC}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
