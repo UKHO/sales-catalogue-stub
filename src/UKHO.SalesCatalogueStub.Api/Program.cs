@@ -42,7 +42,7 @@ namespace UKHO.SalesCatalogueStub.Api
                     var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
 
                     builder.AddAzureAppConfiguration(azureAppConfConnectionString)
-                        .AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager()).Build();
+                        .AddAzureKeyVault(keyVaultAddress, keyVaultClient, new DefaultKeyVaultSecretManager());
                 });
     }
 }
