@@ -5,6 +5,6 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Repositories
 {
     public interface IProductEditionRepository
     {
-        List<ProductEdition> GetProductEditions(List<string> products);
+        List<ProductEditionDto> GetProductEditions(List<string> products);
     }
 }

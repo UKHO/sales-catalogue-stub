@@ -19,7 +19,7 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Repositories
             _logger = logger;
         }
 
-        public List<ProductEdition> GetProductEditions(List<string> products)
+        public List<ProductEditionDto> GetProductEditions(List<string> products)
         {
             if (products == null) throw new ArgumentNullException(nameof(products));
 
@@ -28,7 +28,7 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Repositories
                 .Select(g => g.Key)
                 .ToList();
 
-            var matchedProducts = new List<ProductEdition>();
+            var matchedProducts = new List<ProductEditionDto>();
 
             foreach (var product in distinctProducts)
             {
@@ -39,7 +39,7 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Repositories
 
                 if (productMatch != null)
                 {
-                    matchedProducts.Add(new ProductEdition(productMatch.EditionIdentifier, productMatch.EditionNumber,
+                    matchedProducts.Add(new ProductEditionDto(productMatch.EditionIdentifier, productMatch.EditionNumber,
                         productMatch.LastReissueUpdateNumber ?? 0, productMatch.UpdateNumber ?? 0,
                         productMatch.LatestStatus));
                 }

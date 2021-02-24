@@ -6,7 +6,7 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Models
     /// <summary>
     /// 
     /// </summary>
-    public class ProductEdition
+    public class ProductEditionDto
     {
         private readonly string _editionNumber;
 
@@ -18,7 +18,7 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Models
         /// <param name="reissueUpdateNumber"></param>
         /// <param name="latestUpdateNumber"></param>
         /// <param name="latestStatus"></param>
-        public ProductEdition(string productName, string editionNumber, int reissueUpdateNumber, int latestUpdateNumber, ProductEditionStatusEnum latestStatus)
+        public ProductEditionDto(string productName, string editionNumber, int reissueUpdateNumber, int latestUpdateNumber, ProductEditionStatusEnum latestStatus)
         {
             ProductName = productName;
             _editionNumber = editionNumber;
