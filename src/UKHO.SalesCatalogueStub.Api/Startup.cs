@@ -111,6 +111,9 @@ namespace UKHO.SalesCatalogueStub.Api
             var eventhubLoggingConfig = new EventHubLoggingConfig();
             Configuration.GetSection("EventHubLogging").Bind(eventhubLoggingConfig);
 
+            var pidDatabaseConfig = new PidDatabaseConfig();
+            Configuration.GetSection("PidDatabase").Bind(pidDatabaseConfig);
+
             services.AddHttpContextAccessor();
 
             services.AddLogging(builder =>
@@ -144,8 +147,7 @@ namespace UKHO.SalesCatalogueStub.Api
                 });
             });
 
-            //TODO: Get from keyvault
-            var dbConnectionString = ConnectionString.Build("", "");
+            var dbConnectionString = ConnectionString.Build(pidDatabaseConfig.ServerInstance, pidDatabaseConfig.Database);
 
             services.AddDbContext<SalesCatalogueStubDbContext>((serviceProvider, options) =>
                 options.UseLazyLoadingProxies().UseSqlServer(dbConnectionString));
