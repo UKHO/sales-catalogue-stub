@@ -1,13 +1,8 @@
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,9 +10,17 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using UKHO.Logging.EventHubLogProvider;
 using UKHO.SalesCatalogueStub.Api.Configuration;
+using UKHO.SalesCatalogueStub.Api.EF;
+using UKHO.SalesCatalogueStub.Api.EF.Repositories;
 using UKHO.SalesCatalogueStub.Api.Filters;
+using UKHO.SalesCatalogueStub.Api.Middleware;
 
 namespace UKHO.SalesCatalogueStub.Api
 {
@@ -108,6 +111,9 @@ namespace UKHO.SalesCatalogueStub.Api
             var eventhubLoggingConfig = new EventHubLoggingConfig();
             Configuration.GetSection("EventHubLogging").Bind(eventhubLoggingConfig);
 
+            var pidDatabaseConfig = new PidDatabaseConfig();
+            Configuration.GetSection("PidDatabase").Bind(pidDatabaseConfig);
+
             services.AddHttpContextAccessor();
 
             services.AddLogging(builder =>
@@ -141,6 +147,13 @@ namespace UKHO.SalesCatalogueStub.Api
                 });
             });
 
+            var dbConnectionString = ConnectionString.Build(pidDatabaseConfig.ServerInstance, pidDatabaseConfig.Database);
+
+            services.AddDbContext<SalesCatalogueStubDbContext>((serviceProvider, options) =>
+                options.UseLazyLoadingProxies().UseSqlServer(dbConnectionString));
+
+            services.AddScoped<IProductEditionRepository, ProductEditionRepository>();
+
             services.AddHealthChecks();
         }
 
@@ -164,6 +177,8 @@ namespace UKHO.SalesCatalogueStub.Api
 
                 app.UseHsts();
             }
+
+            app.UseRequestResponseLogging();
 
             app.UseHttpsRedirection();
 
