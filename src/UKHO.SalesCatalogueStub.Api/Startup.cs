@@ -1,3 +1,5 @@
+#pragma warning disable 1591
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,36 +26,20 @@ using UKHO.SalesCatalogueStub.Api.Services;
 
 namespace UKHO.SalesCatalogueStub.Api
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class Startup
     {
         private IHttpContextAccessor _httpContextAccessor;
 
         private readonly IWebHostEnvironment _hostingEnvironment;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="configuration"></param>
-        /// <param name="environment"></param>
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
             _hostingEnvironment = environment;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers().AddNewtonsoftJson(options =>
@@ -157,13 +143,6 @@ namespace UKHO.SalesCatalogueStub.Api
             services.AddHealthChecks();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="env"></param>
-        /// <param name="httpContextAccessor"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHttpContextAccessor httpContextAccessor)
         {
             if (env.IsDevelopment())
