@@ -1,7 +1,8 @@
+using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
-using System.Collections.Generic;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
+using UKHO.SalesCatalogueStub.Api.Models;
 
 namespace UKHO.SalesCatalogueStub.Api.Tests
 {
@@ -10,7 +11,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [Test]
         public void Product_Edition_With_Supplied_Params_Should_Initialize_Correctly()
         {
-            var productEdition = new ProductEditionDto("TEST", "1", 0, 5, ProductEditionStatusEnum.Updated);
+            var productEdition = new ProductEdition("TEST", "1", 0, 5, ProductEditionStatusEnum.Updated);
             productEdition.EditionNumber.Should().Be("1");
             productEdition.ProductName.Should().Be("TEST");
             productEdition.UpdateNumber.Should().ContainInOrder(new List<int> { 1, 2, 3, 4, 5 });
@@ -22,7 +23,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase(100, 0, ExpectedResult = 100)]
         public int Product_Editions_With_No_Reissue_Return_Correct_Updates_Count(int latestUpdateNumber, int reissueNumber)
         {
-            var productEdition = new ProductEditionDto("TEST", "1", reissueNumber, latestUpdateNumber, ProductEditionStatusEnum.Updated);
+            var productEdition = new ProductEdition("TEST", "1", reissueNumber, latestUpdateNumber, ProductEditionStatusEnum.Updated);
             return productEdition.UpdateNumber.Count;
         }
 
@@ -33,7 +34,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase(150, 125, ExpectedResult = 26)]
         public int Product_Editions_With_Reissue_Return_Correct_Updates_Count(int latestUpdateNumber, int reissueNumber)
         {
-            var productEdition = new ProductEditionDto("TEST", "1", reissueNumber, latestUpdateNumber, ProductEditionStatusEnum.Updated);
+            var productEdition = new ProductEdition("TEST", "1", reissueNumber, latestUpdateNumber, ProductEditionStatusEnum.Updated);
             return productEdition.UpdateNumber.Count;
         }
 
@@ -44,7 +45,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase(20, 0, ExpectedResult = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 })]
         public int[] Product_Editions_With_No_Reissue_Return_Correct_Updates_Array(int latestUpdateNumber, int reissueNumber)
         {
-            var productEdition = new ProductEditionDto("TEST", "1", reissueNumber, latestUpdateNumber, ProductEditionStatusEnum.Updated);
+            var productEdition = new ProductEdition("TEST", "1", reissueNumber, latestUpdateNumber, ProductEditionStatusEnum.Updated);
             return productEdition.UpdateNumber.ToArray();
         }
 
@@ -55,14 +56,14 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase(20, 15, ExpectedResult = new[] { 15, 16, 17, 18, 19, 20 })]
         public int[] Product_Editions_With_Reissue_Return_Correct_Updates_Array(int latestUpdateNumber, int reissueNumber)
         {
-            var productEdition = new ProductEditionDto("TEST", "1", reissueNumber, latestUpdateNumber, ProductEditionStatusEnum.Updated);
+            var productEdition = new ProductEdition("TEST", "1", reissueNumber, latestUpdateNumber, ProductEditionStatusEnum.Updated);
             return productEdition.UpdateNumber.ToArray();
         }
 
         [Test]
         public void Product_Edition_With_Status_Cancelled_Should_Have_Edition_Zero()
         {
-            var productEdition = new ProductEditionDto("TEST", "1", 0, 1, ProductEditionStatusEnum.Cancelled);
+            var productEdition = new ProductEdition("TEST", "1", 0, 1, ProductEditionStatusEnum.Cancelled);
             productEdition.EditionNumber.Should().Be("0");
         }
 

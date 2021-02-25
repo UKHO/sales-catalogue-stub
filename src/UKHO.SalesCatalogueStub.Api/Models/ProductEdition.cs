@@ -1,12 +1,13 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+using UKHO.SalesCatalogueStub.Api.EF.Models;
 
-namespace UKHO.SalesCatalogueStub.Api.EF.Models
+namespace UKHO.SalesCatalogueStub.Api.Models
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ProductEditionDto
+    public class ProductEdition
     {
         private readonly string _editionNumber;
 
@@ -18,7 +19,7 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Models
         /// <param name="reissueUpdateNumber"></param>
         /// <param name="latestUpdateNumber"></param>
         /// <param name="latestStatus"></param>
-        public ProductEditionDto(string productName, string editionNumber, int reissueUpdateNumber, int latestUpdateNumber, ProductEditionStatusEnum latestStatus)
+        public ProductEdition(string productName, string editionNumber, int reissueUpdateNumber, int latestUpdateNumber, ProductEditionStatusEnum latestStatus)
         {
             ProductName = productName;
             _editionNumber = editionNumber;

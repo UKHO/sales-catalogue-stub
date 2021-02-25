@@ -1,8 +1,7 @@
 using FakeItEasy;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using UKHO.SalesCatalogueStub.Api.Controllers;
-using UKHO.SalesCatalogueStub.Api.EF.Repositories;
+using UKHO.SalesCatalogueStub.Api.Services;
 
 namespace UKHO.SalesCatalogueStub.Api.Tests
 {
@@ -11,7 +10,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [SetUp]
         public void Setup()
         {
-            var productRepo = A.Fake<IProductEditionRepository>();
+            var productRepo = A.Fake<IProductEditionService>();
             var exchangeServiceApiController = new ExchangeServiceApiController(productRepo);
         }
 
