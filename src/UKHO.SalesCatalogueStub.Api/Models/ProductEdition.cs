@@ -1,25 +1,17 @@
-﻿using System.Collections.Generic;
+﻿#pragma warning disable 1591
+
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 
 namespace UKHO.SalesCatalogueStub.Api.Models
 {
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <summary />
     public class ProductEdition
     {
-        private readonly string _editionNumber;
+        private readonly int _editionNumber;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="productName"></param>
-        /// <param name="editionNumber"></param>
-        /// <param name="reissueUpdateNumber"></param>
-        /// <param name="latestUpdateNumber"></param>
-        /// <param name="latestStatus"></param>
-        public ProductEdition(string productName, string editionNumber, int reissueUpdateNumber, int latestUpdateNumber, ProductEditionStatusEnum latestStatus)
+        public ProductEdition(string productName, int editionNumber, int reissueUpdateNumber, int latestUpdateNumber, ProductEditionStatusEnum latestStatus)
         {
             ProductName = productName;
             _editionNumber = editionNumber;
@@ -28,38 +20,21 @@ namespace UKHO.SalesCatalogueStub.Api.Models
             Status = latestStatus;
 
         }
-        /// <summary>
-        /// 
-        /// </summary>
+
         [JsonProperty(PropertyName = "productName")]
 
         public string ProductName { get; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [JsonProperty(PropertyName = "editionNumber")]
-        public string EditionNumber => Status == ProductEditionStatusEnum.Cancelled ? "0" : _editionNumber;
+        public int EditionNumber => Status == ProductEditionStatusEnum.Cancelled ? 0 : _editionNumber;
 
-        /// <summary>
-        /// 
-        /// </summary>
         [JsonProperty(PropertyName = "updateNumber")]
         public List<int> UpdateNumber => CalculateProductUpdates();
 
-        /// <summary>
-        /// 
-        /// </summary>
         private int ReissueUpdateNumber { get; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         private int LatestUpdateNumber { get; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         private ProductEditionStatusEnum Status { get; }
 
 

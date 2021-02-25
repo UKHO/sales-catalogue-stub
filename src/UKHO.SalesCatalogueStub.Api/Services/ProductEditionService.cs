@@ -43,7 +43,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
                 if (productMatch != null)
                 {
-                    matchedProducts.Add(new ProductEdition(productMatch.EditionIdentifier, productMatch.EditionNumber,
+                    matchedProducts.Add(new ProductEdition(productMatch.EditionIdentifier, Convert.ToInt32(productMatch.EditionNumber),
                         productMatch.LastReissueUpdateNumber ?? 0, productMatch.UpdateNumber ?? 0,
                         productMatch.LatestStatus));
                 }
