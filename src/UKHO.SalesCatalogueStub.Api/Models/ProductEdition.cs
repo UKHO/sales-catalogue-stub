@@ -1,24 +1,21 @@
 ﻿#pragma warning disable 1591
 
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 
 namespace UKHO.SalesCatalogueStub.Api.Models
 {
-    /// <summary />
     public class ProductEdition
     {
-        private readonly int _editionNumber;
-
         public ProductEdition(string productName, int editionNumber, int reissueUpdateNumber, int latestUpdateNumber, ProductEditionStatusEnum latestStatus)
         {
             ProductName = productName;
-            _editionNumber = editionNumber;
             ReissueUpdateNumber = reissueUpdateNumber;
             LatestUpdateNumber = latestUpdateNumber;
             Status = latestStatus;
-
+            EditionNumber = Status == ProductEditionStatusEnum.Cancelled ? 0 : editionNumber;
         }
 
         [JsonProperty(PropertyName = "productName")]
@@ -26,7 +23,7 @@ namespace UKHO.SalesCatalogueStub.Api.Models
         public string ProductName { get; }
 
         [JsonProperty(PropertyName = "editionNumber")]
-        public int EditionNumber => Status == ProductEditionStatusEnum.Cancelled ? 0 : _editionNumber;
+        public int EditionNumber { get; }
 
         [JsonProperty(PropertyName = "updateNumber")]
         public List<int> UpdateNumber => CalculateProductUpdates();
@@ -40,18 +37,8 @@ namespace UKHO.SalesCatalogueStub.Api.Models
 
         private List<int> CalculateProductUpdates()
         {
-            var productUpdates = new List<int>();
-
-            var upperLimit = LatestUpdateNumber;
             var lowerLimit = ReissueUpdateNumber == 0 ? ReissueUpdateNumber + 1 : ReissueUpdateNumber;
-
-            for (var i = lowerLimit; i <= upperLimit; i++)
-            {
-                productUpdates.Add(i);
-            }
-
-            return productUpdates;
+            return Enumerable.Range(lowerLimit, LatestUpdateNumber - lowerLimit + 1).ToList();
         }
     }
-
 }
