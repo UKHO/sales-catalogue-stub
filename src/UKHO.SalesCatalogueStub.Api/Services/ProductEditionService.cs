@@ -1,25 +1,29 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿#pragma warning disable 1591
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using UKHO.SalesCatalogueStub.Api.EF;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
+using UKHO.SalesCatalogueStub.Api.Models;
 
-namespace UKHO.SalesCatalogueStub.Api.EF.Repositories
+namespace UKHO.SalesCatalogueStub.Api.Services
 {
-    public class ProductEditionRepository : IProductEditionRepository
+    public class ProductEditionService : IProductEditionService
     {
         private readonly SalesCatalogueStubDbContext _dbContext;
         private readonly ILogger _logger;
         private readonly List<ProductEditionStatusEnum> _allowedProductStatus = new List<ProductEditionStatusEnum> { ProductEditionStatusEnum.Base, ProductEditionStatusEnum.Updated, ProductEditionStatusEnum.Reissued, ProductEditionStatusEnum.Cancelled };
 
-        public ProductEditionRepository(SalesCatalogueStubDbContext dbContext, ILogger<ProductEditionRepository> logger)
+        public ProductEditionService(SalesCatalogueStubDbContext dbContext, ILogger<ProductEditionService> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
         }
 
-        public List<ProductEditionDto> GetProductEditions(List<string> products)
+        public List<ProductEdition> GetProductEditions(List<string> products)
         {
             if (products == null) throw new ArgumentNullException(nameof(products));
 
@@ -28,7 +32,7 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Repositories
                 .Select(g => g.Key)
                 .ToList();
 
-            var matchedProducts = new List<ProductEditionDto>();
+            var matchedProducts = new List<ProductEdition>();
 
             foreach (var product in distinctProducts)
             {
@@ -39,13 +43,13 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Repositories
 
                 if (productMatch != null)
                 {
-                    matchedProducts.Add(new ProductEditionDto(productMatch.EditionIdentifier, productMatch.EditionNumber,
+                    matchedProducts.Add(new ProductEdition(productMatch.EditionIdentifier, Convert.ToInt32(productMatch.EditionNumber),
                         productMatch.LastReissueUpdateNumber ?? 0, productMatch.UpdateNumber ?? 0,
                         productMatch.LatestStatus));
                 }
                 else
                 {
-                    _logger.LogInformation($"{nameof(ProductEditionRepository)} no match, or duplicate entries found for product {product}");
+                    _logger.LogInformation($"{nameof(ProductEditionService)} no match, or duplicate entries found for product {product}");
                 }
             }
 

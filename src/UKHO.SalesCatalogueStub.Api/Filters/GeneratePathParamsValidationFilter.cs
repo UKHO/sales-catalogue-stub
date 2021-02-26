@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Controllers;
+﻿#pragma warning disable 1591
+
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.ComponentModel.DataAnnotations;
@@ -11,11 +13,6 @@ namespace UKHO.SalesCatalogueStub.Api.Filters
     /// </summary>
     public class GeneratePathParamsValidationFilter : IOperationFilter
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="operation">Operation</param>
-        /// <param name="context">OperationFilterContext</param>
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             var pars = context.ApiDescription.ParameterDescriptions;

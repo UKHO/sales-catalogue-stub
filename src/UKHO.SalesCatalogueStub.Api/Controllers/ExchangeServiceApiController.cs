@@ -1,14 +1,14 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Annotations;
 using UKHO.SalesCatalogueStub.Api.Attributes;
-using UKHO.SalesCatalogueStub.Api.EF.Repositories;
 using UKHO.SalesCatalogueStub.Api.Models;
+using UKHO.SalesCatalogueStub.Api.Services;
 using Products = UKHO.SalesCatalogueStub.Api.Models.Products;
 
 namespace UKHO.SalesCatalogueStub.Api.Controllers
@@ -19,12 +19,12 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
     [Authorize(Roles = "ExchangeServiceReader")]
     public class ExchangeServiceApiController : ControllerBase
     {
-        private readonly IProductEditionRepository _productEditionRepository;
+        private readonly IProductEditionService _productEditionService;
 
         /// <inheritdoc />
-        public ExchangeServiceApiController(IProductEditionRepository productEditionRepository)
+        public ExchangeServiceApiController(IProductEditionService productEditionService)
         {
-            _productEditionRepository = productEditionRepository;
+            _productEditionService = productEditionService;
         }
 
         /// <summary>
@@ -110,9 +110,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual IActionResult PostProductIdentifiers([FromRoute][Required] string productType, [FromBody] List<string> body)
         {
-
-
-            var productVersions = _productEditionRepository.GetProductEditions(body);
+            var productVersions = _productEditionService.GetProductEditions(body);
 
             return !productVersions.Any() ? StatusCode(400, default(ErrorDescription)) : StatusCode(200, JsonConvert.SerializeObject(productVersions, Formatting.Indented));
         }
