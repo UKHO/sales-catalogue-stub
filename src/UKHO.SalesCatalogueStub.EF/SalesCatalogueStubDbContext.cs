@@ -1,7 +1,7 @@
-﻿using Microsoft.Azure.Services.AppAuthentication;
+﻿using System;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 
 namespace UKHO.SalesCatalogueStub.Api.EF
@@ -11,6 +11,8 @@ namespace UKHO.SalesCatalogueStub.Api.EF
         public SalesCatalogueStubDbContext(DbContextOptions<SalesCatalogueStubDbContext> options)
             : base(options)
         {
+            if (!Database.IsSqlServer()) return;
+
             if (Database.GetDbConnection() is SqlConnection dbConnection)
             {
                 dbConnection.AccessToken = new AzureServiceTokenProvider()
@@ -20,7 +22,6 @@ namespace UKHO.SalesCatalogueStub.Api.EF
             {
                 throw new ApplicationException("Could not configure Db AccessToken as the DbConnection is null");
             }
-
         }
 
         public DbSet<Products> Products { get; set; }

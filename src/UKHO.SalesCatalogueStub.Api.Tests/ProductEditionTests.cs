@@ -14,7 +14,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var productEdition = new ProductEdition("TEST", 1, 0, 5, ProductEditionStatusEnum.Updated);
             productEdition.EditionNumber.Should().Be(1);
             productEdition.ProductName.Should().Be("TEST");
-            productEdition.UpdateNumber.Should().ContainInOrder(new List<int> { 1, 2, 3, 4, 5 });
+            productEdition.UpdateNumbers.Should().ContainInOrder(new List<int> { 1, 2, 3, 4, 5 });
         }
         [TestCase(1, 0, ExpectedResult = 1)]
         [TestCase(2, 0, ExpectedResult = 2)]
@@ -24,7 +24,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         public int Product_Editions_With_No_Reissue_Return_Correct_Updates_Count(int latestUpdateNumber, int reissueNumber)
         {
             var productEdition = new ProductEdition("TEST", 1, reissueNumber, latestUpdateNumber, ProductEditionStatusEnum.Updated);
-            return productEdition.UpdateNumber.Count;
+            return productEdition.UpdateNumbers.Count;
         }
 
         [TestCase(5, 2, ExpectedResult = 4)]
@@ -35,7 +35,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         public int Product_Editions_With_Reissue_Return_Correct_Updates_Count(int latestUpdateNumber, int reissueNumber)
         {
             var productEdition = new ProductEdition("TEST", 1, reissueNumber, latestUpdateNumber, ProductEditionStatusEnum.Updated);
-            return productEdition.UpdateNumber.Count;
+            return productEdition.UpdateNumbers.Count;
         }
 
         [TestCase(1, 0, ExpectedResult = new[] { 1 })]
@@ -46,7 +46,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         public int[] Product_Editions_With_No_Reissue_Return_Correct_Updates_Array(int latestUpdateNumber, int reissueNumber)
         {
             var productEdition = new ProductEdition("TEST", 1, reissueNumber, latestUpdateNumber, ProductEditionStatusEnum.Updated);
-            return productEdition.UpdateNumber.ToArray();
+            return productEdition.UpdateNumbers.ToArray();
         }
 
         [TestCase(2, 1, ExpectedResult = new[] { 1, 2 })]
@@ -57,7 +57,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         public int[] Product_Editions_With_Reissue_Return_Correct_Updates_Array(int latestUpdateNumber, int reissueNumber)
         {
             var productEdition = new ProductEdition("TEST", 1, reissueNumber, latestUpdateNumber, ProductEditionStatusEnum.Updated);
-            return productEdition.UpdateNumber.ToArray();
+            return productEdition.UpdateNumbers.ToArray();
         }
 
         [Test]

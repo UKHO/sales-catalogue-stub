@@ -76,8 +76,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
             //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(500, default(DefaultErrorResponse));
             string exampleJson = null;
-            exampleJson = "{\n  \"productName\" : \"AU895561\",\n  \"editionNumber\" : 4,\n  \"updateNumber\" : [ 5, 6, 7 ]\n}";
-
+            exampleJson = "{\n  \"productName\" : \"AU895561\",\n  \"editionNumber\" : 4,\n  \"updateNumbers\" : [ 5, 6, 7 ],\n  \"fileSize\" : 100\n}";
             var example = exampleJson != null
             ? JsonConvert.DeserializeObject<Products>(exampleJson)
             : default(Products);            //TODO: Change the data returned
@@ -165,8 +164,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
             //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(500, default(DefaultErrorResponse));
             string exampleJson = null;
-            exampleJson = "{\n  \"productName\" : \"AU895561\",\n  \"editionNumber\" : 4,\n  \"updateNumber\" : [ 5, 6, 7 ]\n}";
-
+            exampleJson = "{\n  \"productName\" : \"AU895561\",\n  \"editionNumber\" : 4,\n  \"updateNumbers\" : [ 5, 6, 7 ],\n  \"fileSize\" : 100\n}";
             var example = exampleJson != null
             ? JsonConvert.DeserializeObject<Products>(exampleJson)
             : default(Products);            //TODO: Change the data returned

@@ -25,8 +25,8 @@ namespace UKHO.SalesCatalogueStub.Api.Models
         [JsonProperty(PropertyName = "editionNumber")]
         public int EditionNumber { get; }
 
-        [JsonProperty(PropertyName = "updateNumber")]
-        public List<int> UpdateNumber => CalculateProductUpdates();
+        [JsonProperty(PropertyName = "updateNumbers")]
+        public List<int> UpdateNumbers => CalculateProductUpdates();
 
         private int ReissueUpdateNumber { get; }
 
