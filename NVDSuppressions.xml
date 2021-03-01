@@ -34,4 +34,11 @@
 		<packageUrl regex="true">^pkg:generic/System\.Threading\.Tasks\.Parallel@.*$</packageUrl>
 		<cve>CVE-2020-22475</cve>
 	</suppress>
+<suppress>
+		<notes><![CDATA[
+   file name: System.Threading.Tasks.Dataflow.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/System\.Threading\.Tasks\.Dataflow@.*$</packageUrl>
+		<cve>CVE-2020-22475</cve>
+	</suppress>
 </suppressions>
