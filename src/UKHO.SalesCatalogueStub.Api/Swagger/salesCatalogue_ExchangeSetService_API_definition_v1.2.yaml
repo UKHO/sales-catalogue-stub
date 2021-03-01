@@ -1,9 +1,12 @@
 openapi: "3.0.0"
 info:
-  version: "1"
+  version: "1.2"
   title: Sales Catalogue Service API
   description: |
     This API is for Sales Catalogue Service
+  contact: 
+    email: ***
+    
     
 servers:
   - url: https://salescatalogue.admiralty.co.uk/v1/productData
@@ -11,16 +14,75 @@ security:
   - jwtBearerAuth: []
 
 paths:
-  /{productType}/products/productIdentifiers:
-    post:
-      summary: Get the latest, releasable versions for requested products or changes to requested products since a date
-      operationId: postProductIdentifiers
+
+  /{productType}/products:
+    get:
+      summary: Get the all releasable changes to products since a date
+      operationId: getProducts
       tags:
         - Exchange Service
       parameters:
         - $ref: '#/components/parameters/productType'
         - $ref: '#/components/parameters/sinceDateTime'
-       
+     
+  
+      responses:
+        '200':
+          description: A JSON body of product objects
+          headers:
+            schema:
+                $ref: "#/components/schemas/Last-Modified"
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/products"
+        '304':
+          description: Not modified.
+          headers:
+            schema:
+                $ref: "#/components/schemas/Last-Modified"
+         
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+        '401':
+          description: Unauthorised.
+          
+        '403':
+          description: Forbidden.
+          
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
+        '406':
+          description: Not acceptable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'   
+                
+  
+  /{productType}/products/productIdentifiers:
+    post:
+      summary: Get the latest baseline, releasable versions for requested products 
+      
+      operationId: postProductIdentifiers
+      tags:
+        - Exchange Service
+      parameters:
+        - $ref: '#/components/parameters/productType'
        
       requestBody:
         description: | 
@@ -75,11 +137,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DefaultErrorResponse'      
+                $ref: '#/components/schemas/DefaultErrorResponse'  
+                
                 
   /{productType}/products/productVersions:
     post:
-      summary: Get the latest, releasable versions of requested products since a specified version
+      summary: Get the latest baseline, releasable versions for requested products since a specified version
+      
       operationId: postProductVersions
       tags:
         - Exchange Service
@@ -165,7 +229,7 @@ paths:
             application/json:    
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/productstxt"
+                  - $ref: "#/components/schemas/essData"
                   - $ref: "#/components/schemas/products"
                 
         '304':
@@ -253,7 +317,7 @@ components:
         The type of catalogue data requested       
       schema:
         type: string 
-      example: productstxt
+      example: essData, avcs_catalogue
   
   
   ################################################################################
@@ -303,16 +367,30 @@ components:
             editionNumber:
               type: number
               description: The edition number
-            updateNumber:
+            updateNumbers:
               type: array
               description: an array of update numbers
               items: 
                 type: number
                 description: The update number, if applicable
+            cancellation:
+              type: object
+              description: The details of the cancellation, if one exists
+              properties:
+                editionNumber:
+                  type: number
+                  description: The edition number of the cancellation, i.e. 0
+                updateNumber:
+                  type: number
+                  description: The cancellation update number
+              example: {"editionNumber": 0, "updateNumber": 8}
+            fileSize: 
+                type: number
+                description: the total file size in bytes of all the files for this product
       
-      example:   {"productName": "AU895561",  "editionNumber": 4,  "updateNumber": [5,6,7]}      
+      example:   {"productName": "AU895561",  "editionNumber": 4,  "updateNumbers": [5,6,7], "fileSize": 100 }      
         
-    productstxt:
+    essData:
       type: array
       items: 
           type: object
@@ -411,6 +489,17 @@ components:
               description: |
                   List of replacement cells, if relevant, when a cell is cancelled.  Semi-colon separated.
               example: ["FR312345","FR323456"]
+            issueDatePreviousUpdate:
+              type: string
+              format: date
+              description: |
+                The date that the previous update was issued when the current update is a re-issue.
+              example: "2005-02-22" 
+            cancelledEditionNumber:
+              type: number
+              description: |
+                For a cancellation, this is the latest edition number prior to the cancellation update
+              example: 5 
       
     
     
@@ -467,4 +556,3 @@ components:
       scheme: bearer
       bearerFormat: JWT
  
-  

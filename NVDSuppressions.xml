@@ -27,4 +27,18 @@
     <sha1>36ed049328fe585f2053a7e20be4b98a3c3a1f24</sha1>
     <cve>CVE-2006-2453</cve>
   </suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: System.Threading.Tasks.Parallel.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/System\.Threading\.Tasks\.Parallel@.*$</packageUrl>
+		<cve>CVE-2020-22475</cve>
+	</suppress>
+<suppress>
+		<notes><![CDATA[
+   file name: System.Threading.Tasks.Dataflow.dll
+   ]]></notes>
+		<packageUrl regex="true">^pkg:generic/System\.Threading\.Tasks\.Dataflow@.*$</packageUrl>
+		<cve>CVE-2020-22475</cve>
+	</suppress>
 </suppressions>
