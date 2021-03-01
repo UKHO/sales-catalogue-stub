@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UKHO.SalesCatalogueStub.Api.EF.Models
@@ -74,6 +75,9 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Models
         public string LastUpdateWeekNumber { get; set; }
 
         public string Position { get; set; }
+
+
+        public virtual ICollection<LifecycleEvent> LifecycleEvents { get; set; }
 
     }
 }

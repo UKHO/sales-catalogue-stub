@@ -26,7 +26,9 @@ namespace UKHO.SalesCatalogueStub.Api.EF
 
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductEdition> ProductEditions { get; set; }
+        public DbSet<LifecycleEvent> LifecycleEvents { get; set; }
 
+        public DbSet<EventType> EventTypes { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
