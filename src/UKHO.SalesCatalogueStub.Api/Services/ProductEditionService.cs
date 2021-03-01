@@ -83,6 +83,17 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return matchedProducts;
         }
 
+        public Products GetProductEditionsSinceDateTime(DateTime sinceDateTime)
+        {
+            //var product = _dbContext.Products
+            //    .Include(p => p.ProductEditions)
+            //    .ThenInclude(pe => pe.LifecycleEvents)
+            //    .ThenInclude(le => le.EventType)
+            //    .Single(p => p.Identifier == "a");
+            //var lifecycle = product.ProductEditions.ElementAt(0).LifecycleEvents.ElementAt(0);
+            return null;
+        }
+
         private static List<int?> GetUpdates(int lastReissueUpdateNumber, int latestUpdateNumber)
         {
             var productUpdates = new List<int?>();
