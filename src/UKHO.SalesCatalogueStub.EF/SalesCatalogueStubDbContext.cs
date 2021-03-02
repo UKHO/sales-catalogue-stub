@@ -24,22 +24,22 @@ namespace UKHO.SalesCatalogueStub.Api.EF
             }
         }
 
-        public DbSet<Products> Products { get; set; }
-        public DbSet<ProductEditions> ProductEditions { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductEdition> ProductEditions { get; set; }
 
-        public DbSet<ProductTypes> ProductTypes { get; set; }
+        public DbSet<ProductType> ProductTypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .Entity<ProductTypes>()
+                .Entity<ProductType>()
                 .Property(e => e.Name)
                 .HasConversion(
                     v => v.ToString(),
                     v => (ProductTypeNameEnum)Enum.Parse(typeof(ProductTypeNameEnum), v));
 
             modelBuilder
-                .Entity<ProductEditions>()
+                .Entity<ProductEdition>()
                 .Property(e => e.LatestStatus)
                 .HasConversion(
                     v => v.ToString(),

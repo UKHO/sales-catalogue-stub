@@ -4,12 +4,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace UKHO.SalesCatalogueStub.Api.EF.Models
 {
     [Table("ProductEditions")]
-    public class ProductEditions
+    public class ProductEdition
     {
         [Column("ID")]
         public Guid Id { get; set; }
 
-        public virtual Products Product { get; set; }
+        public virtual Product Product { get; set; }
 
         public string EditionIdentifier { get; set; }
 

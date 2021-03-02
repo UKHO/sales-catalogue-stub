@@ -7,6 +7,6 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 {
     public interface IProductEditionService
     {
-        List<ProductEdition> GetProductEditions(List<string> products);
+        Products GetProductEditions(List<string> products);
     }
 }

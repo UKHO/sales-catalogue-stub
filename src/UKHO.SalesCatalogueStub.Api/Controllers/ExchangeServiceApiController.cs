@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using UKHO.SalesCatalogueStub.Api.Attributes;
 using UKHO.SalesCatalogueStub.Api.Models;
 using UKHO.SalesCatalogueStub.Api.Services;
@@ -111,7 +111,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         {
             var productVersions = _productEditionService.GetProductEditions(body);
 
-            return !productVersions.Any() ? StatusCode(400, default(ErrorDescription)) : StatusCode(200, JsonConvert.SerializeObject(productVersions, Formatting.Indented));
+            return !productVersions.Any() ? StatusCode(400, default(ErrorDescription)) : StatusCode(200, JsonConvert.SerializeObject(productVersions, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }));
         }
 
         /// <summary>

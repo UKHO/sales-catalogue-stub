@@ -1,8 +1,8 @@
-using System.Collections.Generic;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using System.Collections.Generic;
 using UKHO.SalesCatalogueStub.Api.EF;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 using UKHO.SalesCatalogueStub.Api.Services;
@@ -34,13 +34,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("GB1234", 2, 3, ProductEditionStatusEnum.Updated, ProductTypeNameEnum.Avcs, ExpectedResult = 1)]
         public int Test1(string productName, int editionNumber, int updateNumber, ProductEditionStatusEnum latestStatus, ProductTypeNameEnum productType)
         {
-            _dbContext.AddRange(new List<Products>
+            _dbContext.AddRange(new List<Product>
             {
-                new Products
+                new Product
                 {
-                    ProductEditions = new List<ProductEditions>
+                    ProductEditions = new List<ProductEdition>
                     {
-                        new ProductEditions
+                        new ProductEdition
                         {
                             LatestStatus = latestStatus,
                             EditionIdentifier = productName,
@@ -48,7 +48,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                             UpdateNumber = updateNumber,
                         }
                     },
-                    ProductType = new ProductTypes {Name = productType}
+                    ProductType = new ProductType {Name = productType}
                 }
             });
 
