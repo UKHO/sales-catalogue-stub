@@ -75,9 +75,14 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return matchedProducts;
         }
 
-        private static List<int> GetUpdates(int lastReissueUpdateNumber, int latestUpdateNumber)
+        private static List<int?> GetUpdates(int lastReissueUpdateNumber, int latestUpdateNumber)
         {
-            return Enumerable.Range(lastReissueUpdateNumber, latestUpdateNumber - lastReissueUpdateNumber + 1).ToList();
+            var productUpdates = new List<int?>();
+            for (var i = lastReissueUpdateNumber; i <= latestUpdateNumber; i++)
+            {
+                productUpdates.Add(i);
+            }
+            return productUpdates;
         }
 
         private ProductEdition GetActiveEdition(string productName)

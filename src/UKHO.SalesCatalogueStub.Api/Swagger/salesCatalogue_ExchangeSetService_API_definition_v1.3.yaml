@@ -1,11 +1,9 @@
 openapi: "3.0.0"
 info:
-  version: "1.2"
+  version: "1.3"
   title: Sales Catalogue Service API
   description: |
     This API is for Sales Catalogue Service
-  contact: 
-    email: ***
     
     
 servers:
@@ -345,10 +343,10 @@ components:
               type: string
               description: The unique product identifiers
             editionNumber:
-              type: number
+              type: integer
               description: The edition number
             updateNumber:
-              type: number
+              type: integer
               description: The update number, if applicable
         example:   {"productName": "AU895561",  "editionNumber": 4,  "updateNumber": 1} 
         
@@ -365,27 +363,27 @@ components:
               type: string
               description: The unique product identifiers
             editionNumber:
-              type: number
+              type: integer
               description: The edition number
             updateNumbers:
               type: array
               description: an array of update numbers
               items: 
-                type: number
+                type: integer
                 description: The update number, if applicable
             cancellation:
               type: object
               description: The details of the cancellation, if one exists
               properties:
                 editionNumber:
-                  type: number
+                  type: integer
                   description: The edition number of the cancellation, i.e. 0
                 updateNumber:
-                  type: number
+                  type: integer
                   description: The cancellation update number
               example: {"editionNumber": 0, "updateNumber": 8}
             fileSize: 
-                type: number
+                type: integer
                 description: the total file size in bytes of all the files for this product
       
       example:   {"productName": "AU895561",  "editionNumber": 4,  "updateNumbers": [5,6,7], "fileSize": 100 }      
@@ -407,7 +405,7 @@ components:
                 The date that a base cell (new cell, new edition or re-issue) was issued.
               example: "2005-02-22" 
             baseCellEditionNumber:
-              type: number
+              type: integer
               description: The edition number
             issueDateLatestUpdate:
               type: string
@@ -416,12 +414,12 @@ components:
                 The date that the latest update was issued.
               example: "2005-02-22" 
             latestUpdateNumber:
-              type: number
+              type: integer
               description: |
                 The update number of the latest update.  Blank when no update.
               example: 4
             fileSize:
-              type: number
+              type: integer
               description: |
                 The total file size in kilobytes for all files issued for the product.
                 Currently blank. 
@@ -468,12 +466,12 @@ components:
                 Indicator of encryption of dataset.  
               example: true
             baseCellUpdateNumber:
-              type: number
+              type: integer
               description: |
                   The update number current at the time of a cell reissue. If a cell edition does not have a re-issue then this field is blank or zero filled 
               example: 1
             lastUpdateNumberPreviousEdition:
-              type: number
+              type: integer
               description: |
                   Last update number of previous edition, if previous editions are available.  
                   Currently blank.
@@ -496,7 +494,7 @@ components:
                 The date that the previous update was issued when the current update is a re-issue.
               example: "2005-02-22" 
             cancelledEditionNumber:
-              type: number
+              type: integer
               description: |
                 For a cancellation, this is the latest edition number prior to the cancellation update
               example: 5 
@@ -556,3 +554,4 @@ components:
       scheme: bearer
       bearerFormat: JWT
  
+  
