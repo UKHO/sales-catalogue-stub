@@ -96,7 +96,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                              le.ProductEdition.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
                              _lifecycleEventTypes.Contains(le.EventType.Name)
                              )
-                .ToList(); //TODO: confirm not evaluating locally
+                .ToList();
 
             //var product = _dbContext.Products
             //    .Include(p => p.ProductEditions)

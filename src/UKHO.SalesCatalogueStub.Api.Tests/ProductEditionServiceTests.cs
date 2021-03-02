@@ -75,7 +75,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().ContainSingle();
+            productEditions.Should().NotBeNull().And.ContainSingle();
 
             var productEdition = productEditions.Single();
 
@@ -99,7 +99,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().ContainSingle();
+            productEditions.Should().NotBeNull().And.ContainSingle();
 
             var productEdition = productEditions.ElementAt(0);
 
