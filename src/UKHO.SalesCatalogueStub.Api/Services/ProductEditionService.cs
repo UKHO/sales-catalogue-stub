@@ -31,17 +31,25 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
         public Products GetProductEditions(List<string> products)
         {
-            if (products == null) throw new ArgumentNullException(nameof(products));
+            if (products == null)
+            {
+                throw new ArgumentNullException(nameof(products));
+            }
 
             var distinctProducts = products
-                .GroupBy(item => item.Trim(), StringComparer.OrdinalIgnoreCase)
-                .Select(g => g.Key)
+                .GroupBy(item => item?.Trim(), StringComparer.OrdinalIgnoreCase)
+                .Select(g => g?.Key)
                 .ToList();
 
             var matchedProducts = new Products();
 
             foreach (var product in distinctProducts)
             {
+                if (product == null)
+                {
+                    continue;
+                }
+
                 var activeEdition = GetActiveEdition(product);
 
                 if (activeEdition != null)
