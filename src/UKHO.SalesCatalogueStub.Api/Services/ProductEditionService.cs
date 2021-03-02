@@ -23,6 +23,12 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             ProductEditionStatusEnum.Cancelled
         };
 
+        private readonly List<ProductEditionStatusEnum> _lifecycleEventTypes = new List<ProductEditionStatusEnum>
+        {
+            ProductEditionStatusEnum.Base, ProductEditionStatusEnum.Updated, ProductEditionStatusEnum.Reissued,
+            ProductEditionStatusEnum.Cancelled, ProductEditionStatusEnum.Superseded
+        };
+
         public ProductEditionService(SalesCatalogueStubDbContext dbContext, ILogger<ProductEditionService> logger)
         {
             _dbContext = dbContext;
@@ -85,6 +91,19 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
         public Products GetProductEditionsSinceDateTime(DateTime sinceDateTime)
         {
+            var test = _dbContext.LifecycleEvents.First();
+
+            var lifecycleEvents = _dbContext.LifecycleEvents
+                //.Include(le => le.EventType)
+                //.Include(le => le.ProductEdition)
+                //.ThenInclude(pe => pe.Product)
+                //.ThenInclude(p => p.ProductType)
+                .Where(le => le.LastUpdated > sinceDateTime // &&
+                             //le.ProductEdition.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
+                             //_allowedProductStatus.Contains(Enum.Parse<ProductEditionStatusEnum>(le.EventType.Name))
+                             )
+                .ToList(); //TODO: confirm not evaluating locally
+
             //var product = _dbContext.Products
             //    .Include(p => p.ProductEditions)
             //    .ThenInclude(pe => pe.LifecycleEvents)

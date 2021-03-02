@@ -34,11 +34,22 @@ namespace UKHO.SalesCatalogueStub.Api.EF
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .Entity<ProductType>()
-                .Property(e => e.Name)
-                .HasConversion(
-                    v => v.ToString(),
-                    v => (ProductTypeNameEnum)Enum.Parse(typeof(ProductTypeNameEnum), v));
+                .Entity<ProductEdition>()
+                .HasMany<LifecycleEvent>(pe => pe.LifecycleEvents)
+                .WithOne(le => le.ProductEdition)
+                .HasForeignKey(le => le.EditionId);
+
+            //modelBuilder
+            //    .Entity<LifecycleEvent>()
+            //    .HasOne<ProductEdition>(pe => pe.EditionId).WithMany(le => le.LifecycleEvents).HasForeignKey(le => le.EditionId);
+
+
+            modelBuilder
+                            .Entity<ProductType>()
+                            .Property(e => e.Name)
+                            .HasConversion(
+                                v => v.ToString(),
+                                v => (ProductTypeNameEnum)Enum.Parse(typeof(ProductTypeNameEnum), v));
 
             modelBuilder
                 .Entity<ProductEdition>()
