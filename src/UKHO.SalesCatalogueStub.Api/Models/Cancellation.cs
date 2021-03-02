@@ -12,13 +12,13 @@ namespace UKHO.SalesCatalogueStub.Api.Models
         /// </summary>
         /// <value>The edition number</value>
         [DataMember(Name = "editionNumber")]
-        public decimal? EditionNumber { get; set; }
+        public int? EditionNumber { get; set; }
 
         /// <summary>
         /// The update number, if applicable
         /// </summary>
         /// <value>The update number, if applicable</value>
         [DataMember(Name = "updateNumber")]
-        public decimal? UpdateNumber { get; set; }
+        public int? UpdateNumber { get; set; }
     }
 }
