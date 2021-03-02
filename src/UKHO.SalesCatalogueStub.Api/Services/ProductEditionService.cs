@@ -91,16 +91,10 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
         public Products GetProductEditionsSinceDateTime(DateTime sinceDateTime)
         {
-            var test = _dbContext.LifecycleEvents.First();
-
-            var lifecycleEvents = _dbContext.LifecycleEvents
-                //.Include(le => le.EventType)
-                //.Include(le => le.ProductEdition)
-                //.ThenInclude(pe => pe.Product)
-                //.ThenInclude(p => p.ProductType)
-                .Where(le => le.LastUpdated > sinceDateTime // &&
-                             //le.ProductEdition.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
-                             //_allowedProductStatus.Contains(Enum.Parse<ProductEditionStatusEnum>(le.EventType.Name))
+            var lifecycleEvents = _dbContext.LifecycleEvents.AsNoTracking()
+                .Where(le => le.LastUpdated > sinceDateTime &&
+                             le.ProductEdition.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
+                             _allowedProductStatus.Contains(le.EventType.Name)
                              )
                 .ToList(); //TODO: confirm not evaluating locally
 

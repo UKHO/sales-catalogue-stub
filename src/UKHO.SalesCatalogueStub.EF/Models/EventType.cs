@@ -9,7 +9,7 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Models
         [Column("ID")]
         public Guid Id { get; set; }
 
-        public string Name { get; set; }
+        public ProductEditionStatusEnum Name { get; set; }
 
         public bool StateChanging { get; set; }
 

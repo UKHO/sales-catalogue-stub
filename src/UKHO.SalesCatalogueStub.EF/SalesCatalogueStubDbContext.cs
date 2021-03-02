@@ -39,10 +39,12 @@ namespace UKHO.SalesCatalogueStub.Api.EF
                 .WithOne(le => le.ProductEdition)
                 .HasForeignKey(le => le.EditionId);
 
-            //modelBuilder
-            //    .Entity<LifecycleEvent>()
-            //    .HasOne<ProductEdition>(pe => pe.EditionId).WithMany(le => le.LifecycleEvents).HasForeignKey(le => le.EditionId);
-
+            modelBuilder
+                .Entity<EventType>()
+                .Property(e => e.Name)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (ProductEditionStatusEnum)Enum.Parse(typeof(ProductEditionStatusEnum), v));
 
             modelBuilder
                             .Entity<ProductType>()
