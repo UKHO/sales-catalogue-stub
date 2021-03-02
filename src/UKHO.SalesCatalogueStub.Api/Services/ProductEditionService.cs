@@ -94,7 +94,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             var lifecycleEvents = _dbContext.LifecycleEvents.AsNoTracking()
                 .Where(le => le.LastUpdated > sinceDateTime &&
                              le.ProductEdition.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
-                             _allowedProductStatus.Contains(le.EventType.Name)
+                             _lifecycleEventTypes.Contains(le.EventType.Name)
                              )
                 .ToList(); //TODO: confirm not evaluating locally
 
