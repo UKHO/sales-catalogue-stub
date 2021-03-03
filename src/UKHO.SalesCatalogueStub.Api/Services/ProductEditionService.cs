@@ -96,33 +96,11 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 .Where(le => le.LastUpdated > sinceDateTime &&
                              le.ProductEdition.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
                              _lifecycleEventTypes.Contains(le.EventType.Name)
-                             )
+                )
                 .AsNoTracking()
-                .ToList();
-
-            var groupBy = lifecycleEvents.GroupBy(le => le.ProductEdition.EditionIdentifier);
-            foreach (var group in groupBy)
-            {
-                
-                //var a = group.Key.EditionNumber;
-                string b = group.Key.ToString();
-                string c = "";
-                string d = "";
-                string e = "";
-                var i = 0;
-                foreach (var lifecycleEvent in group)
-                {
-                    if (i == 1)
-                    {
-                        e = "wow!";
-                    }
-                    i++;
-                    c = lifecycleEvent.Id.ToString();
-                    d = lifecycleEvent.EditionId.ToString();
-                    e = e + "";
-                }
-
-            }
+                .ToList()
+                .OrderByDescending(l => l.ProductEdition.EditionNumberAsInt)
+                .GroupBy(le => le.ProductEdition.EditionIdentifier);
 
             //var product = _dbContext.Products
             //    .Include(p => p.ProductEditions)

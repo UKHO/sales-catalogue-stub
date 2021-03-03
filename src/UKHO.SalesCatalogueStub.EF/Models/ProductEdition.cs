@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
 namespace UKHO.SalesCatalogueStub.Api.EF.Models
 {
@@ -15,6 +16,15 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Models
         public string EditionIdentifier { get; set; }
 
         public string EditionNumber { get; set; }
+
+        [IgnoreDataMember]
+        public int EditionNumberAsInt
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(EditionNumber) ? 0 : int.Parse(EditionNumber);
+            }
+        }
 
         public DateTime EditionDate { get; set; }
 
