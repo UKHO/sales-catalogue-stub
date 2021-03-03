@@ -124,16 +124,55 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 // TODO: Popukate productEdition
                 // if latest event is: Update, or Cancel, or reissue,or superseded
 
+                //TODO: if product edition has a 'superseded' event type, what should we do?
 
                 var activeEditionUpdateNumber = relevantLifecycleEvents.First().ProductEdition.UpdateNumber ?? 0;
                 var activeEditionReissueNumber = relevantLifecycleEvents.First().ProductEdition.LastReissueUpdateNumber ?? 0;
-                var updates = GetUpdates(activeEditionReissueNumber, activeEditionUpdateNumber);
 
+                var updatedNumbers = new List<int?>();
+
+                var updatedCount = activeEditionUpdateNumber;
+
+                for (int i = 0; i < relevantLifecycleEvents.Count; i++)
+                {
+                    var lifecycleEvent = relevantLifecycleEvents.ElementAt(i);
+
+                    if (lifecycleEvent.EventType.Name == ProductEditionStatusEnum.Base)
+                    {
+                        updatedNumbers.Add(0);
+                        break;
+                    }
+
+                    if (lifecycleEvent.EventType.Name == ProductEditionStatusEnum.Updated)
+                    {
+                        updatedNumbers.Add(updatedCount);
+                        updatedCount--;
+                        continue;
+                    }
+
+                    if (lifecycleEvent.EventType.Name == ProductEditionStatusEnum.Reissued)
+                    {
+                        updatedNumbers.Add(activeEditionReissueNumber);
+                        break;
+                    }
+
+                    if (lifecycleEvent.EventType.Name == ProductEditionStatusEnum.Cancelled)
+                    {
+                        continue;
+                    }
+                }
+
+                 if (relevantLifecycleEvents.Any(le => le.EventType.Name == ProductEditionStatusEnum.Cancelled))
+                {
+                    var currentUpdateNumber = updatedNumbers.Count > 0 ? updatedNumbers.Max(l => l).Value : 0;
+                    productEdition.Cancellation = GetCancellation(currentUpdateNumber);
+                }
+                    
                 var t = relevantLifecycleEvents.First().EventType.Name;
 
 
                 productEdition.EditionNumber = editionNumberAsInt;
-                productEdition.UpdateNumbers = updates;
+                productEdition.UpdateNumbers = updatedNumbers.OrderBy(gt => gt.Value).ToList();
                 productEdition.ProductName = product;
 
                 productsSinceDatetime.Add(productEdition);
