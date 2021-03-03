@@ -67,7 +67,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
 
-            SimpleProductEditionSetupByStatusCollection(expectedProductName, expectedEditionNumber,
+            SimpleProductEditionSetupByStatusCollection(expectedProductName, expectedEditionNumber,null,
                 new List<ProductEditionStatusEnum>
                 {
                     ProductEditionStatusEnum.Base
@@ -81,7 +81,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
-            productEdition.UpdateNumbers.Should().ContainSingle().Which.Should().Be(0);
+            productEdition.UpdateNumbers.Should().BeEquivalentTo(0);
         }
 
         [Test]
@@ -89,8 +89,9 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
+            var expectedUpdateNumber = 1;
 
-            SimpleProductEditionSetupByStatusCollection(expectedProductName, expectedEditionNumber,
+            SimpleProductEditionSetupByStatusCollection(expectedProductName, expectedEditionNumber, expectedUpdateNumber,
                 new List<ProductEditionStatusEnum>
                 {
                     ProductEditionStatusEnum.Base,
@@ -105,10 +106,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
-            productEdition.UpdateNumbers.Should().HaveCount(2).And.BeEquivalentTo(new List<int>{0, 1});
+            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?>{0, 1});
         }
 
-        private void SimpleProductEditionSetupByStatusCollection(string productName, int editionNumber, ICollection<ProductEditionStatusEnum> statusCollection)
+        private void SimpleProductEditionSetupByStatusCollection(string productName, int editionNumber, int? updateNumber, ICollection<ProductEditionStatusEnum> statusCollection)
         {
             var lifecycleEvents = new List<LifecycleEvent>();
 
@@ -136,7 +137,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                             EditionIdentifier = productName,
                             LatestStatus = statusCollection.Last(),
                             EditionNumber = editionNumber.ToString(),
-                            UpdateNumber = null,
+                            UpdateNumber = updateNumber,
                             LifecycleEvents = lifecycleEvents
                         }
                     },

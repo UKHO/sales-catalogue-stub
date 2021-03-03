@@ -91,12 +91,15 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
         public Products GetProductEditionsSinceDateTime(DateTime sinceDateTime)
         {
+            var productsSinceDatetime = new Products();
+
             var lifecycleEvents = _dbContext.LifecycleEvents
                 .Include(le => le.ProductEdition)
+                .Include(le => le.EventType)
                 .Where(le => le.LastUpdated > sinceDateTime &&
                              le.ProductEdition.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
                              _lifecycleEventTypes.Contains(le.EventType.Name)
-                             //le.ProductEdition.EditionIdentifier == "1U419232"
+                             //&& le.ProductEdition.EditionIdentifier == "jp34b5jk" //lastupdated: 2011-11-08 13:50:35.680
                 )
                 .AsNoTracking()
                 .ToList();
@@ -105,6 +108,8 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
             foreach (var product in products)
             {
+                var productEdition = new ProductsInner();
+
                 var editionNumberAsInt = lifecycleEvents
                     .Where(le => le.ProductEdition.EditionIdentifier == product)
                     .Select(le => le.ProductEdition.EditionNumberAsInt)
@@ -116,9 +121,27 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     .OrderByDescending(le => le.LastUpdated)
                     .ToList();
 
+                // TODO: Popukate productEdition
+                // if latest event is: Update, or Cancel, or reissue,or superseded
+
+
+                var activeEditionUpdateNumber = relevantLifecycleEvents.First().ProductEdition.UpdateNumber ?? 0;
+                var activeEditionReissueNumber = relevantLifecycleEvents.First().ProductEdition.LastReissueUpdateNumber ?? 0;
+                var updates = GetUpdates(activeEditionReissueNumber, activeEditionUpdateNumber);
+
+                var t = relevantLifecycleEvents.First().EventType.Name;
+
+
+                productEdition.EditionNumber = editionNumberAsInt;
+                productEdition.UpdateNumbers = updates;
+                productEdition.ProductName = product;
+
+                productsSinceDatetime.Add(productEdition);
+                    
+
             }
 
-            return null;
+            return productsSinceDatetime;
         }
 
         private static List<int?> GetUpdates(int lastReissueUpdateNumber, int latestUpdateNumber)
