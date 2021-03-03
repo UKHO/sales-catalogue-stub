@@ -96,18 +96,28 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 .Where(le => le.LastUpdated > sinceDateTime &&
                              le.ProductEdition.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
                              _lifecycleEventTypes.Contains(le.EventType.Name)
+                             //le.ProductEdition.EditionIdentifier == "1U419232"
                 )
                 .AsNoTracking()
-                .ToList()
-                .OrderByDescending(l => l.ProductEdition.EditionNumberAsInt)
-                .GroupBy(le => le.ProductEdition.EditionIdentifier);
+                .ToList();
 
-            //var product = _dbContext.Products
-            //    .Include(p => p.ProductEditions)
-            //    .ThenInclude(pe => pe.LifecycleEvents)
-            //    .ThenInclude(le => le.EventType)
-            //    .Single(p => p.Identifier == "a");
-            //var lifecycle = product.ProductEditions.ElementAt(0).LifecycleEvents.ElementAt(0);
+            var products = lifecycleEvents.Select(le => le.ProductEdition.EditionIdentifier).Distinct().ToList();
+
+            foreach (var product in products)
+            {
+                var editionNumberAsInt = lifecycleEvents
+                    .Where(le => le.ProductEdition.EditionIdentifier == product)
+                    .Select(le => le.ProductEdition.EditionNumberAsInt)
+                    .OrderByDescending(le => le)
+                    .First();
+
+                var relevantLifecycleEvents = lifecycleEvents
+                    .Where(le => le.ProductEdition.EditionIdentifier == product && le.ProductEdition.EditionNumberAsInt == editionNumberAsInt)
+                    .OrderByDescending(le => le.LastUpdated)
+                    .ToList();
+
+            }
+
             return null;
         }
 
