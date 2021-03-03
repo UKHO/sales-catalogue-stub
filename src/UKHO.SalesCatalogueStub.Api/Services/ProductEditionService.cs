@@ -76,7 +76,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 else
                 {
                     _logger.LogInformation(
-                        $"{nameof(ProductEditionService)} no match, or duplicate entries found for product {product}");
+                        $"{nameof(ProductEditionService)} no match found for product {product}");
                 }
             }
 
