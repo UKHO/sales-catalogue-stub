@@ -118,7 +118,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                 {
                     EventType = new EventType
                     {
-                        Name = statusCollection.ElementAt(i).ToString()
+                        Name = statusCollection.ElementAt(i)
                     },
                     LastUpdated = DateTime.Now.AddDays(-(statusCollection.Count - i))
                 });
@@ -128,11 +128,12 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             {
                 new Product
                 {
-                    Identifier = productName,
+                    //Identifier = productName,
                     ProductEditions = new List<ProductEdition>
                     {
                         new ProductEdition
                         {
+                            EditionIdentifier = productName,
                             LatestStatus = statusCollection.Last(),
                             EditionNumber = editionNumber.ToString(),
                             UpdateNumber = null,
