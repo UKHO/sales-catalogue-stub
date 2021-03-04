@@ -193,7 +193,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Base_Followed_By_Updated_Then_Correct_ProductEdition_Is_Returned()
+        public void Test_GetProductEditionsSinceDateTime_Given_Events_Of_Base_Followed_By_Updated_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -219,7 +219,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Reissued_Followed_By_Updated_Then_Correct_ProductEdition_Is_Returned()
+        public void Test_GetProductEditionsSinceDateTime_Given_Events_Of_Reissued_Followed_By_Updated_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -245,7 +245,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Updated_Followed_By_Reissued_Then_Correct_ProductEdition_Is_Returned()
+        public void Test_GetProductEditionsSinceDateTime_Given_Events_Of_Updated_Followed_By_Reissued_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -271,7 +271,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Updated_Followed_By_Reissued_Followed_By_Updated_Then_Correct_ProductEdition_Is_Returned()
+        public void Test_GetProductEditionsSinceDateTime_Given_Events_Of_Updated_Followed_By_Reissued_Followed_By_Updated_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -298,7 +298,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Updated_Followed_By_Cancelled_Then_Correct_ProductEdition_Is_Returned()
+        public void Test_GetProductEditionsSinceDateTime_Given_Events_Of_Updated_Followed_By_Cancelled_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -326,6 +326,92 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                 EditionNumber = 0,
                 UpdateNumber = 2
             });
+        }
+
+        [Test]
+        public void Test_GetProductEditionsSinceDateTime_Given_No_Matching_Events_Then_WHAT_Is_Returned()
+        {
+            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+
+            productEditions.Should().NotBeNull().And.BeEmpty();
+        }
+
+        [Test]
+        public void Test_GetProductEditionsSinceDateTime_Given_Two_ProductEditions_Then_One_Correct_ProductEdition_Is_Returned()
+        {
+            var expectedProductName = "a";
+            var expectedEditionNumber = 2;
+            var expectedUpdateNumber = 1;
+            var expectedReissueNumber = 0;
+
+            SimpleProductEditionSetupByStatusCollection(expectedProductName, 1, expectedUpdateNumber, expectedReissueNumber,
+                new List<ProductEditionStatusEnum>
+                {
+                    ProductEditionStatusEnum.Updated,
+                    ProductEditionStatusEnum.Cancelled
+                });
+
+            SimpleProductEditionSetupByStatusCollection(expectedProductName, expectedEditionNumber, expectedUpdateNumber, expectedReissueNumber,
+                new List<ProductEditionStatusEnum>
+                {
+                    ProductEditionStatusEnum.Base,
+                    ProductEditionStatusEnum.Updated
+                });
+
+            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+
+            productEditions.Should().NotBeNull().And.ContainSingle();
+
+            var productEdition = productEditions.ElementAt(0);
+
+            productEdition.ProductName.Should().Be(expectedProductName);
+            productEdition.EditionNumber.Should().Be(expectedEditionNumber);
+            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 0, 1 });
+        }
+
+        [Test]
+        public void Test_GetProductEditionsSinceDateTime_Given_Two_Products_Then_Two_Correct_ProductEditions_Are_Returned()
+        {
+            var expectedProductName = "a";
+            var expectedEditionNumber = 2;
+            var expectedUpdateNumber = 2;
+            var expectedReissueNumber = 0;
+
+            var expectedProductName2 = "b";
+            var expectedEditionNumber2 = 2;
+            var expectedUpdateNumber2 = 1;
+            var expectedReissueNumber2 = 0;
+
+            SimpleProductEditionSetupByStatusCollection(expectedProductName, expectedEditionNumber, expectedUpdateNumber, expectedReissueNumber,
+                new List<ProductEditionStatusEnum>
+                {
+                    ProductEditionStatusEnum.Base,
+                    ProductEditionStatusEnum.Updated,
+                    ProductEditionStatusEnum.Updated
+                });
+
+            SimpleProductEditionSetupByStatusCollection(expectedProductName2, expectedEditionNumber2, expectedUpdateNumber2, expectedReissueNumber2,
+                new List<ProductEditionStatusEnum>
+                {
+                    ProductEditionStatusEnum.Base,
+                    ProductEditionStatusEnum.Updated
+                });
+
+            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+
+            productEditions.Should().NotBeNull().And.HaveCount(2);
+
+            var productEdition = productEditions.ElementAt(0);
+
+            productEdition.ProductName.Should().Be(expectedProductName);
+            productEdition.EditionNumber.Should().Be(expectedEditionNumber);
+            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 0, 1, 2 });
+
+            var productEdition2 = productEditions.ElementAt(1);
+
+            productEdition2.ProductName.Should().Be(expectedProductName2);
+            productEdition2.EditionNumber.Should().Be(expectedEditionNumber2);
+            productEdition2.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 0, 1 });
         }
 
         private void SimpleProductEditionSetupByStatusCollection(string productName, int editionNumber, int? updateNumber, int? reissueNumber, ICollection<ProductEditionStatusEnum> statusCollection)
