@@ -52,14 +52,14 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual IActionResult GetProducts([FromRoute][Required] string productType, [FromQuery] DateTime? sinceDateTime)
         {
-            // return StatusCode(500, default(DefaultErrorResponse));
-
-            //TODO: Null sinceDateTime return 400
-            //TODO: Empty productEditions return 304?
+            if (!sinceDateTime.HasValue)
+            {
+                return StatusCode(400, default(DefaultErrorResponse));
+            }
 
             var productEditions = _productEditionService.GetProductEditionsSinceDateTime(sinceDateTime.Value);
 
-            return !productEditions.Any() ? StatusCode(400, default(ErrorDescription)) : StatusCode(200, JsonConvert.SerializeObject(productEditions, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }));
+            return !productEditions.Any() ? StatusCode(304, default(ErrorDescription)) : StatusCode(200, JsonConvert.SerializeObject(productEditions, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }));
         }
 
         /// <summary>
