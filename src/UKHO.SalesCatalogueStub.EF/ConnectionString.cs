@@ -19,7 +19,6 @@ namespace UKHO.SalesCatalogueStub.Api.EF
             Build(string dataSource, string initialCatalog = "", string userId = "", string password = "") =>
             new SqlConnectionStringBuilder
             {
-                //TODO: Ensure these are correct
                 DataSource = dataSource,
                 InitialCatalog = initialCatalog,
                 IntegratedSecurity = false,
