@@ -58,6 +58,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 0 });
+            productEdition.FileSize.Should().Be(100);
         }
 
         [Test]
@@ -83,6 +84,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?>{ expectedUpdateNumber });
+            productEdition.FileSize.Should().Be(600);
         }
 
         [Test]
@@ -108,6 +110,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?>{ expectedReissueNumber });
+            productEdition.FileSize.Should().Be(600);
         }
 
         [Test]
@@ -133,11 +136,31 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?>{ });
+            productEdition.FileSize.Should().Be(200);
             productEdition.Cancellation.Should().BeEquivalentTo(new Cancellation
             {
                 EditionNumber = 0,
                 UpdateNumber = expectedUpdateNumber + 1
             });
+        }
+
+        [Test]
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Events_Solely_Superseded_Then_Empty_Collection_Is_Returned()
+        {
+            var expectedProductName = "a";
+            var expectedEditionNumber = 1;
+            var expectedUpdateNumber = 1;
+            var expectedReissueNumber = 0;
+
+            SimpleProductEditionSetupByStatusCollection(expectedProductName, expectedEditionNumber, expectedUpdateNumber, expectedReissueNumber,
+                new List<ProductEditionStatusEnum>
+                {
+                    ProductEditionStatusEnum.Superseded
+                });
+
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+
+            productEditions.Should().NotBeNull().And.BeEmpty();
         }
 
         [Test]
@@ -165,6 +188,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?>{ 3, 4, 5 });
+            productEdition.FileSize.Should().Be(600);
         }
 
         [Test]
@@ -191,6 +215,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?>{0, 1});
+            productEdition.FileSize.Should().Be(200);
         }
 
         [Test]
@@ -217,6 +242,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 5, 6 });
+            productEdition.FileSize.Should().Be(700);
         }
 
         [Test]
@@ -243,6 +269,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 6 });
+            productEdition.FileSize.Should().Be(700);
         }
 
         [Test]
@@ -270,6 +297,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 6, 7 });
+            productEdition.FileSize.Should().Be(800);
         }
 
         [Test]
@@ -296,6 +324,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 1 });
+            productEdition.FileSize.Should().Be(200);
             productEdition.Cancellation.Should().BeEquivalentTo(new Cancellation
             {
                 EditionNumber = 0,
@@ -304,7 +333,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public async Task Test_GetProductEditionsSinceDateTime_Given_No_Matching_Events_Then_WHAT_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_No_Matching_Events_Then_Empty_Collection_Is_Returned()
         {
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
@@ -342,6 +371,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 0, 1 });
+            productEdition.FileSize.Should().Be(200);
         }
 
         [Test]
@@ -381,12 +411,14 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 0, 1, 2 });
+            productEdition.FileSize.Should().Be(300);
 
             var productEdition2 = productEditions.ElementAt(1);
 
             productEdition2.ProductName.Should().Be(expectedProductName2);
             productEdition2.EditionNumber.Should().Be(expectedEditionNumber2);
             productEdition2.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 0, 1 });
+            productEdition2.FileSize.Should().Be(200);
         }
 
         private void SimpleProductEditionSetupByStatusCollection(string productName, int editionNumber, int? updateNumber, int? reissueNumber, ICollection<ProductEditionStatusEnum> statusCollection)
