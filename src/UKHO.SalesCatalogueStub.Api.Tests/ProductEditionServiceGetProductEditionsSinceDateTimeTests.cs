@@ -136,7 +136,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.Cancellation.Should().BeEquivalentTo(new Cancellation
             {
                 EditionNumber = 0,
-                UpdateNumber = expectedUpdateNumber
+                UpdateNumber = expectedUpdateNumber + 1
             });
         }
 
