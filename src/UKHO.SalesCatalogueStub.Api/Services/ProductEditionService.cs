@@ -163,15 +163,18 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     }
                 }
 
+                var currentUpdateNumber = updatedNumbers.Count > 0 ? updatedNumbers.Max(l => l).Value : 0;
+
                 if (relevantLifecycleEvents.Any(le => le.EventType.Name == ProductEditionStatusEnum.Cancelled))
                 {
-                    var currentUpdateNumber = updatedNumbers.Count > 0 ? updatedNumbers.Max(l => l).Value : 0;
+                    
                     productEdition.Cancellation = GetCancellation(currentUpdateNumber);
                 }
 
                 productEdition.EditionNumber = editionNumberAsInt;
                 productEdition.UpdateNumbers = updatedNumbers.OrderBy(gt => gt.Value).ToList();
                 productEdition.ProductName = product;
+                productEdition.FileSize = GetFileSize(currentUpdateNumber);
 
                 productsSinceDatetime.Add(productEdition);
 
