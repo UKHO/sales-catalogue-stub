@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UKHO.SalesCatalogueStub.Api.Models;
 
 namespace UKHO.SalesCatalogueStub.Api.Services
@@ -9,6 +10,6 @@ namespace UKHO.SalesCatalogueStub.Api.Services
     public interface IProductEditionService
     {
         Products GetProductEditions(List<string> products);
-        Products GetProductEditionsSinceDateTime(DateTime sinceDateTime);
+        Task<Products> GetProductEditionsSinceDateTime(DateTime sinceDateTime);
     }
 }

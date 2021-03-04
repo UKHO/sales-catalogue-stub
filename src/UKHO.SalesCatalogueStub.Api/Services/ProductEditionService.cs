@@ -1,10 +1,11 @@
 ﻿#pragma warning disable 1591
 
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using UKHO.SalesCatalogueStub.Api.EF;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 using UKHO.SalesCatalogueStub.Api.Models;
@@ -89,20 +90,19 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return matchedProducts;
         }
 
-        public Products GetProductEditionsSinceDateTime(DateTime sinceDateTime)
+        public async Task<Products> GetProductEditionsSinceDateTime(DateTime sinceDateTime)
         {
             var productsSinceDatetime = new Products();
 
-            var lifecycleEvents = _dbContext.LifecycleEvents
+            var lifecycleEvents = await _dbContext.LifecycleEvents
                 .Include(le => le.ProductEdition)
                 .Include(le => le.EventType)
                 .Where(le => le.LastUpdated > sinceDateTime &&
                              le.ProductEdition.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
                              _lifecycleEventTypes.Contains(le.EventType.Name)
-                //&& le.ProductEdition.EditionIdentifier == "jp34b5jk" //lastupdated: 2011-11-08 13:50:35.680
                 )
                 .AsNoTracking()
-                .ToList();
+                .ToListAsync();
 
             var products = lifecycleEvents.Select(le => le.ProductEdition.EditionIdentifier).Distinct().ToList();
 
@@ -123,7 +123,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
                 if (relevantLifecycleEvents.First().EventType.Name == ProductEditionStatusEnum.Superseded)
                 {
-                    // TODO: confirm with Kev that this product will not be listed in the output
+                    // this product will not be listed in the output
                     continue;
                 }
 

@@ -1,11 +1,12 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Annotations;
 using UKHO.SalesCatalogueStub.Api.Attributes;
 using UKHO.SalesCatalogueStub.Api.Models;
 using UKHO.SalesCatalogueStub.Api.Services;
@@ -50,14 +51,14 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetProducts([FromRoute][Required] string productType, [FromQuery] DateTime? sinceDateTime)
+        public virtual async Task<IActionResult> GetProducts([FromRoute][Required] string productType, [FromQuery] DateTime? sinceDateTime)
         {
             if (!sinceDateTime.HasValue)
             {
                 return StatusCode(400, default(DefaultErrorResponse));
             }
 
-            var productEditions = _productEditionService.GetProductEditionsSinceDateTime(sinceDateTime.Value);
+            var productEditions = await _productEditionService.GetProductEditionsSinceDateTime(sinceDateTime.Value);
 
             return !productEditions.Any() ? StatusCode(304, default(ErrorDescription)) : StatusCode(200, JsonConvert.SerializeObject(productEditions, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }));
         }

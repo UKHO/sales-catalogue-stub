@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +37,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Solely_Base_Then_Correct_ProductEdition_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Events_Solely_Base_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -48,7 +49,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     ProductEditionStatusEnum.Base
                 });
 
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.ContainSingle();
 
@@ -60,7 +61,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Solely_Updated_Then_Correct_ProductEdition_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Events_Solely_Updated_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -73,7 +74,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     ProductEditionStatusEnum.Updated
                 });
 
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.ContainSingle();
 
@@ -85,7 +86,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Solely_Reissued_Then_Correct_ProductEdition_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Events_Solely_Reissued_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -98,7 +99,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     ProductEditionStatusEnum.Reissued
                 });
 
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.ContainSingle();
 
@@ -110,7 +111,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Solely_Cancelled_Then_Correct_ProductEdition_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Events_Solely_Cancelled_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -123,7 +124,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     ProductEditionStatusEnum.Cancelled
                 });
 
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.ContainSingle();
 
@@ -140,7 +141,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_With_Multiple_Updated_Then_Correct_ProductEdition_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Events_With_Multiple_Updated_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -155,7 +156,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     ProductEditionStatusEnum.Updated
                 });
 
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.ContainSingle();
 
@@ -167,7 +168,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Of_Base_Followed_By_Updated_Then_Correct_ProductEdition_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Events_Of_Base_Followed_By_Updated_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -181,7 +182,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     ProductEditionStatusEnum.Updated
                 });
 
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.ContainSingle();
 
@@ -193,7 +194,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Of_Reissued_Followed_By_Updated_Then_Correct_ProductEdition_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Events_Of_Reissued_Followed_By_Updated_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -207,7 +208,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     ProductEditionStatusEnum.Updated
                 });
 
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.ContainSingle();
 
@@ -219,7 +220,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Of_Updated_Followed_By_Reissued_Then_Correct_ProductEdition_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Events_Of_Updated_Followed_By_Reissued_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -233,7 +234,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     ProductEditionStatusEnum.Reissued
                 });
 
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.ContainSingle();
 
@@ -245,7 +246,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Of_Updated_Followed_By_Reissued_Followed_By_Updated_Then_Correct_ProductEdition_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Events_Of_Updated_Followed_By_Reissued_Followed_By_Updated_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -260,7 +261,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     ProductEditionStatusEnum.Updated
                 });
 
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.ContainSingle();
 
@@ -272,7 +273,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Events_Of_Updated_Followed_By_Cancelled_Then_Correct_ProductEdition_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Events_Of_Updated_Followed_By_Cancelled_Then_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 1;
@@ -286,7 +287,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     ProductEditionStatusEnum.Cancelled
                 });
 
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.ContainSingle();
 
@@ -303,15 +304,15 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_No_Matching_Events_Then_WHAT_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_No_Matching_Events_Then_WHAT_Is_Returned()
         {
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.BeEmpty();
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Two_ProductEditions_Then_One_Correct_ProductEdition_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Two_ProductEditions_Then_One_Correct_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 2;
@@ -332,7 +333,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     ProductEditionStatusEnum.Updated
                 });
 
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.ContainSingle();
 
@@ -344,7 +345,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Test_GetProductEditionsSinceDateTime_Given_Two_Products_Then_Two_Correct_ProductEditions_Are_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Two_Products_Then_Two_Correct_ProductEditions_Are_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 2;
@@ -371,7 +372,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     ProductEditionStatusEnum.Updated
                 });
 
-            var productEditions = _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
             productEditions.Should().NotBeNull().And.HaveCount(2);
 
