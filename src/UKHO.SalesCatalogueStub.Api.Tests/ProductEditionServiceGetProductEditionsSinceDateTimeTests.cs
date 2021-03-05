@@ -341,7 +341,105 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public async Task Test_GetProductEditionsSinceDateTime_Given_Two_ProductEditions_Then_One_Correct_ProductEdition_Is_Returned()
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Ignored_Events_Then_Empty_Collection_Is_Returned()
+        {
+            SimpleProductEditionSetupByStatusCollection("a", 1, null, 0,
+                new List<ProductEditionStatusEnum>
+                {
+                    ProductEditionStatusEnum.Announced,
+                    ProductEditionStatusEnum.Archived,
+                    ProductEditionStatusEnum.Edition,
+                    ProductEditionStatusEnum.New,
+                    ProductEditionStatusEnum.Published,
+                    ProductEditionStatusEnum.Unavailable
+                });
+
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+
+            productEditions.Should().NotBeNull().And.BeEmpty();
+        }
+
+        [Test]
+        public async Task Test_GetProductEditionsSinceDateTime_Given_ProductType_Not_Avcs_Then_Empty_Collection_Is_Returned()
+        {
+            _dbContext.AddRange(new List<Product>
+            {
+                new Product
+                {
+                    ProductEditions = new List<ProductEdition>
+                    {
+                        new ProductEdition
+                        {
+                            EditionIdentifier = "a",
+                            LatestStatus = ProductEditionStatusEnum.Base,
+                            EditionNumber = "1",
+                            UpdateNumber = null,
+                            LastReissueUpdateNumber = 0,
+                            LifecycleEvents = new List<LifecycleEvent>{
+                                new LifecycleEvent
+                                {
+                                    EventType = new EventType
+                                    {
+                                        Name = ProductEditionStatusEnum.Base
+                                    },
+                                    LastUpdated = DateTime.Now
+                                }
+                            }
+                        }
+                    },
+                    ProductType = new ProductType {Name = ProductTypeNameEnum.Chart}
+                }
+            });
+
+            _dbContext.SaveChanges();
+
+            var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
+
+            productEditions.Should().NotBeNull().And.BeEmpty();
+        }
+
+        [TestCase("2021-01-01", "2021-01-01")]
+        [TestCase("2021-01-01", "2021-01-02")]
+        public async Task Test_GetProductEditionsSinceDateTime_Given_LastUpdated_Older_Or_The_Same_As_SinceDateTime_Then_Empty_Collection_Is_Returned(DateTime lastUpdated, DateTime sinceDateTime)
+        {
+            _dbContext.AddRange(new List<Product>
+            {
+                new Product
+                {
+                    ProductEditions = new List<ProductEdition>
+                    {
+                        new ProductEdition
+                        {
+                            EditionIdentifier = "a",
+                            LatestStatus = ProductEditionStatusEnum.Base,
+                            EditionNumber = "1",
+                            UpdateNumber = null,
+                            LastReissueUpdateNumber = 0,
+                            LifecycleEvents = new List<LifecycleEvent>{
+                                new LifecycleEvent
+                                {
+                                    EventType = new EventType
+                                    {
+                                        Name = ProductEditionStatusEnum.Base
+                                    },
+                                    LastUpdated = lastUpdated
+                                }
+                            }
+                        }
+                    },
+                    ProductType = new ProductType {Name = ProductTypeNameEnum.Avcs}
+                }
+            });
+
+            _dbContext.SaveChanges();
+
+            var productEditions = await _service.GetProductEditionsSinceDateTime(sinceDateTime);
+
+            productEditions.Should().NotBeNull().And.BeEmpty();
+        }
+
+        [Test]
+        public async Task Test_GetProductEditionsSinceDateTime_Given_Two_ProductEditions_For_Same_Product_Then_Only_The_Newer_ProductEdition_Is_Returned()
         {
             var expectedProductName = "a";
             var expectedEditionNumber = 2;
