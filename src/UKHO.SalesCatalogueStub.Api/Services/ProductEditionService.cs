@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using UKHO.SalesCatalogueStub.Api.EF;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 using UKHO.SalesCatalogueStub.Api.Models;
-using Products = UKHO.SalesCatalogueStub.Api.Models.Products;
 
 namespace UKHO.SalesCatalogueStub.Api.Services
 {
@@ -85,6 +84,93 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     _logger.LogInformation(
                         $"{nameof(ProductEditionService)} no match found for product {product}");
                 }
+            }
+
+            return matchedProducts;
+        }
+
+
+        public Products GetProductVersions(ProductVersions productVersions)
+        {
+            if (productVersions == null) throw new ArgumentNullException(nameof(productVersions));
+
+            var distinctProducts = productVersions
+                .GroupBy(item => item.ProductName.Trim(), StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.First())
+                .ToList();
+
+            var matchedProducts = new Products();
+
+            foreach (var requestProduct in distinctProducts)
+            {
+                var productDbMatch = _dbContext.ProductEditions.AsNoTracking().SingleOrDefault(a =>
+                    a.EditionIdentifier == requestProduct.ProductName &&
+                    a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
+                    _allowedProductStatus.Contains(a.LatestStatus));
+
+                if (productDbMatch == null) continue;
+
+                var activeEditionUpdateNumber = productDbMatch.UpdateNumber ?? 0;
+
+                var matchedProduct = new ProductsInner
+                {
+                    EditionNumber = Convert.ToInt32(productDbMatch.EditionNumber),
+                    FileSize = GetFileSize(activeEditionUpdateNumber),
+                    ProductName = productDbMatch.EditionIdentifier
+                };
+
+
+                // If not cancelled, reject where provided and current are the same
+                if (productDbMatch.UpdateNumber == requestProduct.UpdateNumber &&
+                    matchedProduct.EditionNumber == requestProduct.EditionNumber &&
+                    productDbMatch.LatestStatus != ProductEditionStatusEnum.Cancelled)
+                    continue;
+
+                // Reject where edition or update numbers are provided that are higher than current
+                if ((requestProduct.EditionNumber > matchedProduct.EditionNumber) ||
+                    (requestProduct.EditionNumber == matchedProduct.EditionNumber &&
+                     requestProduct.UpdateNumber > productDbMatch.UpdateNumber))
+                    continue;
+
+                var start = (productDbMatch.LastReissueUpdateNumber > 0)
+                    ? productDbMatch.LastReissueUpdateNumber : (requestProduct.EditionNumber < matchedProduct.EditionNumber) ? 0 : requestProduct.UpdateNumber + 1 ?? 1;
+
+                var end = activeEditionUpdateNumber;
+
+                switch (productDbMatch.LatestStatus)
+                {
+                    case ProductEditionStatusEnum.Cancelled:
+                        {
+                            matchedProduct.Cancellation = new Cancellation
+                            {
+                                EditionNumber = 0
+                            };
+
+                            if (requestProduct.EditionNumber == matchedProduct.EditionNumber && requestProduct.UpdateNumber == activeEditionUpdateNumber)
+                            {
+                                matchedProduct.UpdateNumbers = new List<int?>();
+                                matchedProduct.Cancellation.UpdateNumber = activeEditionUpdateNumber;
+                                matchedProduct.EditionNumber = 0;
+                            }
+                            else if (requestProduct.EditionNumber < matchedProduct.EditionNumber || requestProduct.UpdateNumber < activeEditionUpdateNumber)
+                            {
+                                end--;
+
+                                matchedProduct.UpdateNumbers = GetUpdates(start.Value, end);
+                                matchedProduct.Cancellation.UpdateNumber = activeEditionUpdateNumber;
+                            }
+
+                            break;
+                        }
+                    case ProductEditionStatusEnum.Base:
+                        matchedProduct.UpdateNumbers = new List<int?> { 0 };
+                        break;
+                    default:
+                        matchedProduct.UpdateNumbers = GetUpdates(start.Value, end);
+                        break;
+                }
+
+                matchedProducts.Add(matchedProduct);
             }
 
             return matchedProducts;
@@ -177,6 +263,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
         private static List<int?> GetUpdates(int lastReissueUpdateNumber, int latestUpdateNumber)
         {
             var productUpdates = new List<int?>();
+
             for (var i = lastReissueUpdateNumber; i <= latestUpdateNumber; i++)
             {
                 productUpdates.Add(i);
