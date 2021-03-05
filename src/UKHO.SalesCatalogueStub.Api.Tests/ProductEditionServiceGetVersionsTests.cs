@@ -44,10 +44,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersion.UpdateNumber = null;
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersion }).First();
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actual.UpdateNumbers.Should().ContainInOrder(new[] { 1, 2, 3, 4 });
+            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 1, 2, 3, 4 });
         }
 
         [Test]
@@ -59,10 +59,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersion.UpdateNumber = 1;
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersion }).First();
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actual.UpdateNumbers.Should().ContainInOrder(new[] { 2, 3, 4 });
+            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 2, 3, 4 });
         }
 
         [TestCase(2, null, TestName = "No update number provided")]
@@ -77,13 +77,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersionOne.EditionNumber = callerEdition;
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersionOne }).First();
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersionOne });
 
             // Assert
             var currentEditionNumber = Convert.ToInt32(dbProduct.ProductEditions.First().EditionNumber);
 
-            actual.UpdateNumbers.Should().ContainInOrder(new[] { 2, 3, 4 });
-            actual.EditionNumber.Should().Be(currentEditionNumber);
+            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 2, 3, 4 });
+            actualProducts.First().EditionNumber.Should().Be(currentEditionNumber);
         }
 
         [Test]
@@ -95,10 +95,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersionOne.UpdateNumber = null;
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersionOne }).First();
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersionOne });
 
             // Assert
-            actual.UpdateNumbers.Should().ContainInOrder(new[] { 1, 2, 3 });
+            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 1, 2, 3 });
         }
 
         [Test]
@@ -109,11 +109,11 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersion.EditionNumber = 1;
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersion }).First();
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actual.EditionNumber.Should().Be(2);
-            actual.UpdateNumbers.Single().Should().Be(0);
+            actualProducts.First().EditionNumber.Should().Be(2);
+            actualProducts.First().UpdateNumbers.Single().Should().Be(0);
         }
 
         [Test]
@@ -123,10 +123,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (_, productVersion, _) = CreateProduct("GB1234", 2, 3, ProductEditionStatusEnum.Superseded);
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actual.Should().HaveCount(0);
+            actualProducts.Should().HaveCount(0);
         }
 
         [Test]
@@ -136,10 +136,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (_, productVersion, _) = CreateProduct("GB1234", 2, 3, ProductEditionStatusEnum.Updated);
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actual.Should().HaveCount(0);
+            actualProducts.Should().HaveCount(0);
         }
 
         [Test]
@@ -150,10 +150,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersion.EditionNumber++;
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actual.Should().HaveCount(0);
+            actualProducts.Should().HaveCount(0);
         }
 
         [Test]
@@ -164,10 +164,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersion.UpdateNumber++;
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actual.Should().HaveCount(0);
+            actualProducts.Should().HaveCount(0);
         }
 
 
@@ -179,10 +179,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersion.EditionNumber = 1;
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersion }).First();
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actual.UpdateNumbers.Should().ContainInOrder(new[] { 0, 1, 2, 3 });
+            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 0, 1, 2, 3 });
         }
 
         //this can be updates up to one befor4e cancel but also need an updates from reissue
@@ -193,13 +193,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (_, productVersion, _) = CreateProduct("GB1234", 2, 1, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersion }).First();
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actual.EditionNumber.Should().Be(0);
-            actual.Cancellation.UpdateNumber.Should().Be(1);
-            actual.Cancellation.EditionNumber.Should().Be(0);
-            actual.UpdateNumbers.Should().HaveCount(0);
+            actualProducts.First().EditionNumber.Should().Be(0);
+            actualProducts.First().Cancellation.UpdateNumber.Should().Be(1);
+            actualProducts.First().Cancellation.EditionNumber.Should().Be(0);
+            actualProducts.First().UpdateNumbers.Should().HaveCount(0);
         }
 
         [Test]
@@ -210,13 +210,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersion.UpdateNumber -= 2;
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersion }).First();
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actual.UpdateNumbers.Should().ContainInOrder(new[] { 2 });
-            actual.EditionNumber.Should().Be(2);
-            actual.Cancellation.UpdateNumber.Should().Be(3);
-            actual.Cancellation.EditionNumber.Should().Be(0);
+            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 2 });
+            actualProducts.First().EditionNumber.Should().Be(2);
+            actualProducts.First().Cancellation.UpdateNumber.Should().Be(3);
+            actualProducts.First().Cancellation.EditionNumber.Should().Be(0);
         }
 
         [Test]
@@ -231,12 +231,12 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersionTwo.UpdateNumber = 1;
 
             // Act
-            var actual = _service.GetProductVersions(new ProductVersions { productVersionOne, productVersionTwo });
+            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersionOne, productVersionTwo });
 
             // Assert
-            actual.Should().HaveCount(2);
-            actual.Single(p => p.ProductName == productVersionOne.ProductName).UpdateNumbers.Should().ContainInOrder(new[] { 3 });
-            actual.Single(p => p.ProductName == productVersionTwo.ProductName).UpdateNumbers.Should().ContainInOrder(new[] { 2, 3, 4 });
+            actualProducts.Should().HaveCount(2);
+            actualProducts.Single(p => p.ProductName == productVersionOne.ProductName).UpdateNumbers.Should().ContainInOrder(new[] { 3 });
+            actualProducts.Single(p => p.ProductName == productVersionTwo.ProductName).UpdateNumbers.Should().ContainInOrder(new[] { 2, 3, 4 });
         }
 
         private (Product, ProductVersionsInner, ProductsInner) CreateProduct(string productName, int editionNumber, int? updateNumber,

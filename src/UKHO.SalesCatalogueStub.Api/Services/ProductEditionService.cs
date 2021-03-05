@@ -90,7 +90,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
         }
 
 
-        public Products GetProductVersions(ProductVersions productVersions)
+        public (Products, GetProductVersionResponseEnum) GetProductVersions(ProductVersions productVersions)
         {
             if (productVersions == null) throw new ArgumentNullException(nameof(productVersions));
 
@@ -100,6 +100,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 .ToList();
 
             var matchedProducts = new Products();
+            var productsInDatabase = false;
 
             foreach (var requestProduct in distinctProducts)
             {
@@ -110,6 +111,8 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
                 if (productDbMatch == null) continue;
 
+                productsInDatabase = true;
+
                 var activeEditionUpdateNumber = productDbMatch.UpdateNumber ?? 0;
 
                 var matchedProduct = new ProductsInner
@@ -118,7 +121,6 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     FileSize = GetFileSize(activeEditionUpdateNumber),
                     ProductName = productDbMatch.EditionIdentifier
                 };
-
 
                 // If not cancelled, reject where provided and current are the same
                 if (productDbMatch.UpdateNumber == requestProduct.UpdateNumber &&
@@ -173,7 +175,12 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 matchedProducts.Add(matchedProduct);
             }
 
-            return matchedProducts;
+            if (matchedProducts.Count == 0)
+            {
+                return productsInDatabase ? (matchedProducts, GetProductVersionResponseEnum.NoUpdatesFound) : (matchedProducts, GetProductVersionResponseEnum.NoProductsFound);
+            }
+
+            return (matchedProducts, GetProductVersionResponseEnum.UpdatesFound);
         }
 
         public async Task<Products> GetProductEditionsSinceDateTime(DateTime sinceDateTime)
