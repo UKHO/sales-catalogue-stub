@@ -134,10 +134,8 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
                 var updatedCount = activeEditionUpdateNumber;
 
-                for (int i = 0; i < relevantLifecycleEvents.Count; i++)
+                foreach (var lifecycleEvent in relevantLifecycleEvents)
                 {
-                    var lifecycleEvent = relevantLifecycleEvents.ElementAt(i);
-
                     if (lifecycleEvent.EventType.Name == ProductEditionStatusEnum.Base)
                     {
                         updatedNumbers.Add(0);
