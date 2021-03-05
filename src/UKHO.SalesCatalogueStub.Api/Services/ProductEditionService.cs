@@ -1,10 +1,11 @@
 ﻿#pragma warning disable 1591
 
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using UKHO.SalesCatalogueStub.Api.EF;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 using UKHO.SalesCatalogueStub.Api.Models;
@@ -21,6 +22,12 @@ namespace UKHO.SalesCatalogueStub.Api.Services
         {
             ProductEditionStatusEnum.Base, ProductEditionStatusEnum.Updated, ProductEditionStatusEnum.Reissued,
             ProductEditionStatusEnum.Cancelled
+        };
+
+        private readonly List<ProductEditionStatusEnum> _lifecycleEventTypes = new List<ProductEditionStatusEnum>
+        {
+            ProductEditionStatusEnum.Base, ProductEditionStatusEnum.Updated, ProductEditionStatusEnum.Reissued,
+            ProductEditionStatusEnum.Cancelled, ProductEditionStatusEnum.Superseded
         };
 
         public ProductEditionService(SalesCatalogueStubDbContext dbContext, ILogger<ProductEditionService> logger)
@@ -81,6 +88,95 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             }
 
             return matchedProducts;
+        }
+
+        public async Task<Products> GetProductEditionsSinceDateTime(DateTime sinceDateTime)
+        {
+            var productsSinceDatetime = new Products();
+
+            var lifecycleEvents = await _dbContext.LifecycleEvents
+                .Include(le => le.ProductEdition)
+                .Include(le => le.EventType)
+                .Where(le => le.LastUpdated > sinceDateTime &&
+                             le.ProductEdition.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
+                             _lifecycleEventTypes.Contains(le.EventType.Name)
+                )
+                .AsNoTracking()
+                .ToListAsync();
+
+            var products = lifecycleEvents.Select(le => le.ProductEdition.EditionIdentifier).Distinct().ToList();
+
+            foreach (var product in products)
+            {
+                var productEdition = new ProductsInner();
+
+                var editionNumberAsInt = lifecycleEvents
+                    .Where(le => le.ProductEdition.EditionIdentifier == product)
+                    .Select(le => le.ProductEdition.EditionNumberAsInt)
+                    .OrderByDescending(le => le)
+                    .First();
+
+                var relevantLifecycleEvents = lifecycleEvents
+                    .Where(le => le.ProductEdition.EditionIdentifier == product && le.ProductEdition.EditionNumberAsInt == editionNumberAsInt)
+                    .OrderByDescending(le => le.LastUpdated)
+                    .ToList();
+
+                if (relevantLifecycleEvents.First().EventType.Name == ProductEditionStatusEnum.Superseded)
+                {
+                    // this product will not be listed in the output
+                    continue;
+                }
+
+                var activeEditionUpdateNumber = relevantLifecycleEvents.First().ProductEdition.UpdateNumber ?? 0;
+                var activeEditionReissueNumber = relevantLifecycleEvents.First().ProductEdition.LastReissueUpdateNumber ?? 0;
+
+                var updatedNumbers = new List<int?>();
+
+                var updatedCount = activeEditionUpdateNumber;
+
+                foreach (var lifecycleEvent in relevantLifecycleEvents)
+                {
+                    if (lifecycleEvent.EventType.Name == ProductEditionStatusEnum.Base)
+                    {
+                        updatedNumbers.Add(0);
+                        break;
+                    }
+
+                    if (lifecycleEvent.EventType.Name == ProductEditionStatusEnum.Updated)
+                    {
+                        updatedNumbers.Add(updatedCount);
+                        updatedCount--;
+                        continue;
+                    }
+
+                    if (lifecycleEvent.EventType.Name == ProductEditionStatusEnum.Reissued)
+                    {
+                        updatedNumbers.Add(activeEditionReissueNumber);
+                        break;
+                    }
+
+                    if (lifecycleEvent.EventType.Name == ProductEditionStatusEnum.Cancelled)
+                    {
+                        continue;
+                    }
+                }
+
+                if (relevantLifecycleEvents.Any(le => le.EventType.Name == ProductEditionStatusEnum.Cancelled))
+                {
+                    
+                    productEdition.Cancellation = GetCancellation(activeEditionUpdateNumber);
+                }
+
+                productEdition.EditionNumber = editionNumberAsInt;
+                productEdition.UpdateNumbers = updatedNumbers.OrderBy(gt => gt.Value).ToList();
+                productEdition.ProductName = product;
+                productEdition.FileSize = GetFileSize(activeEditionUpdateNumber);
+
+                productsSinceDatetime.Add(productEdition);
+
+            }
+
+            return productsSinceDatetime;
         }
 
         private static List<int?> GetUpdates(int lastReissueUpdateNumber, int latestUpdateNumber)

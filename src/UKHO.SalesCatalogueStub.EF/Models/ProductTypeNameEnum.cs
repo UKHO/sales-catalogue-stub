@@ -2,6 +2,7 @@
 {
     public enum ProductTypeNameEnum
     {
-        Avcs
+        Avcs,
+        Chart
     }
 }

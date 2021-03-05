@@ -72,7 +72,7 @@ namespace UKHO.SalesCatalogueStub.Api.IntegrationTests
 
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
 
-                var result = await httpClient.PostAsync(exchangeService, new StringContent("[\"string\"]", Encoding.UTF8, MediaTypeNames.Application.Json));
+                var result = await httpClient.PostAsync(exchangeService, new StringContent("[\"GB100160\"]", Encoding.UTF8, MediaTypeNames.Application.Json));
 
                 Assert.IsTrue(result.IsSuccessStatusCode);
             }
