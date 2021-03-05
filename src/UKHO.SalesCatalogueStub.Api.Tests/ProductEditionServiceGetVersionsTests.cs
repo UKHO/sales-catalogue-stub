@@ -185,7 +185,6 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 0, 1, 2, 3 });
         }
 
-        //this can be updates up to one befor4e cancel but also need an updates from reissue
         [Test]
         public void GetProductVersions_WhenCancelledCellIsOnlyUpdateSinceEdition_And_UpdateRequestedIsThatCancellation_Returns_Expected()
         {
@@ -207,7 +206,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         {
             // Arrange
             var (_, productVersion, _) = CreateProduct("GB1234", 2, 3, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
-            productVersion.UpdateNumber -= 2;
+            productVersion.UpdateNumber = 1;
 
             // Act
             var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
