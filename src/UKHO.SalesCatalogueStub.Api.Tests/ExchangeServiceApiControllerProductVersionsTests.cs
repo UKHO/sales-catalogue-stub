@@ -11,21 +11,21 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 {
     public class ExchangeServiceApiControllerProductVersionsTests
     {
-        private IProductEditionService _productRepo;
+        private IProductEditionService _productEditionService;
         private ExchangeServiceApiController _exchangeServiceApiController;
 
         [SetUp]
         public void Setup()
         {
-            _productRepo = A.Fake<IProductEditionService>();
-            _exchangeServiceApiController = new ExchangeServiceApiController(_productRepo);
+            _productEditionService = A.Fake<IProductEditionService>();
+            _exchangeServiceApiController = new ExchangeServiceApiController(_productEditionService);
         }
 
         [Test]
         public void Calling_PostProductVersions_With_No_Matching_Products_Should_Return_Status_Code_400()
         {
             var dummyInput = A.Dummy<ProductVersions>();
-            A.CallTo(() => _productRepo.GetProductVersions(A<ProductVersions>.Ignored)).Returns((new Products(), GetProductVersionResponseEnum.NoProductsFound));
+            A.CallTo(() => _productEditionService.GetProductVersions(A<ProductVersions>.Ignored)).Returns((new Products(), GetProductVersionResponseEnum.NoProductsFound));
             var response = _exchangeServiceApiController.PostProductVersions(A.Dummy<string>(), dummyInput) as ObjectResult;
             response?.StatusCode.Should().Be(400);
         }
@@ -35,7 +35,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         {
             var dummyInput = A.Dummy<ProductVersions>();
             //A.CollectionOfDummy<ProductVersionsInner>(1).ToList();
-            A.CallTo(() => _productRepo.GetProductVersions(A<ProductVersions>.Ignored)).Returns((new Products(), GetProductVersionResponseEnum.NoUpdatesFound));
+            A.CallTo(() => _productEditionService.GetProductVersions(A<ProductVersions>.Ignored)).Returns((new Products(), GetProductVersionResponseEnum.NoUpdatesFound));
             var response = _exchangeServiceApiController.PostProductVersions(A.Dummy<string>(), dummyInput) as ObjectResult;
             response?.StatusCode.Should().Be(304);
         }
@@ -47,7 +47,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             {
                 null
             };
-            A.CallTo(() => _productRepo.GetProductVersions(testData)).Returns((new Products(), GetProductVersionResponseEnum.NoProductsFound));
+            A.CallTo(() => _productEditionService.GetProductVersions(testData)).Returns((new Products(), GetProductVersionResponseEnum.NoProductsFound));
             var response = _exchangeServiceApiController.PostProductVersions(A.Dummy<string>(), testData) as ObjectResult;
             response?.StatusCode.Should().Be(400);
         }
@@ -56,7 +56,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         public void Calling_PostProductVersions_With_At_Least_One_Matching_Product_Should_Return_Status_Code_200()
         {
             var productVersions = A.Dummy<ProductVersions>();
-            A.CallTo(() => _productRepo.GetProductVersions(productVersions)).Returns((new Products
+            A.CallTo(() => _productEditionService.GetProductVersions(productVersions)).Returns((new Products
             {
                 new ProductsInner()
                 {
@@ -93,7 +93,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             };
 
             const string expectedJson = "[\r\n  {\r\n    \"productName\": \"AU220120\",\r\n    \"editionNumber\": 1,\r\n    \"updateNumbers\": [\r\n      1,\r\n      2,\r\n      3\r\n    ],\r\n    \"fileSize\": 100\r\n  },\r\n  {\r\n    \"productName\": \"EG3GOA01\",\r\n    \"editionNumber\": 1,\r\n    \"updateNumbers\": [\r\n      1,\r\n      2,\r\n      3\r\n    ],\r\n    \"fileSize\": 100\r\n  }\r\n]";
-            A.CallTo(() => _productRepo.GetProductVersions(productVersions)).Returns((testResponse, GetProductVersionResponseEnum.UpdatesFound));
+            A.CallTo(() => _productEditionService.GetProductVersions(productVersions)).Returns((testResponse, GetProductVersionResponseEnum.UpdatesFound));
             var response = _exchangeServiceApiController.PostProductVersions(A.Dummy<string>(), productVersions) as ObjectResult;
             response?.Value.Should().BeEquivalentTo(expectedJson);
         }
