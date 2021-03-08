@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using UKHO.SalesCatalogueStub.Api.EF;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 using UKHO.SalesCatalogueStub.Api.Models;
-using Products = UKHO.SalesCatalogueStub.Api.Models.Products;
 
 namespace UKHO.SalesCatalogueStub.Api.Services
 {
@@ -77,8 +76,6 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     }
 
                     matchedProducts.Add(productsInner);
-
-
                 }
                 else
                 {
@@ -88,6 +85,118 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             }
 
             return matchedProducts;
+        }
+
+        public async Task<(Products, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions)
+        {
+            if (productVersions == null) throw new ArgumentNullException(nameof(productVersions));
+
+            var distinctProducts = new List<ProductVersionsInner>();
+
+            var validProductVersions = productVersions
+                .Where(x => x != null && x.ProductName != null).ToList();
+
+            if (validProductVersions.Any())
+            {
+                distinctProducts = validProductVersions
+                           .GroupBy(item => item.ProductName.Trim(),
+                               StringComparer.OrdinalIgnoreCase)
+                           .Select(g => g.First())
+                           .ToList();
+            }
+
+            var productsInDatabase = false;
+            var matchedProducts = new Products();
+
+            // Might be more efficient to pull everything from Db first. Check after base lined.
+            foreach (var requestProduct in distinctProducts)
+            {
+                if (requestProduct.UpdateNumber.HasValue && !requestProduct.EditionNumber.HasValue) continue;
+
+                var productDbMatch = await _dbContext.ProductEditions.AsNoTracking().SingleOrDefaultAsync(a =>
+                    a.EditionIdentifier == requestProduct.ProductName &&
+                    a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
+                    _allowedProductStatus.Contains(a.LatestStatus));
+
+                if (productDbMatch == null) continue;
+
+                productsInDatabase = true;
+
+                // Reject where update number is provided without an edition number
+                if ((productDbMatch.EditionNumber == null) &&
+                    (productDbMatch.UpdateNumber != null))
+                    continue;
+
+                var activeEditionUpdateNumber = productDbMatch.UpdateNumber ?? 0;
+
+                var matchedProduct = new ProductsInner
+                {
+                    EditionNumber = Convert.ToInt32(productDbMatch.EditionNumber),
+                    FileSize = GetFileSize(activeEditionUpdateNumber),
+                    ProductName = productDbMatch.EditionIdentifier
+                };
+
+                // If not cancelled, reject where provided and current are the same
+                if (productDbMatch.UpdateNumber == requestProduct.UpdateNumber &&
+                    matchedProduct.EditionNumber == requestProduct.EditionNumber &&
+                    productDbMatch.LatestStatus != ProductEditionStatusEnum.Cancelled)
+                    continue;
+
+                // Reject where edition or update numbers are provided that are higher than current
+                if ((requestProduct.EditionNumber > matchedProduct.EditionNumber) ||
+                    (requestProduct.EditionNumber == matchedProduct.EditionNumber &&
+                     requestProduct.UpdateNumber > productDbMatch.UpdateNumber))
+                    continue;
+
+                var start = (productDbMatch.LastReissueUpdateNumber > 0)
+                    ? productDbMatch.LastReissueUpdateNumber
+                    : !requestProduct.EditionNumber.HasValue || (requestProduct.EditionNumber < matchedProduct.EditionNumber)
+                        ? 0 : requestProduct.UpdateNumber + 1 ?? 1;
+
+                var end = activeEditionUpdateNumber;
+
+                switch (productDbMatch.LatestStatus)
+                {
+                    case ProductEditionStatusEnum.Cancelled:
+                        {
+                            matchedProduct.Cancellation = new Cancellation
+                            {
+                                EditionNumber = 0
+                            };
+
+                            if (requestProduct.EditionNumber == matchedProduct.EditionNumber && requestProduct.UpdateNumber == activeEditionUpdateNumber)
+                            {
+                                matchedProduct.UpdateNumbers = new List<int?>();
+                                matchedProduct.Cancellation.UpdateNumber = activeEditionUpdateNumber;
+                                matchedProduct.EditionNumber = 0;
+                            }
+                            else if (requestProduct.EditionNumber < matchedProduct.EditionNumber || requestProduct.UpdateNumber < activeEditionUpdateNumber)
+                            {
+                                end--;
+
+                                matchedProduct.UpdateNumbers = GetUpdates(start.Value, end);
+                                matchedProduct.Cancellation.UpdateNumber = activeEditionUpdateNumber;
+                            }
+
+                            break;
+                        }
+                    case ProductEditionStatusEnum.Base:
+                        matchedProduct.UpdateNumbers = new List<int?> { 0 };
+                        break;
+                    default:
+                        matchedProduct.UpdateNumbers = GetUpdates(start.Value, end);
+                        break;
+                }
+
+                matchedProducts.Add(matchedProduct);
+            }
+
+            if (matchedProducts.Count == 0)
+            {
+                return productsInDatabase ? (matchedProducts, GetProductVersionResponseEnum.NoUpdatesFound) : (matchedProducts, GetProductVersionResponseEnum.NoProductsFound);
+            }
+
+            return (matchedProducts, GetProductVersionResponseEnum.UpdatesFound);
         }
 
         public async Task<Products> GetProductEditionsSinceDateTime(DateTime sinceDateTime)
@@ -158,7 +267,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
                 if (relevantLifecycleEvents.Any(le => le.EventType.Name == ProductEditionStatusEnum.Cancelled))
                 {
-                    
+
                     productEdition.Cancellation = GetCancellation(activeEditionUpdateNumber);
                 }
 
@@ -177,6 +286,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
         private static List<int?> GetUpdates(int lastReissueUpdateNumber, int latestUpdateNumber)
         {
             var productUpdates = new List<int?>();
+
             for (var i = lastReissueUpdateNumber; i <= latestUpdateNumber; i++)
             {
                 productUpdates.Add(i);
