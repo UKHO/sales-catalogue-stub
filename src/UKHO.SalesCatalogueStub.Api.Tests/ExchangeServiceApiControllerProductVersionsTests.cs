@@ -53,23 +53,6 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             response?.StatusCode.Should().Be(400);
         }
 
-        //[Test]
-        //public async Task Test_Calling_PostProductVersions_With_UpdateNumberButNoEditionNumber_Should_Return_Status_Code_400()
-        //{
-        //    var testData = new ProductVersions
-        //    {
-        //       new ProductVersionsInner
-        //       {
-        //           ProductName = "GB1",
-        //           EditionNumber = null,
-        //           UpdateNumber = 2
-        //       }
-        //    };
-        //    A.CallTo(() => _productEditionService.GetProductVersions(testData)).Returns((new Products(), GetProductVersionResponseEnum.NoProductsFound));
-        //    var response = await _exchangeServiceApiController.PostProductVersions(A.Dummy<string>(), testData) as ObjectResult;
-        //    response?.StatusCode.Should().Be(400);
-        //}
-
         [Test]
         public async Task Test_Calling_PostProductVersions_With_At_Least_One_Matching_Product_Should_Return_Status_Code_200()
         {
