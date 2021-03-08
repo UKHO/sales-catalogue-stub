@@ -154,11 +154,6 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                         updatedNumbers.Add(activeEditionReissueNumber);
                         break;
                     }
-
-                    if (lifecycleEvent.EventType.Name == ProductEditionStatusEnum.Cancelled)
-                    {
-                        continue;
-                    }
                 }
 
                 if (relevantLifecycleEvents.Any(le => le.EventType.Name == ProductEditionStatusEnum.Cancelled))

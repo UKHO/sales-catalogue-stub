@@ -51,6 +51,7 @@ resource "azurerm_app_service" "main" {
 
   lifecycle {
     ignore_changes = [
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
       tags
     ]
   }
