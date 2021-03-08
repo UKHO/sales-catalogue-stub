@@ -91,7 +91,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("GB340060", 21, 1, 0, ProductEditionStatusEnum.Cancelled, ProductTypeNameEnum.Avcs, ExpectedResult = 2)]
         [TestCase("DE521860", 6, 1, 0, ProductEditionStatusEnum.Cancelled, ProductTypeNameEnum.Avcs, ExpectedResult = 2)]
         public int
-            Calls_To_GetProductEditions_With_A_Matching_Product_Return_A_Product_Edition_With_Correct_Number_Of_Updates(
+            Calls_To_GetProductEditions_With_A_Matching_Product_Return_A_Product_Edition_With_Expected_Number_Of_Updates(
                 string productName, int editionNumber, int updateNumber, int lastReissueUpdateNumber,
                 ProductEditionStatusEnum latestStatus, ProductTypeNameEnum productType)
         {
@@ -115,7 +115,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
         [Test, TestCaseSource(nameof(ProductEditionUpdateListCases))]
         public void
-            Calls_To_GetProductEditions_With_A_Matching_Product_Returns_A_Product_Edition_With_Correct_Update_List(
+            Calls_To_GetProductEditions_With_A_Matching_Product_Returns_A_Product_Edition_With_Expected_Update_List(
                 string productName, int editionNumber, int updateNumber, int lastReissueUpdateNumber,
                 ProductEditionStatusEnum latestStatus, ProductTypeNameEnum productType, List<int?> expected)
         {
@@ -173,7 +173,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
         [Test]
         public void
-            Calls_To_GetProductEditions_Should_Return_Correct_Model_Type()
+            Calls_To_GetProductEditions_Should_Return_Expected_Model_Types()
         {
             PopulateTestProductData();
             var productList = new List<string> { "JP54QNMK" };
