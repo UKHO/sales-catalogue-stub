@@ -1,7 +1,7 @@
-﻿using System;
-using Microsoft.Azure.Services.AppAuthentication;
+﻿using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 
 namespace UKHO.SalesCatalogueStub.Api.EF
@@ -27,7 +27,7 @@ namespace UKHO.SalesCatalogueStub.Api.EF
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductEdition> ProductEditions { get; set; }
         public DbSet<LifecycleEvent> LifecycleEvents { get; set; }
-
+        public DbSet<PidGeometry> PidGeometries { get; set; }
         public DbSet<EventType> EventTypes { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
 

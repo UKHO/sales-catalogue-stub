@@ -86,8 +86,9 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Models
 
         public string Position { get; set; }
 
-
         public virtual ICollection<LifecycleEvent> LifecycleEvents { get; set; }
+
+        public virtual ICollection<PidGeometry> PidGeometry { get; set; }
 
     }
 }
