@@ -238,6 +238,12 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             actualProducts.Single(p => p.ProductName == productVersionTwo.ProductName).UpdateNumbers.Should().ContainInOrder(new[] { 2, 3, 4 });
         }
 
+        [Test]
+        public void Calls_To_GetProductEditions_With_Null_Throws_ArgumentNullException()
+        {
+            _service.Invoking(a => a.GetProductVersions(null)).Should().Throw<ArgumentNullException>();
+        }
+
         private (Product, ProductVersionsInner, ProductsInner) CreateProduct(string productName, int editionNumber, int? updateNumber,
             ProductEditionStatusEnum latestStatus, int? LastReissueUpdateNumber = null, ProductTypeNameEnum productType = ProductTypeNameEnum.Avcs)
         {
