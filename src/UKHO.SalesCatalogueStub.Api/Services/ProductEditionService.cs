@@ -76,8 +76,6 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     }
 
                     matchedProducts.Add(productsInner);
-
-
                 }
                 else
                 {
@@ -93,17 +91,28 @@ namespace UKHO.SalesCatalogueStub.Api.Services
         {
             if (productVersions == null) throw new ArgumentNullException(nameof(productVersions));
 
+            var distinctProducts = new List<ProductVersionsInner>();
 
-            var distinctProducts = productVersions
-                .GroupBy(item => item?.ProductName?.Trim(), StringComparer.OrdinalIgnoreCase)
-                .Select(g => g?.First())
-                .ToList();
+            var validProductVersions = productVersions
+                .Where(x => x != null && x.ProductName != null).ToList();
 
-            var matchedProducts = new Products();
+            if (validProductVersions.Any())
+            {
+                distinctProducts = validProductVersions
+                           .GroupBy(item => item.ProductName.Trim(),
+                               StringComparer.OrdinalIgnoreCase)
+                           .Select(g => g.First())
+                           .ToList();
+            }
+
             var productsInDatabase = false;
+            var matchedProducts = new Products();
 
+            // Might be more efficient to pull everything from Db first. Check after base lined.
             foreach (var requestProduct in distinctProducts)
             {
+                if (requestProduct.UpdateNumber.HasValue && !requestProduct.EditionNumber.HasValue) continue;
+
                 var productDbMatch = await _dbContext.ProductEditions.AsNoTracking().SingleOrDefaultAsync(a =>
                     a.EditionIdentifier == requestProduct.ProductName &&
                     a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
@@ -112,6 +121,11 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 if (productDbMatch == null) continue;
 
                 productsInDatabase = true;
+
+                // Reject where update number is provided without an edition number
+                if ((productDbMatch.EditionNumber == null) &&
+                    (productDbMatch.UpdateNumber != null))
+                    continue;
 
                 var activeEditionUpdateNumber = productDbMatch.UpdateNumber ?? 0;
 
@@ -135,7 +149,9 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     continue;
 
                 var start = (productDbMatch.LastReissueUpdateNumber > 0)
-                    ? productDbMatch.LastReissueUpdateNumber : (requestProduct.EditionNumber < matchedProduct.EditionNumber) ? 0 : requestProduct.UpdateNumber + 1 ?? 1;
+                    ? productDbMatch.LastReissueUpdateNumber
+                    : !requestProduct.EditionNumber.HasValue || (requestProduct.EditionNumber < matchedProduct.EditionNumber)
+                        ? 0 : requestProduct.UpdateNumber + 1 ?? 1;
 
                 var end = activeEditionUpdateNumber;
 

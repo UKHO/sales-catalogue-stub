@@ -16,14 +16,14 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         private ExchangeServiceApiController _exchangeServiceApiController;
 
         [SetUp]
-        public async Task Setup()
+        public async Task Test_Setup()
         {
             _productEditionService = A.Fake<IProductEditionService>();
             _exchangeServiceApiController = new ExchangeServiceApiController(_productEditionService);
         }
 
         [Test]
-        public async Task Calling_PostProductVersions_With_No_Matching_Products_Should_Return_Status_Code_400()
+        public async Task Test_Calling_PostProductVersions_With_No_Matching_Products_Should_Return_Status_Code_400()
         {
             var dummyInput = A.Dummy<ProductVersions>();
             A.CallTo(() => _productEditionService.GetProductVersions(A<ProductVersions>.Ignored)).Returns((new Products(), GetProductVersionResponseEnum.NoProductsFound));
@@ -32,7 +32,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public async Task Calling_PostProductVersions_With_No_Products_That_Have_Updates_Should_Return_Status_Code_304()
+        public async Task Test_Calling_PostProductVersions_With_No_Products_That_Have_Updates_Should_Return_Status_Code_304()
         {
             var dummyInput = A.Dummy<ProductVersions>();
             //A.CollectionOfDummy<ProductVersionsInner>(1).ToList();
@@ -42,7 +42,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public async Task Calling_PostProductVersions_With_List_Of_Null_Should_Return_Status_Code_400()
+        public async Task Test_Calling_PostProductVersions_With_List_Of_Null_Should_Return_Status_Code_400()
         {
             var testData = new ProductVersions
             {
@@ -53,8 +53,25 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             response?.StatusCode.Should().Be(400);
         }
 
+        //[Test]
+        //public async Task Test_Calling_PostProductVersions_With_UpdateNumberButNoEditionNumber_Should_Return_Status_Code_400()
+        //{
+        //    var testData = new ProductVersions
+        //    {
+        //       new ProductVersionsInner
+        //       {
+        //           ProductName = "GB1",
+        //           EditionNumber = null,
+        //           UpdateNumber = 2
+        //       }
+        //    };
+        //    A.CallTo(() => _productEditionService.GetProductVersions(testData)).Returns((new Products(), GetProductVersionResponseEnum.NoProductsFound));
+        //    var response = await _exchangeServiceApiController.PostProductVersions(A.Dummy<string>(), testData) as ObjectResult;
+        //    response?.StatusCode.Should().Be(400);
+        //}
+
         [Test]
-        public async Task Calling_PostProductVersions_With_At_Least_One_Matching_Product_Should_Return_Status_Code_200()
+        public async Task Test_Calling_PostProductVersions_With_At_Least_One_Matching_Product_Should_Return_Status_Code_200()
         {
             var productVersions = A.Dummy<ProductVersions>();
             A.CallTo(() => _productEditionService.GetProductVersions(productVersions)).Returns((new Products
@@ -75,7 +92,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public async Task Calling_PostProductVersions_With_A_Product_List_Should_Return_Expected_Json_Response()
+        public async Task Test_Calling_PostProductVersions_With_A_Product_List_Should_Return_Expected_Json_Response()
         {
             var productVersions = A.Dummy<ProductVersions>();
 
