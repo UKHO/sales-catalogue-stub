@@ -89,14 +89,14 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return matchedProducts;
         }
 
-
-        public (Products, GetProductVersionResponseEnum) GetProductVersions(ProductVersions productVersions)
+        public async Task<(Products, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions)
         {
             if (productVersions == null) throw new ArgumentNullException(nameof(productVersions));
 
+
             var distinctProducts = productVersions
-                .GroupBy(item => item.ProductName.Trim(), StringComparer.OrdinalIgnoreCase)
-                .Select(g => g.First())
+                .GroupBy(item => item?.ProductName?.Trim(), StringComparer.OrdinalIgnoreCase)
+                .Select(g => g?.First())
                 .ToList();
 
             var matchedProducts = new Products();
@@ -104,7 +104,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
             foreach (var requestProduct in distinctProducts)
             {
-                var productDbMatch = _dbContext.ProductEditions.AsNoTracking().SingleOrDefault(a =>
+                var productDbMatch = await _dbContext.ProductEditions.AsNoTracking().SingleOrDefaultAsync(a =>
                     a.EditionIdentifier == requestProduct.ProductName &&
                     a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
                     _allowedProductStatus.Contains(a.LatestStatus));
@@ -251,7 +251,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
                 if (relevantLifecycleEvents.Any(le => le.EventType.Name == ProductEditionStatusEnum.Cancelled))
                 {
-                    
+
                     productEdition.Cancellation = GetCancellation(activeEditionUpdateNumber);
                 }
 

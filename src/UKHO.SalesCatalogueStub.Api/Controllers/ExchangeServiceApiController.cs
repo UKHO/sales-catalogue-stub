@@ -118,9 +118,9 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult PostProductVersions([FromRoute][Required] string productType, [FromBody] ProductVersions body)
+        public virtual async Task<IActionResult> PostProductVersions([FromRoute][Required] string productType, [FromBody] ProductVersions body)
         {
-            var (products, response) = _productEditionService.GetProductVersions(body);
+            var (products, response) = await _productEditionService.GetProductVersions(body);
 
             return response switch
             {

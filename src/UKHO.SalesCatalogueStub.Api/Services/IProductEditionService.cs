@@ -11,6 +11,6 @@ namespace UKHO.SalesCatalogueStub.Api.Services
     {
         Products GetProductEditions(List<string> products);
         Task<Products> GetProductEditionsSinceDateTime(DateTime sinceDateTime);
-        (Products, GetProductVersionResponseEnum) GetProductVersions(ProductVersions productVersions);
+        Task<(Products, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions);
     }
 }

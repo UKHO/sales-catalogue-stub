@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         private IProductEditionService _service;
 
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
             var dbContextOptions = new DbContextOptionsBuilder<SalesCatalogueStubDbContext>()
                 .UseInMemoryDatabase(databaseName: "inmemory")
@@ -30,13 +31,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [TearDown]
-        public void TearDown()
+        public async Task TearDown()
         {
             _dbContext.Database.EnsureDeleted();
         }
 
         [Test]
-        public void GetProductVersions_WhenEditionNumberProvidedIsCurrent_AndNoReissues_AndUpdateNumberNotProvided_Returns_AllUpdatesForCurrentEdition()
+        public async Task GetProductVersions_WhenEditionNumberProvidedIsCurrent_AndNoReissues_AndUpdateNumberNotProvided_Returns_AllUpdatesForCurrentEdition()
         {
             // Arrange
             var (_, productVersion, _) = CreateProduct("GB1", 2, 4, ProductEditionStatusEnum.Updated);
@@ -44,14 +45,14 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersion.UpdateNumber = null;
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
             actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 1, 2, 3, 4 });
         }
 
         [Test]
-        public void GetProductVersions_WhenEditionNumberProvidedIsCurrent_AndNoReissues_AndUpdateNumberBeforeCurrentProvided_Returns_AllUpdatesForCurrentEdition()
+        public async Task GetProductVersions_WhenEditionNumberProvidedIsCurrent_AndNoReissues_AndUpdateNumberBeforeCurrentProvided_Returns_AllUpdatesForCurrentEdition()
         {
             // Arrange
             var (_, productVersion, _) = CreateProduct("GB1", 2, 4, ProductEditionStatusEnum.Updated);
@@ -59,7 +60,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersion.UpdateNumber = 1;
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
             actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 2, 3, 4 });
@@ -68,7 +69,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase(2, null, TestName = "No update number provided")]
         [TestCase(1, 3, TestName = "Edition before the current edition provided")]
         [TestCase(2, 1, TestName = "Update number before the current update number provided")]
-        public void GetProductVersions_WhenEditionHasReissue_Returns_AllUpdatesForCurrentEdition_FromReissueOnwards(int callerEdition, int callerUpdate)
+        public async Task GetProductVersions_WhenEditionHasReissue_Returns_AllUpdatesForCurrentEdition_FromReissueOnwards(int callerEdition, int callerUpdate)
         {
             // Arrange
             var (dbProduct, productVersionOne, _) = CreateProduct("GB1", 2, 4, ProductEditionStatusEnum.Updated, LastReissueUpdateNumber: 2);
@@ -77,7 +78,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersionOne.EditionNumber = callerEdition;
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersionOne });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersionOne });
 
             // Assert
             var currentEditionNumber = Convert.ToInt32(dbProduct.ProductEditions.First().EditionNumber);
@@ -87,7 +88,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void GetProductVersions_WhenNoUpdateNumberProvided_Return_AllUpdatesForCurrentEdition()
+        public async Task GetProductVersions_WhenNoUpdateNumberProvided_Return_AllUpdatesForCurrentEdition()
         {
             // Arrange
             var (_, productVersionOne, _) = CreateProduct("GB1", 2, 3, ProductEditionStatusEnum.Updated);
@@ -95,21 +96,21 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersionOne.UpdateNumber = null;
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersionOne });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersionOne });
 
             // Assert
             actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 1, 2, 3 });
         }
 
         [Test]
-        public void GetProductVersions_CurrentStatusBase_EditionNumberLowerThanCurrentIsProvided_Returns_CurrentEditionNumber_And_UpdateNumberZero()
+        public async Task GetProductVersions_CurrentStatusBase_EditionNumberLowerThanCurrentIsProvided_Returns_CurrentEditionNumber_And_UpdateNumberZero()
         {
             // Arrange
             var (_, productVersion, _) = CreateProduct("GB1234", 2, null, ProductEditionStatusEnum.Base);
             productVersion.EditionNumber = 1;
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
             actualProducts.First().EditionNumber.Should().Be(2);
@@ -117,54 +118,54 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void GetProductVersions_SupersededStatus_Returns_NoProducts()
+        public async Task GetProductVersions_SupersededStatus_Returns_NoProducts()
         {
             // Arrange
             var (_, productVersion, _) = CreateProduct("GB1234", 2, 3, ProductEditionStatusEnum.Superseded);
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
             actualProducts.Should().HaveCount(0);
         }
 
         [Test]
-        public void GetProductVersions_WhenThereAreNoUpdatesSinceThatProvided_Returns_NoProducts()
+        public async Task GetProductVersions_WhenThereAreNoUpdatesSinceThatProvided_Returns_NoProducts()
         {
             // Arrange
             var (_, productVersion, _) = CreateProduct("GB1234", 2, 3, ProductEditionStatusEnum.Updated);
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
             actualProducts.Should().HaveCount(0);
         }
 
         [Test]
-        public void GetProductVersions_WhenEditionProvidedIsGreaterThanCurrent_Returns_NoProducts()
+        public async Task GetProductVersions_WhenEditionProvidedIsGreaterThanCurrent_Returns_NoProducts()
         {
             // Arrange
             var (_, productVersion, _) = CreateProduct("GB1234", 2, 3, ProductEditionStatusEnum.Updated);
             productVersion.EditionNumber++;
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
             actualProducts.Should().HaveCount(0);
         }
 
         [Test]
-        public void GetProductVersions_WhenUpdateNumberProvidedIsGreaterThanCurrent_AndEditionProvidedIsCurrent_Returns_NoProducts()
+        public async Task GetProductVersions_WhenUpdateNumberProvidedIsGreaterThanCurrent_AndEditionProvidedIsCurrent_Returns_NoProducts()
         {
             // Arrange
             var (_, productVersion, _) = CreateProduct("GB1234", 2, 3, ProductEditionStatusEnum.Updated);
             productVersion.UpdateNumber++;
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
             actualProducts.Should().HaveCount(0);
@@ -172,27 +173,27 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
 
         [Test]
-        public void GetProductVersions_WhenEditionNumberIsHigherThatProvided_And_CurrentEditionHasNoReissue_Returns_CurrentEdition_And_AnyUpdates_IncludingZero()
+        public async Task GetProductVersions_WhenEditionNumberIsHigherThatProvided_And_CurrentEditionHasNoReissue_Returns_CurrentEdition_And_AnyUpdates_IncludingZero()
         {
             // Arrange
             var (_, productVersion, _) = CreateProduct("GB1234", 2, 3, ProductEditionStatusEnum.Updated, LastReissueUpdateNumber: null);
             productVersion.EditionNumber = 1;
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
             actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 0, 1, 2, 3 });
         }
 
         [Test]
-        public void GetProductVersions_WhenCancelledCellIsOnlyUpdateSinceEdition_And_UpdateRequestedIsThatCancellation_Returns_Expected()
+        public async Task GetProductVersions_WhenCancelledCellIsOnlyUpdateSinceEdition_And_UpdateRequestedIsThatCancellation_Returns_Expected()
         {
             // Arrange
             var (_, productVersion, _) = CreateProduct("GB1234", 2, 1, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
             actualProducts.First().EditionNumber.Should().Be(0);
@@ -202,14 +203,14 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void GetProductVersions_WhenCancelledCellHasPreviousUpdatesForEdition_And_UpdateRequestedIsBeforeEditionAndUpdateRquested_Returns_Expected()
+        public async Task GetProductVersions_WhenCancelledCellHasPreviousUpdatesForEdition_And_UpdateRequestedIsBeforeEditionAndUpdateRquested_Returns_Expected()
         {
             // Arrange
             var (_, productVersion, _) = CreateProduct("GB1234", 2, 3, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
             productVersion.UpdateNumber = 1;
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersion });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
             actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 2 });
@@ -219,7 +220,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void GetProductVersions_OnlyProductsRequestedAreReturned()
+        public async Task GetProductVersions_OnlyProductsRequestedAreReturned()
         {
             // Arrange
             var (_, productVersionOne, _) = CreateProduct("GB1", 2, 3, ProductEditionStatusEnum.Updated);
@@ -230,7 +231,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productVersionTwo.UpdateNumber = 1;
 
             // Act
-            var (actualProducts, _) = _service.GetProductVersions(new ProductVersions { productVersionOne, productVersionTwo });
+            var (actualProducts, _) = await _service.GetProductVersions(new ProductVersions { productVersionOne, productVersionTwo });
 
             // Assert
             actualProducts.Should().HaveCount(2);
@@ -239,7 +240,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Calls_To_GetProductEditions_With_Null_Throws_ArgumentNullException()
+        public async Task Calls_To_GetProductEditions_With_Null_Throws_ArgumentNullException()
         {
             _service.Invoking(a => a.GetProductVersions(null)).Should().Throw<ArgumentNullException>();
         }
