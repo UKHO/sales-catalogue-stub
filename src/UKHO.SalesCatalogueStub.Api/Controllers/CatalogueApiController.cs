@@ -6,6 +6,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using UKHO.SalesCatalogueStub.Api.Attributes;
 using UKHO.SalesCatalogueStub.Api.Models;
+using UKHO.SalesCatalogueStub.Api.Services;
 
 namespace UKHO.SalesCatalogueStub.Api.Controllers
 {
@@ -16,6 +17,17 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
     [Authorize(Roles = "CatalogueReader")]
     public class CatalogueApiController : ControllerBase
     {
+        private readonly IProductEditionService _productEditionService;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="productEditionService"></param>
+        public CatalogueApiController(IProductEditionService productEditionService)
+        {
+            _productEditionService = productEditionService;
+        }
+
         /// <summary>
         /// Get the data for a catalogue
         /// </summary>
@@ -65,13 +77,9 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
 
             //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(500, default(DefaultErrorResponse));
-            string exampleJson = null;
-            exampleJson = "\"\"";
+            var geoms = _productEditionService.GetCatalogue(null);
 
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<InlineResponse200>(exampleJson)
-            : default(InlineResponse200);            //TODO: Change the data returned
-            return new ObjectResult(example);
+            return new ObjectResult(null);
         }
     }
 }
