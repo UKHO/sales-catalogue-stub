@@ -150,7 +150,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 // Reject where edition or update numbers are provided that are higher than current
                 if ((requestProduct.EditionNumber > matchedProduct.EditionNumber) ||
                     (requestProduct.EditionNumber == matchedProduct.EditionNumber &&
-                     requestProduct.UpdateNumber > productDbMatch.UpdateNumber))
+                     requestProduct.UpdateNumber > (productDbMatch.UpdateNumber ?? 0)))
                     continue;
 
                 var start = (productDbMatch.LastReissueUpdateNumber > 0)

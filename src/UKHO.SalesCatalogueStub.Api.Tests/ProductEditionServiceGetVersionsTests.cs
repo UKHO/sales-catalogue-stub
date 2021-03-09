@@ -328,6 +328,21 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
+        public async Task Test_GetProductVersions_When_UpdateNumberProvidedIsGreaterZero__And_StatusIsBase_And_EditionProvidedIsCurrent_Returns_NoProducts()
+        {
+            // Arrange
+            var (_, productVersion, _) = CreateProduct("GB1234", 2, null, ProductEditionStatusEnum.Base);
+            productVersion.UpdateNumber = 100;
+
+            // Act
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
+
+            // Assert
+            actualProducts.Should().HaveCount(0);
+            response.Should().Be(GetProductVersionResponseEnum.NoUpdatesFound);
+        }
+
+        [Test]
         public async Task Test_GetProductVersions_When_EditionProvidedIsLowerThanCurrent_And_CurrentEditionHasNoReissue_Returns_CurrentEdition_And_AnyUpdates_IncludingZero()
         {
             // Arrange
@@ -342,8 +357,6 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
-
-        //need to presume update for cancel is + 1 last upate
         [Test]
         public async Task Test_GetProductVersions_When_CancelledCellIsOnlyUpdateSinceEdition_And_UpdateRequestedIsThatCancellation_Returns_Expected()
         {
