@@ -393,6 +393,24 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
+        public async Task Test_GetProductVersions_When_CancelledCellHasPreviousUpdatesForEdition_And_NoUpdateProvided_Returns_Expected()
+        {
+            // Arrange
+            var (_, productVersion, _) = CreateProduct("US4WI21M", 16, 3, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
+            productVersion.UpdateNumber = null;
+
+            // Act
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
+
+            // Assert
+            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 1, 2, 3 });
+            actualProducts.First().EditionNumber.Should().Be(16);
+            actualProducts.First().Cancellation.UpdateNumber.Should().Be(4);
+            actualProducts.First().Cancellation.EditionNumber.Should().Be(0);
+            response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
+        }
+
+        [Test]
         public async Task Test_GetProductVersions_OnlyProductsRequestedAreReturned()
         {
             // Arrange

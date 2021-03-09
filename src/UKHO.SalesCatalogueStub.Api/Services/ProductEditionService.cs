@@ -177,7 +177,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                                 matchedProduct.Cancellation.UpdateNumber = activeEditionUpdateNumber + 1;
                                 matchedProduct.EditionNumber = null;
                             }
-                            else if (requestProduct.EditionNumber < matchedProduct.EditionNumber || requestProduct.UpdateNumber < activeEditionUpdateNumber)
+                            else if (requestProduct.EditionNumber < matchedProduct.EditionNumber || updateNumber < activeEditionUpdateNumber)
                             {
                                 matchedProduct.UpdateNumbers = GetUpdates(start.Value, end);
                                 matchedProduct.Cancellation.UpdateNumber = activeEditionUpdateNumber + 1;
