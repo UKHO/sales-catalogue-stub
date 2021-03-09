@@ -136,7 +136,13 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     ProductName = productDbMatch.EditionIdentifier
                 };
 
-                // If not cancelled, reject where provided and current are the same
+                // Reject where status is Base and update zero is requested for current edition
+                if (requestProduct.UpdateNumber == 0 &&
+                    matchedProduct.EditionNumber == requestProduct.EditionNumber &&
+                    productDbMatch.LatestStatus == ProductEditionStatusEnum.Base)
+                    continue;
+
+                // Reject where the provided and current are the same
                 if (productDbMatch.UpdateNumber == requestProduct.UpdateNumber &&
                     matchedProduct.EditionNumber == requestProduct.EditionNumber &&
                     productDbMatch.LatestStatus != ProductEditionStatusEnum.Cancelled)

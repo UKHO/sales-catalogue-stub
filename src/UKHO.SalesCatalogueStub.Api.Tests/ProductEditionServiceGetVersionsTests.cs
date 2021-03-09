@@ -227,6 +227,35 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
+        public async Task Test_GetProductVersions_When_EditionProvidedButNoUpdate_And_LatestStatusBase_Returns_NoProducts()
+        {
+            // Arrange
+            var (_, productVersion, _) = CreateProduct("GB1234", 2, null, ProductEditionStatusEnum.Base);
+            productVersion.EditionNumber = 2;
+
+            // Act
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
+
+            // Assert
+            response.Should().Be(GetProductVersionResponseEnum.NoUpdatesFound);
+        }
+
+        [Test]
+        public async Task Test_GetProductVersions_When_EditionAndUpdateZeroProvided_And_LatestStatusBase_Returns_NoProducts()
+        {
+            // Arrange
+            var (_, productVersion, _) = CreateProduct("GB1234", 2, null, ProductEditionStatusEnum.Base);
+            productVersion.EditionNumber = 2;
+            productVersion.UpdateNumber = 0;
+
+            // Act
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
+
+            // Assert
+            response.Should().Be(GetProductVersionResponseEnum.NoUpdatesFound);
+        }
+
+        [Test]
         public async Task Test_GetProductVersions_When_LatestStatusSuperseded_Returns_NoProducts()
         {
             // Arrange
