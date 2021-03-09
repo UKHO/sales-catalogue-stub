@@ -342,17 +342,19 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
+
+        //need to presume update for cancel is + 1 last upate
         [Test]
         public async Task Test_GetProductVersions_When_CancelledCellIsOnlyUpdateSinceEdition_And_UpdateRequestedIsThatCancellation_Returns_Expected()
         {
             // Arrange
-            var (_, productVersion, _) = CreateProduct("GB1234", 2, 1, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
+            var (_, productVersion, _) = CreateProduct("CA570179", 1, null, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
 
             // Act
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actualProducts.First().EditionNumber.Should().Be(0);
+            actualProducts.First().EditionNumber.Should().Be(null);
             actualProducts.First().Cancellation.UpdateNumber.Should().Be(1);
             actualProducts.First().Cancellation.EditionNumber.Should().Be(0);
             actualProducts.First().UpdateNumbers.Should().HaveCount(0);
@@ -360,19 +362,19 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public async Task Test_GetProductVersions_When_CancelledCellHasPreviousUpdatesForEdition_And_UpdateRequestedIsBeforeEditionAndUpdateRequested_Returns_Expected()
+        public async Task Test_GetProductVersions_When_CancelledCellHasPreviousUpdatesForEdition_And_EditionRequestedIsBeforeEditionAndUpdateRequested_Returns_Expected()
         {
             // Arrange
-            var (_, productVersion, _) = CreateProduct("GB1234", 2, 3, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
-            productVersion.UpdateNumber = 1;
+            var (_, productVersion, _) = CreateProduct("US4WI21M", 16, 3, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
+            productVersion.EditionNumber = 1;
 
             // Act
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 2 });
-            actualProducts.First().EditionNumber.Should().Be(2);
-            actualProducts.First().Cancellation.UpdateNumber.Should().Be(3);
+            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 0, 1, 2, 3 });
+            actualProducts.First().EditionNumber.Should().Be(16);
+            actualProducts.First().Cancellation.UpdateNumber.Should().Be(4);
             actualProducts.First().Cancellation.EditionNumber.Should().Be(0);
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }

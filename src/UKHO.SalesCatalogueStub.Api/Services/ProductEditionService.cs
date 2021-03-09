@@ -108,7 +108,6 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             var productsInDatabase = false;
             var matchedProducts = new Products();
 
-            // Might be more efficient to pull everything from Db first. Check after base lined.
             foreach (var requestProduct in distinctProducts)
             {
                 if (requestProduct.UpdateNumber.HasValue && !requestProduct.EditionNumber.HasValue) continue;
@@ -165,23 +164,23 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 {
                     case ProductEditionStatusEnum.Cancelled:
                         {
+                            var updateNumber = requestProduct.UpdateNumber ?? 0;
+
                             matchedProduct.Cancellation = new Cancellation
                             {
                                 EditionNumber = 0
                             };
 
-                            if (requestProduct.EditionNumber == matchedProduct.EditionNumber && requestProduct.UpdateNumber == activeEditionUpdateNumber)
+                            if (requestProduct.EditionNumber == matchedProduct.EditionNumber && updateNumber == activeEditionUpdateNumber)
                             {
-                                matchedProduct.UpdateNumbers = new List<int?>();
-                                matchedProduct.Cancellation.UpdateNumber = activeEditionUpdateNumber;
-                                matchedProduct.EditionNumber = 0;
+                                matchedProduct.UpdateNumbers = GetUpdates(start.Value, end);
+                                matchedProduct.Cancellation.UpdateNumber = activeEditionUpdateNumber + 1;
+                                matchedProduct.EditionNumber = null;
                             }
                             else if (requestProduct.EditionNumber < matchedProduct.EditionNumber || requestProduct.UpdateNumber < activeEditionUpdateNumber)
                             {
-                                end--;
-
                                 matchedProduct.UpdateNumbers = GetUpdates(start.Value, end);
-                                matchedProduct.Cancellation.UpdateNumber = activeEditionUpdateNumber;
+                                matchedProduct.Cancellation.UpdateNumber = activeEditionUpdateNumber + 1;
                             }
 
                             break;
