@@ -16,7 +16,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         private ExchangeServiceApiController _exchangeServiceApiController;
 
         [SetUp]
-        public async Task Test_Setup()
+        public void Test_Setup()
         {
             _productEditionService = A.Fake<IProductEditionService>();
             _exchangeServiceApiController = new ExchangeServiceApiController(_productEditionService);

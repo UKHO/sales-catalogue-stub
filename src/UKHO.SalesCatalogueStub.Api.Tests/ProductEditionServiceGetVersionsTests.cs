@@ -20,7 +20,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         private IProductEditionService _service;
 
         [SetUp]
-        public async Task Test_Setup()
+        public void Test_Setup()
         {
             var dbContextOptions = new DbContextOptionsBuilder<SalesCatalogueStubDbContext>()
                 .UseInMemoryDatabase(databaseName: "inmemory")
@@ -31,7 +31,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [TearDown]
-        public async Task Test_TearDown()
+        public void Test_TearDown()
         {
             _dbContext.Database.EnsureDeleted();
         }
@@ -356,7 +356,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public async Task Test_Calls_To_GetProductEditions_With_Null_Throws_ArgumentNullException()
+        public void Test_Calls_To_GetProductEditions_With_Null_Throws_ArgumentNullException()
         {
             _service.Invoking(async a => await a.GetProductVersions(null)).Should().Throw<ArgumentNullException>();
         }
