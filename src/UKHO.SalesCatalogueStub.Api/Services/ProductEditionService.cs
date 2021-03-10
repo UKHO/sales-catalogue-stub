@@ -65,7 +65,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     var productsInner = new ProductsInner
                     {
                         UpdateNumbers = updates,
-                        EditionNumber = Convert.ToInt32(activeEdition.EditionNumber),
+                        EditionNumber = activeEdition.EditionNumberAsInt,
                         FileSize = GetFileSize(activeEditionUpdateNumber),
                         ProductName = activeEdition.EditionIdentifier
                     };
@@ -197,6 +197,48 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             }
 
             return (matchedProducts, GetProductVersionResponseEnum.UpdatesFound);
+        }
+
+        public EssData GetCatalogue(DateTime? ifModifiedSince)
+        {
+            var editions = _dbContext.ProductEditions.Include(a => a.PidGeometry).AsNoTracking().Where(a =>
+                a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
+                _allowedProductStatus.Contains(a.LatestStatus));
+
+            var catalogue = new EssData();
+
+            foreach (var edition in editions)
+            {
+                var updateNumber = edition.UpdateNumber ?? 0;
+                var geometry = edition.PidGeometry.SingleOrDefault(a => a.IsBoundingBox)?.Geom;
+                var reissueNumber = edition.LastReissueUpdateNumber ?? 0;
+
+                catalogue.Add(
+                    new EssDataInner()
+                    {
+                        ProductName = edition.EditionIdentifier,
+                        BaseCellIssueDate = edition.BaseIssueDate,
+                        BaseCellEditionNumber = edition.LatestStatus == ProductEditionStatusEnum.Cancelled ? 0 : edition.EditionNumberAsInt,
+                        IssueDateLatestUpdate = edition.LastUpdateIssueDate,
+                        LatestUpdateNumber = edition.UpdateNumber,
+                        FileSize = GetFileSize(updateNumber),
+                        CellLimitNorthernmostLatitude = Convert.ToDecimal(geometry?.EnvelopeInternal.MaxX),
+                        CellLimitEasternmostLatitude = Convert.ToDecimal(geometry?.EnvelopeInternal.MaxY),
+                        CellLimitSouthernmostLatitude = Convert.ToDecimal(geometry?.EnvelopeInternal.MinX),
+                        CellLimitWesternmostLatitude = Convert.ToDecimal(geometry?.EnvelopeInternal.MinY),
+                        DataCoverageCoordinates = new List<DataCoverageCoordinate> { new DataCoverageCoordinate() { Latitude = 0, Longitude = 0 } },
+                        Compression = true,
+                        Encryption = true,
+                        BaseCellUpdateNumber = reissueNumber,
+                        LastUpdateNumberPreviousEdition = 0,
+                        CancelledCellReplacements = new List<string>(),
+                        IssueDatePreviousUpdate = edition.BaseIssueDate,
+                        CancelledEditionNumber = edition.LatestStatus == ProductEditionStatusEnum.Cancelled ? edition.EditionNumberAsInt : 0,
+
+                    });
+            };
+
+            return catalogue;
         }
 
         public async Task<ProductResponse> GetProductEditionsSinceDateTime(DateTime sinceDateTime)

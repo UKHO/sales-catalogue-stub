@@ -97,7 +97,7 @@ namespace UKHO.SalesCatalogueStub.Api.Models
         /// </summary>
         /// <value>Optional. Currently blank. 10 coordinate pairs can be supplied to indicate the data coverage within the ENC cell. It will be provided as repeating Y-coordinate and X-coordinate pairs.  </value>
         [DataMember(Name = "dataCoverageCoordinates")]
-        public List<Object> DataCoverageCoordinates { get; set; }
+        public List<DataCoverageCoordinate> DataCoverageCoordinates { get; set; }
 
         /// <summary>
         /// Indicator of compression of dataset.   
