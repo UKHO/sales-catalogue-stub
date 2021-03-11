@@ -56,7 +56,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         {
 
             var catalogueModified = _productEditionService.CheckIfCatalogueModified(ifModifiedSince, out var dateEntered);
-            Response.Headers.Add("LastModified", catalogueModified.ToString());
+            Response.Headers.Add("LastModified", dateEntered.ToString());
 
             if (!catalogueModified)
             {
