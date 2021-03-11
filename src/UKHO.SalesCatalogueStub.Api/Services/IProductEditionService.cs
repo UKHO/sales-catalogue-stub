@@ -12,7 +12,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
         Products GetProductEditions(List<string> products);
         Task<ProductResponse> GetProductEditionsSinceDateTime(DateTime sinceDateTime);
         Task<(Products, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions);
-        EssData GetCatalogue(DateTime? ifModifiedSince);
+        EssData GetCatalogue();
         bool CheckIfCatalogueModified(DateTime? ifModifiedSince, out DateTime? dateEntered);
     }
 }

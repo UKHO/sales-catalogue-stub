@@ -212,7 +212,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return ifModifiedSince == null || ifModifiedSince < latestDateEntered;
         }
 
-        public EssData GetCatalogue(DateTime? ifModifiedSince)
+        public EssData GetCatalogue()
         {
             var editions = _dbContext.ProductEditions.Include(a => a.PidGeometry).Include(a => a.PidTombstone).AsNoTracking().Where(a =>
                 a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
