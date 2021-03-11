@@ -163,29 +163,24 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEdition.CellLimitWesternmostLatitude.Should().Be((decimal?)expectedWestLatitude);
         }
 
-        private static readonly object[] GetCatalogueCoverageCoordinatesCases =
-        {
-            new object[] { "EG3GOA01", 0, 0 },
-            new object[] { "AU220120",  0, 0 },
-            new object[] { "1U420222", 0, 0 },
-            new object[] { "JP54QNMK", 0, 0 },
-            new object[] { "GB340060", 0, 0 },
-            new object[] { "DE521860", 0, 0 },
-            new object[] { "JP44MON8", 0, 0 },
-            new object[] { "MX300511", 0, 0 }
-        };
 
-        [Test, TestCaseSource(nameof(GetCatalogueCoverageCoordinatesCases))]
-        public void Calls_To_GetCatalogue_Should_Return_Expected_DataCoverageCoordinates_For_Matched_Edition(string productName,
-            double expectedLatitude, double expectedLongitude)
+        [TestCase("EG3GOA01")]
+        [TestCase("AU220120")]
+        [TestCase("1U420222")]
+        [TestCase("JP54QNMK")]
+        [TestCase("GB340060")]
+        [TestCase("DE521860")]
+        [TestCase("JP44MON8")]
+        [TestCase("MX300511")]
+        public void Calls_To_GetCatalogue_Should_Return_DataCoverageCoordinates_As_Null_For_Matched_Edition(string productName)
         {
 
             var serviceResponse = _service.GetCatalogue(A.Dummy<DateTime>());
 
             var productEdition = serviceResponse.Single(a => a.ProductName == productName);
 
-            productEdition.DataCoverageCoordinates.Single().Longitude.Should().Be((decimal?)expectedLongitude);
-            productEdition.DataCoverageCoordinates.Single().Latitude.Should().Be((decimal?)expectedLongitude);
+            productEdition.DataCoverageCoordinates.Single().Longitude.Should().BeNull();
+            productEdition.DataCoverageCoordinates.Single().Latitude.Should().BeNull();
 
         }
 
@@ -245,12 +240,12 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860")]
         [TestCase("JP44MON8")]
         [TestCase("MX300511")]
-        public void Calls_To_GetCatalogue_Should_Return_Zero_As_LastUpdateNumberPreviousEdition_For_Matched_Edition(string productName)
+        public void Calls_To_GetCatalogue_Should_Return_Null_As_LastUpdateNumberPreviousEdition_For_Matched_Edition(string productName)
         {
 
             var serviceResponse = _service.GetCatalogue(A.Dummy<DateTime>());
 
-            serviceResponse.Single(a => a.ProductName == productName).LastUpdateNumberPreviousEdition.Should().Be(0);
+            serviceResponse.Single(a => a.ProductName == productName).LastUpdateNumberPreviousEdition.Should().BeNull();
         }
 
         [TestCase("EG3GOA01")]
@@ -289,12 +284,12 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             serviceResponse.Single(a => a.ProductName == productName).IssueDatePreviousUpdate.Should().Be(expected);
         }
 
-        [TestCase("EG3GOA01", ExpectedResult = 0)]
-        [TestCase("AU220120", ExpectedResult = 0)]
-        [TestCase("1U420222", ExpectedResult = 0)]
-        [TestCase("JP54QNMK", ExpectedResult = 0)]
-        [TestCase("GB340060", ExpectedResult = 0)]
-        [TestCase("DE521860", ExpectedResult = 0)]
+        [TestCase("EG3GOA01", ExpectedResult = null)]
+        [TestCase("AU220120", ExpectedResult = null)]
+        [TestCase("1U420222", ExpectedResult = null)]
+        [TestCase("JP54QNMK", ExpectedResult = null)]
+        [TestCase("GB340060", ExpectedResult = null)]
+        [TestCase("DE521860", ExpectedResult = null)]
         [TestCase("JP44MON8", ExpectedResult = 9)]
         [TestCase("MX300511", ExpectedResult = 16)]
         public int? Calls_To_GetCatalogue_Should_Return_Expected_CancelledEditionNumber_For_Matched_Edition(string productName)

@@ -276,7 +276,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                         LastUpdateNumberPreviousEdition = null,
                         CancelledCellReplacements = new List<string>(),
                         IssueDatePreviousUpdate = edition.BaseIssueDate,
-                        CancelledEditionNumber = isCancelled ? edition.EditionNumberAsInt : 0,
+                        CancelledEditionNumber = isCancelled ? edition.EditionNumberAsInt : (int?)null,
                         BaseCellLocation = GetBaseCellLocation(baseCdNumber)
 
                     });
