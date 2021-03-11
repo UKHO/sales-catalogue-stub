@@ -8,13 +8,13 @@ namespace UKHO.SalesCatalogueStub.Api.Models
     public class BoundingBox
     {
         [XmlElement(ElementName = "NorthLimit")]
-        public double NorthLimit { get; set; }
+        public double? NorthLimit { get; set; }
         [XmlElement(ElementName = "SouthLimit")]
-        public double SouthLimit { get; set; }
+        public double? SouthLimit { get; set; }
         [XmlElement(ElementName = "EastLimit")]
-        public double EastLimit { get; set; }
+        public double? EastLimit { get; set; }
         [XmlElement(ElementName = "WestLimit")]
-        public double WestLimit { get; set; }
+        public double? WestLimit { get; set; }
     }
 
     [XmlRoot(ElementName = "Position")]
@@ -85,9 +85,9 @@ namespace UKHO.SalesCatalogueStub.Api.Models
     public class Cd
     {
         [XmlElement(ElementName = "Base")]
-        public string Base { get; set; }
+        public int? Base { get; set; }
         [XmlElement(ElementName = "Update")]
-        public string Update { get; set; }
+        public int? Update { get; set; }
     }
 
     [XmlRoot(ElementName = "Metadata")]

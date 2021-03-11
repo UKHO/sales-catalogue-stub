@@ -210,7 +210,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
                 _allowedProductStatus.Contains(a.LatestStatus));
 
-            var catalogue = new EssData();
+            var catalogue = new List<EssDataInner>();
 
             foreach (var edition in editions)
             {
@@ -220,6 +220,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 var reissueNumber = edition.LastReissueUpdateNumber ?? 0;
 
                 Tuple<double?, double?, double?, double?> latitudes;
+                int? baseCdNumber;
 
                 if (isCancelled && edition.PidTombstone?.XmlData != null)
                 {
@@ -229,6 +230,8 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                         enc.Metadata?.GeographicLimit?.BoundingBox?.EastLimit,
                         enc.Metadata?.GeographicLimit?.BoundingBox?.SouthLimit,
                         enc.Metadata?.GeographicLimit?.BoundingBox?.WestLimit);
+
+                    baseCdNumber = enc.Metadata?.Cd?.Base;
                 }
                 else
                 {
@@ -239,6 +242,8 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                        geometry?.EnvelopeInternal?.MaxY,
                        geometry?.EnvelopeInternal?.MinX,
                        geometry?.EnvelopeInternal?.MinY);
+
+                    baseCdNumber = edition.BaseCd;
                 }
 
                 catalogue.Add(
@@ -254,7 +259,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                         CellLimitEasternmostLatitude = Convert.ToDecimal(latitudes.Item2),
                         CellLimitSouthernmostLatitude = Convert.ToDecimal(latitudes.Item3),
                         CellLimitWesternmostLatitude = Convert.ToDecimal(latitudes.Item4),
-                        DataCoverageCoordinates = new List<DataCoverageCoordinate> { new DataCoverageCoordinate() { Latitude = 0, Longitude = 0 } },
+                        DataCoverageCoordinates = new List<DataCoverageCoordinate> { new DataCoverageCoordinate { Latitude = 0, Longitude = 0 } },
                         Compression = true,
                         Encryption = true,
                         BaseCellUpdateNumber = reissueNumber,
@@ -262,12 +267,14 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                         CancelledCellReplacements = new List<string>(),
                         IssueDatePreviousUpdate = edition.BaseIssueDate,
                         CancelledEditionNumber = isCancelled ? edition.EditionNumberAsInt : 0,
-                        BaseCellLocation = GetBaseCellLocation(edition.BaseCd)
+                        BaseCellLocation = GetBaseCellLocation(baseCdNumber)
 
                     });
             };
 
-            return catalogue;
+            var essData = new EssData();
+            essData.AddRange(catalogue.OrderBy(a => a.ProductName));
+            return essData;
         }
 
         public async Task<ProductResponse> GetProductEditionsSinceDateTime(DateTime sinceDateTime)
@@ -401,7 +408,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return baseCdNumber <= 5 ? $"M1;B{baseCdNumber}" : $"M2;B{baseCdNumber}";
         }
 
-        private Enc DeserializePidTombstone(string xmlString)
+        private static Enc DeserializePidTombstone(string xmlString)
         {
             var serializer =
                 new XmlSerializer(typeof(Enc));

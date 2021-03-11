@@ -311,8 +311,8 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("JP54QNMK", ExpectedResult = "M2;B6")]
         [TestCase("GB340060", ExpectedResult = "M2;B7")]
         [TestCase("DE521860", ExpectedResult = "M2;B9")]
-        [TestCase("JP44MON8", ExpectedResult = null)]
-        [TestCase("MX300511", ExpectedResult = null)]
+        [TestCase("JP44MON8", ExpectedResult = "M1;B1")]
+        [TestCase("MX300511", ExpectedResult = "M2;B9")]
         public string Calls_To_GetCatalogue_Should_Return_Expected_BaseCellLocation_For_Matched_Edition(string productName)
         {
 
@@ -342,13 +342,14 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
         private void CreateProduct(string productName, int? editionNumber, int? updateNumber, int? lastReissueUpdateNumber,
             ProductEditionStatusEnum latestStatus, DateTime? baseIssueDate, DateTime? lastUpdateIssueDate,
-            double northLimit, double eastLimit, double southLimit, double westLimit, int? baseCDNumber,
+            double northLimit, double eastLimit, double southLimit, double westLimit, int? baseCdNumber,
             ProductTypeNameEnum productType = ProductTypeNameEnum.Avcs)
         {
             PidTombstone pidTombstone = null;
             ICollection<PidGeometry> pidGeometry = null;
+            var isCancelled = latestStatus == ProductEditionStatusEnum.Cancelled;
 
-            if (latestStatus == ProductEditionStatusEnum.Cancelled)
+            if (isCancelled)
             {
                 pidTombstone = new PidTombstone
                 {
@@ -384,7 +385,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                             new XElement("Usage", "1"), new XElement("Edtn", "1"),
                             new XElement("Base_isdt", "2021-01-01"), new XElement("UPDN", "1"),
                             new XElement("Last_update_isdt", "2021-01-01"), new XElement("Last_reissue_UPDN", "0"),
-                            new XElement("CD", new XElement("Base", baseCDNumber), new XElement("Update", "0")))).ToString()
+                            new XElement("CD", new XElement("Base", baseCdNumber), new XElement("Update", "0")))).ToString()
                 };
 
             }
@@ -422,7 +423,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                         LastUpdateIssueDate = lastUpdateIssueDate,
                         PidTombstone = pidTombstone,
                         PidGeometry = pidGeometry,
-                        BaseCd = baseCDNumber
+                        BaseCd = isCancelled ? null : baseCdNumber
                     }
                 },
                 ProductType = new ProductType { Name = productType }
@@ -449,9 +450,9 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             CreateProduct("DE521860", 23, 23, 15, ProductEditionStatusEnum.Reissued, new DateTime(2021, 12, 22),
                 new DateTime(2021, 12, 30), 357.242424, 66.53336, 356.2355, 66.35555, 9);
             CreateProduct("JP44MON8", 9, 2, 0, ProductEditionStatusEnum.Cancelled, new DateTime(2022, 5, 11),
-                new DateTime(2022, 11, 16), 56.235, -31.23556, 55.4435, -32.0941667, null);
+                new DateTime(2022, 11, 16), 56.235, -31.23556, 55.4435, -32.0941667, 1);
             CreateProduct("MX300511", 16, 8, 0, ProductEditionStatusEnum.Cancelled, new DateTime(2022, 6, 1),
-                new DateTime(2022, 6, 16), 86.2355555, 143.235555, 86.23444, 143.21112, null);
+                new DateTime(2022, 6, 16), 86.2355555, 143.235555, 86.23444, 143.21112, 9);
         }
     }
 }
