@@ -127,6 +127,8 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     continue;
 
                 var activeEditionUpdateNumber = productDbMatch.UpdateNumber ?? 0;
+                var requestUpdateNumber = requestProduct.UpdateNumber ?? 0;
+                var requestEditionNumber = requestProduct.EditionNumber ?? 0;
 
                 var matchedProduct = new ProductsInner
                 {
@@ -136,25 +138,25 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 };
 
                 // Reject where status is Base and update zero is requested for current edition
-                if (requestProduct.UpdateNumber == 0 &&
-                    matchedProduct.EditionNumber == requestProduct.EditionNumber &&
+                if (requestUpdateNumber == 0 &&
+                    matchedProduct.EditionNumber == requestEditionNumber &&
                     productDbMatch.LatestStatus == ProductEditionStatusEnum.Base)
                     continue;
 
                 // Reject where the provided and current are the same
-                if (productDbMatch.UpdateNumber == requestProduct.UpdateNumber &&
-                    matchedProduct.EditionNumber == requestProduct.EditionNumber &&
+                if (productDbMatch.UpdateNumber == requestUpdateNumber &&
+                    matchedProduct.EditionNumber == requestEditionNumber &&
                     productDbMatch.LatestStatus != ProductEditionStatusEnum.Cancelled)
                     continue;
 
                 // Reject where edition or update numbers are provided that are higher than current
-                if ((requestProduct.EditionNumber > matchedProduct.EditionNumber) ||
-                    (requestProduct.EditionNumber == matchedProduct.EditionNumber &&
-                     requestProduct.UpdateNumber > (productDbMatch.UpdateNumber ?? 0)))
+                if ((requestEditionNumber > matchedProduct.EditionNumber) ||
+                    (requestEditionNumber == matchedProduct.EditionNumber &&
+                     requestUpdateNumber > (productDbMatch.UpdateNumber ?? 0)))
                     continue;
 
                 int? start = 0;
-                if ((requestProduct.UpdateNumber ?? 0) == productDbMatch.LastReissueUpdateNumber)
+                if (requestUpdateNumber == productDbMatch.LastReissueUpdateNumber)
                 {
                     start = productDbMatch.LastReissueUpdateNumber + 1;
                 }
@@ -172,20 +174,17 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 {
                     case ProductEditionStatusEnum.Cancelled:
                         {
-                            var updateNumber = requestProduct.UpdateNumber ?? 0;
-                            var editionNumber = requestProduct.EditionNumber ?? 0;
-
                             matchedProduct.Cancellation = new Cancellation
                             {
                                 EditionNumber = 0,
                                 UpdateNumber = activeEditionUpdateNumber + 1
                             };
 
-                            if (editionNumber == matchedProduct.EditionNumber && updateNumber == activeEditionUpdateNumber)
+                            if (requestEditionNumber == matchedProduct.EditionNumber && requestUpdateNumber == activeEditionUpdateNumber)
                             {
                                 matchedProduct.UpdateNumbers = GetUpdates(start.Value, end);
                             }
-                            else if (editionNumber < matchedProduct.EditionNumber || updateNumber < activeEditionUpdateNumber)
+                            else if (requestEditionNumber < matchedProduct.EditionNumber || requestUpdateNumber < activeEditionUpdateNumber)
                             {
                                 matchedProduct.UpdateNumbers = activeEditionUpdateNumber == 0 ? new List<int?>() : GetUpdates(start.Value, end);
                             }
