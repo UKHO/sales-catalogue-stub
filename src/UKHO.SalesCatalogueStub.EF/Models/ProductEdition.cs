@@ -90,5 +90,7 @@ namespace UKHO.SalesCatalogueStub.Api.EF.Models
 
         public virtual ICollection<PidGeometry> PidGeometry { get; set; }
 
+        public virtual PidTombstone PidTombstone { get; set; }
+
     }
 }

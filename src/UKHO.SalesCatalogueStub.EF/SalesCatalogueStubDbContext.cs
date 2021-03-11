@@ -30,6 +30,7 @@ namespace UKHO.SalesCatalogueStub.Api.EF
         public DbSet<PidGeometry> PidGeometries { get; set; }
         public DbSet<EventType> EventTypes { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
+        public DbSet<PidTombstone> PidTombstone { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

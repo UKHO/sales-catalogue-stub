@@ -4,8 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using UKHO.SalesCatalogueStub.Api.EF;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 using UKHO.SalesCatalogueStub.Api.Models;
@@ -56,7 +58,10 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     continue;
                 }
 
-                var activeEdition = GetActiveEdition(product);
+                var activeEdition = _dbContext.ProductEditions.AsNoTracking().SingleOrDefault(a =>
+                    a.EditionIdentifier == product &&
+                    a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
+                    _allowedProductStatus.Contains(a.LatestStatus));
 
                 if (activeEdition != null)
                 {
@@ -201,7 +206,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
         public EssData GetCatalogue(DateTime? ifModifiedSince)
         {
-            var editions = _dbContext.ProductEditions.Include(a => a.PidGeometry).AsNoTracking().Where(a =>
+            var editions = _dbContext.ProductEditions.Include(a => a.PidGeometry).Include(a => a.PidTombstone).AsNoTracking().Where(a =>
                 a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
                 _allowedProductStatus.Contains(a.LatestStatus));
 
@@ -209,23 +214,46 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
             foreach (var edition in editions)
             {
+                var isCancelled = edition.LatestStatus == ProductEditionStatusEnum.Cancelled;
                 var updateNumber = edition.UpdateNumber ?? 0;
-                var geometry = edition.PidGeometry.SingleOrDefault(a => a.IsBoundingBox)?.Geom;
+
                 var reissueNumber = edition.LastReissueUpdateNumber ?? 0;
+
+                Tuple<double?, double?, double?, double?> latitudes;
+
+                if (isCancelled && edition.PidTombstone?.XmlData != null)
+                {
+                    var enc = DeserializePidTombstone(edition.PidTombstone.XmlData);
+                    latitudes = new Tuple<double?, double?, double?, double?>(
+                        enc.Metadata?.GeographicLimit?.BoundingBox?.NorthLimit,
+                        enc.Metadata?.GeographicLimit?.BoundingBox?.EastLimit,
+                        enc.Metadata?.GeographicLimit?.BoundingBox?.SouthLimit,
+                        enc.Metadata?.GeographicLimit?.BoundingBox?.WestLimit);
+                }
+                else
+                {
+                    var geometry = edition.PidGeometry.SingleOrDefault(a => a.IsBoundingBox)?.Geom;
+
+                    latitudes = new Tuple<double?, double?, double?, double?>(
+                       geometry?.EnvelopeInternal?.MaxX,
+                       geometry?.EnvelopeInternal?.MaxY,
+                       geometry?.EnvelopeInternal?.MinX,
+                       geometry?.EnvelopeInternal?.MinY);
+                }
 
                 catalogue.Add(
                     new EssDataInner()
                     {
                         ProductName = edition.EditionIdentifier,
                         BaseCellIssueDate = edition.BaseIssueDate,
-                        BaseCellEditionNumber = edition.LatestStatus == ProductEditionStatusEnum.Cancelled ? 0 : edition.EditionNumberAsInt,
+                        BaseCellEditionNumber = isCancelled ? 0 : edition.EditionNumberAsInt,
                         IssueDateLatestUpdate = edition.LastUpdateIssueDate,
                         LatestUpdateNumber = edition.UpdateNumber,
                         FileSize = GetFileSize(updateNumber),
-                        CellLimitNorthernmostLatitude = Convert.ToDecimal(geometry?.EnvelopeInternal.MaxX),
-                        CellLimitEasternmostLatitude = Convert.ToDecimal(geometry?.EnvelopeInternal.MaxY),
-                        CellLimitSouthernmostLatitude = Convert.ToDecimal(geometry?.EnvelopeInternal.MinX),
-                        CellLimitWesternmostLatitude = Convert.ToDecimal(geometry?.EnvelopeInternal.MinY),
+                        CellLimitNorthernmostLatitude = Convert.ToDecimal(latitudes.Item1),
+                        CellLimitEasternmostLatitude = Convert.ToDecimal(latitudes.Item2),
+                        CellLimitSouthernmostLatitude = Convert.ToDecimal(latitudes.Item3),
+                        CellLimitWesternmostLatitude = Convert.ToDecimal(latitudes.Item4),
                         DataCoverageCoordinates = new List<DataCoverageCoordinate> { new DataCoverageCoordinate() { Latitude = 0, Longitude = 0 } },
                         Compression = true,
                         Encryption = true,
@@ -233,7 +261,8 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                         LastUpdateNumberPreviousEdition = 0,
                         CancelledCellReplacements = new List<string>(),
                         IssueDatePreviousUpdate = edition.BaseIssueDate,
-                        CancelledEditionNumber = edition.LatestStatus == ProductEditionStatusEnum.Cancelled ? edition.EditionNumberAsInt : 0,
+                        CancelledEditionNumber = isCancelled ? edition.EditionNumberAsInt : 0,
+                        BaseCellLocation = GetBaseCellLocation(edition.BaseCd)
 
                     });
             };
@@ -344,17 +373,8 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             {
                 productUpdates.Add(i);
             }
+
             return productUpdates;
-        }
-
-        private ProductEdition GetActiveEdition(string productName)
-        {
-            var productMatch = _dbContext.ProductEditions.AsNoTracking().SingleOrDefault(a =>
-                a.EditionIdentifier == productName &&
-                a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
-                _allowedProductStatus.Contains(a.LatestStatus));
-
-            return productMatch;
         }
 
         private static int GetFileSize(int latestUpdateNumber)
@@ -369,6 +389,28 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 EditionNumber = 0,
                 UpdateNumber = latestUpdateNumber + 1
             };
+        }
+
+        private static string GetBaseCellLocation(int? baseCdNumber)
+        {
+            if (baseCdNumber == null)
+            {
+                return null;
+            }
+
+            return baseCdNumber <= 5 ? $"M1;B{baseCdNumber}" : $"M2;B{baseCdNumber}";
+        }
+
+        private Enc DeserializePidTombstone(string xmlString)
+        {
+            var serializer =
+                new XmlSerializer(typeof(Enc));
+
+            var stringReader = new StringReader(xmlString);
+
+            var enc = (Enc)serializer.Deserialize(stringReader);
+
+            return enc;
         }
     }
 }
