@@ -54,32 +54,18 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual IActionResult GetCatalogue([FromRoute][Required] string productType, [FromRoute][Required] string catalogueType, [FromHeader] DateTime? ifModifiedSince)
         {
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(InlineResponse200));
 
-            //TODO: Uncomment the next line to return response 304 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(304);
+            var catalogueModified = _productEditionService.CheckIfCatalogueModified(ifModifiedSince, out var dateEntered);
+            Response.Headers.Add("LastModified", catalogueModified.ToString());
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(ErrorDescription));
+            if (!catalogueModified)
+            {
+                return StatusCode(304);
+            }
+            var catalogue = _productEditionService.GetCatalogue(ifModifiedSince);
+            return StatusCode(200, JsonConvert.SerializeObject(catalogue, Formatting.Indented));
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401);
 
-            //TODO: Uncomment the next line to return response 403 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(403);
-
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 406 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(406, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(500, default(DefaultErrorResponse));
-            var geoms = _productEditionService.GetCatalogue(null);
-
-            return new ObjectResult(null);
         }
     }
 }

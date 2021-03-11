@@ -234,14 +234,14 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
                 if (isCancelled && edition.PidTombstone?.XmlData != null)
                 {
-                    var enc = DeserializePidTombstone(edition.PidTombstone.XmlData);
+                    var pidTombstone = DeserializePidTombstone(edition.PidTombstone.XmlData);
                     latitudes = new Tuple<double?, double?, double?, double?>(
-                        enc.Metadata?.GeographicLimit?.BoundingBox?.NorthLimit,
-                        enc.Metadata?.GeographicLimit?.BoundingBox?.EastLimit,
-                        enc.Metadata?.GeographicLimit?.BoundingBox?.SouthLimit,
-                        enc.Metadata?.GeographicLimit?.BoundingBox?.WestLimit);
+                        pidTombstone.Metadata?.GeographicLimit?.BoundingBox?.NorthLimit,
+                        pidTombstone.Metadata?.GeographicLimit?.BoundingBox?.EastLimit,
+                        pidTombstone.Metadata?.GeographicLimit?.BoundingBox?.SouthLimit,
+                        pidTombstone.Metadata?.GeographicLimit?.BoundingBox?.WestLimit);
 
-                    baseCdNumber = enc.Metadata?.Cd?.Base;
+                    baseCdNumber = pidTombstone.Metadata?.Cd?.Base;
                 }
                 else
                 {
@@ -269,11 +269,11 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                         CellLimitEasternmostLatitude = Convert.ToDecimal(latitudes.Item2),
                         CellLimitSouthernmostLatitude = Convert.ToDecimal(latitudes.Item3),
                         CellLimitWesternmostLatitude = Convert.ToDecimal(latitudes.Item4),
-                        DataCoverageCoordinates = new List<DataCoverageCoordinate> { new DataCoverageCoordinate { Latitude = 0, Longitude = 0 } },
+                        DataCoverageCoordinates = new List<DataCoverageCoordinate> { new DataCoverageCoordinate { Latitude = null, Longitude = null } },
                         Compression = true,
                         Encryption = true,
                         BaseCellUpdateNumber = reissueNumber,
-                        LastUpdateNumberPreviousEdition = 0,
+                        LastUpdateNumberPreviousEdition = null,
                         CancelledCellReplacements = new List<string>(),
                         IssueDatePreviousUpdate = edition.BaseIssueDate,
                         CancelledEditionNumber = isCancelled ? edition.EditionNumberAsInt : 0,
