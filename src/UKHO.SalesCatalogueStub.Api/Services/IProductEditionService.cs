@@ -13,5 +13,6 @@ namespace UKHO.SalesCatalogueStub.Api.Services
         Task<ProductResponse> GetProductEditionsSinceDateTime(DateTime sinceDateTime);
         Task<(Products, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions);
         EssData GetCatalogue(DateTime? ifModifiedSince);
+        bool CheckIfCatalogueModified(DateTime? ifModifiedSince, out DateTime? dateEntered);
     }
 }

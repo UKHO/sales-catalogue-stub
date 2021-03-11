@@ -334,6 +334,42 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             serviceResponse[6].ProductName.Should().Be("JP54QNMK");
             serviceResponse[7].ProductName.Should().Be("MX300511");
         }
+        private static readonly object[] GetCatalogueIfModifiedSinceEarlierDateCases =
+        {
+            new object[] { new DateTime(2020, 5, 12), new DateTime(2020, 5, 13) },
+            new object[] { new DateTime(2020, 8, 13), new DateTime(2020, 9, 7) },
+            new object[] { new DateTime(2018, 5, 13), new DateTime(2020, 10, 12) },
+            new object[] { new DateTime(2020, 10, 13), new DateTime(2020, 11, 13) },
+            new object[] { new DateTime(2020, 5, 08), new DateTime(2021, 12, 09) },
+            new object[] { new DateTime(2021, 12, 10), new DateTime(2021, 12, 22) },
+            new object[] { null, new DateTime(2022, 5, 11) },
+            new object[] { null, new DateTime(2022, 6, 1) },
+        };
+        [Test, TestCaseSource(nameof(GetCatalogueIfModifiedSinceEarlierDateCases))]
+        public void Calls_To_CheckIfCatalogueModified_Should_Return_True_If_IfModifiedSince_Is_Earlier_Than_Latest_LoaderStatus_DateEntered_Or_Null(DateTime? ifModifiedSince, DateTime latestDateEntered)
+        {
+            CreateLoaderStatus(latestDateEntered);
+            _service.CheckIfCatalogueModified(ifModifiedSince, out var dateEntered).Should().BeTrue();
+            dateEntered.Should().Be(latestDateEntered);
+        }
+
+        private static readonly object[] GetCatalogueIfModifiedSinceLaterDateCases =
+        {
+            new object[] { new DateTime(2020, 5, 14), new DateTime(2020, 5, 13) },
+            new object[] { new DateTime(2020, 9, 13), new DateTime(2020, 9, 7) },
+            new object[] { new DateTime(2022, 5, 13), new DateTime(2020, 10, 12) },
+            new object[] { new DateTime(2020, 12, 13), new DateTime(2020, 11, 13) },
+            new object[] { new DateTime(2021, 12, 09), new DateTime(2021, 12, 09) },
+            new object[] { new DateTime(2021, 12, 14), new DateTime(2021, 12, 11) }
+        };
+        [Test, TestCaseSource(nameof(GetCatalogueIfModifiedSinceLaterDateCases))]
+        public void Calls_To_CheckIfCatalogueModified_Should_Return_False_If_IfModifiedSince_Is_Later_Than_Latest_LoaderStatus_DateEntered(DateTime? ifModifiedSince, DateTime latestDateEntered)
+        {
+            CreateLoaderStatus(latestDateEntered);
+            _service.CheckIfCatalogueModified(ifModifiedSince, out var dateEntered).Should().BeFalse();
+            dateEntered.Should().Be(latestDateEntered);
+        }
+
         [SetUp]
         public void Setup()
         {
@@ -351,6 +387,19 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         public void TearDown()
         {
             _dbContext.Database.EnsureDeleted();
+        }
+
+        private void CreateLoaderStatus(DateTime dateEntered)
+        {
+            var loaderStatus = new LoaderStatus
+            {
+                Id = new Guid(),
+                AreaName = AreaNameEnum.Main,
+                DateEntered = dateEntered
+            };
+
+            _dbContext.Add(loaderStatus);
+            _dbContext.SaveChanges();
         }
 
         private void CreateProduct(string productName, int? editionNumber, int? updateNumber, int? lastReissueUpdateNumber,

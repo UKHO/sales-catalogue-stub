@@ -204,6 +204,14 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return (matchedProducts, GetProductVersionResponseEnum.UpdatesFound);
         }
 
+        public bool CheckIfCatalogueModified(DateTime? ifModifiedSince, out DateTime? dateEntered)
+        {
+            var latestDateEntered = _dbContext.LoaderStatus.OrderByDescending(a => a.DateEntered).First(a => a.AreaName == AreaNameEnum.Main).DateEntered;
+
+            dateEntered = latestDateEntered;
+            return ifModifiedSince == null || ifModifiedSince < latestDateEntered;
+        }
+
         public EssData GetCatalogue(DateTime? ifModifiedSince)
         {
             var editions = _dbContext.ProductEditions.Include(a => a.PidGeometry).Include(a => a.PidTombstone).AsNoTracking().Where(a =>
@@ -215,11 +223,13 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             foreach (var edition in editions)
             {
                 var isCancelled = edition.LatestStatus == ProductEditionStatusEnum.Cancelled;
+
                 var updateNumber = edition.UpdateNumber ?? 0;
 
                 var reissueNumber = edition.LastReissueUpdateNumber ?? 0;
 
                 Tuple<double?, double?, double?, double?> latitudes;
+
                 int? baseCdNumber;
 
                 if (isCancelled && edition.PidTombstone?.XmlData != null)
