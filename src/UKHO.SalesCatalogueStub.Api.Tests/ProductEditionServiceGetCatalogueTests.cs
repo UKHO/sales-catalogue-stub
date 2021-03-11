@@ -321,6 +321,19 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             return serviceResponse.Single(a => a.ProductName == productName).BaseCellLocation;
         }
 
+        [Test]
+        public void Calls_To_GetCatalogue_Should_Return_Catalogue_In_Alphabetical_Order_1A_To_Z()
+        {
+            var serviceResponse = _service.GetCatalogue(A.Dummy<DateTime>());
+            serviceResponse[0].ProductName.Should().Be("1U420222");
+            serviceResponse[1].ProductName.Should().Be("AU220120");
+            serviceResponse[2].ProductName.Should().Be("DE521860");
+            serviceResponse[3].ProductName.Should().Be("EG3GOA01");
+            serviceResponse[4].ProductName.Should().Be("GB340060");
+            serviceResponse[5].ProductName.Should().Be("JP44MON8");
+            serviceResponse[6].ProductName.Should().Be("JP54QNMK");
+            serviceResponse[7].ProductName.Should().Be("MX300511");
+        }
         [SetUp]
         public void Setup()
         {
