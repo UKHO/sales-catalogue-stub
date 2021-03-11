@@ -48,7 +48,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 1, 2, 3, 4 });
+            actualProducts.First().UpdateNumbers.Should().Equals(new[] { 1, 2, 3, 4 });
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
@@ -65,7 +65,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 0, 1, 2, 3, 4 });
+            actualProducts.First().UpdateNumbers.Should().Equals(new[] { 0, 1, 2, 3, 4 });
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
@@ -82,7 +82,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 0 });
+            actualProducts.First().UpdateNumbers.Should().Equals(new[] { 0 });
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
@@ -99,7 +99,23 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 2, 3, 4 });
+            actualProducts.First().UpdateNumbers.Should().Equal(new[] { 2, 3, 4 });
+            response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
+        }
+
+        [Test]
+        public async Task Test_GetProductVersions_When_ReIssued_And_ReIssuedUpdateProvided_Returns_AllUpdatesForCurrentEditionFromUpdateAfterThatProvided()
+        {
+            // Arrange
+            var (_, productVersion, _) = CreateProduct("JP54NC8S", 12, 7, ProductEditionStatusEnum.Updated, LastReissueUpdateNumber: 6);
+
+            productVersion.UpdateNumber = 6;
+
+            // Act
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
+
+            // Assert
+            actualProducts.First().UpdateNumbers.Should().Equal(new[] { 7 });
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
@@ -131,7 +147,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 2, 3, 4 });
+            actualProducts.First().UpdateNumbers.Should().Equals(new[] { 2, 3, 4 });
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
@@ -152,7 +168,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             // Assert
             var currentEditionNumber = Convert.ToInt32(dbProduct.ProductEditions.First().EditionNumber);
 
-            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 2, 3, 4 });
+            actualProducts.First().UpdateNumbers.Should().Equals(new[] { 2, 3, 4 });
             actualProducts.First().EditionNumber.Should().Be(currentEditionNumber);
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
@@ -169,7 +185,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersionOne });
 
             // Assert
-            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 1, 2, 3 });
+            actualProducts.First().UpdateNumbers.Should().Equals(new[] { 1, 2, 3 });
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
@@ -205,7 +221,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             // Assert
             actualProducts.Should().HaveCount(1);
-            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 2, 3 });
+            actualProducts.First().UpdateNumbers.Should().Equals(new[] { 2, 3 });
             actualProducts.First().EditionNumber.Should().Be(2);
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
@@ -353,7 +369,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 0, 1, 2, 3 });
+            actualProducts.First().UpdateNumbers.Should().Equals(new[] { 0, 1, 2, 3 });
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
@@ -367,7 +383,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actualProducts.First().EditionNumber.Should().Be(null);
+            actualProducts.First().EditionNumber.Should().Be(1);
             actualProducts.First().Cancellation.UpdateNumber.Should().Be(1);
             actualProducts.First().Cancellation.EditionNumber.Should().Be(0);
             actualProducts.First().UpdateNumbers.Should().HaveCount(0);
@@ -385,7 +401,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 0, 1, 2, 3 });
+            actualProducts.First().UpdateNumbers.Should().Equals(new[] { 0, 1, 2, 3 });
             actualProducts.First().EditionNumber.Should().Be(16);
             actualProducts.First().Cancellation.UpdateNumber.Should().Be(4);
             actualProducts.First().Cancellation.EditionNumber.Should().Be(0);
@@ -403,9 +419,28 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
             // Assert
-            actualProducts.First().UpdateNumbers.Should().ContainInOrder(new[] { 1, 2, 3 });
+            actualProducts.First().UpdateNumbers.Should().Equals(new[] { 1, 2, 3 });
             actualProducts.First().EditionNumber.Should().Be(16);
             actualProducts.First().Cancellation.UpdateNumber.Should().Be(4);
+            actualProducts.First().Cancellation.EditionNumber.Should().Be(0);
+            response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
+        }
+
+        [Test]
+        public async Task Test_GetProductVersions_When_CancelledCellIsOnlyUpdateSinceEdition_And_NoUpdateOrEditionProvided_Returns_Expected()
+        {
+            // Arrange
+            var (_, productVersion, _) = CreateProduct("CA570179", 1, null, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
+            productVersion.UpdateNumber = null;
+            productVersion.EditionNumber = null;
+
+            // Act
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
+
+            // Assert
+            actualProducts.First().UpdateNumbers.Should().HaveCount(0);
+            actualProducts.First().EditionNumber.Should().Be(1);
+            actualProducts.First().Cancellation.UpdateNumber.Should().Be(1);
             actualProducts.First().Cancellation.EditionNumber.Should().Be(0);
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
@@ -426,8 +461,8 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             // Assert
             actualProducts.Should().HaveCount(2);
-            actualProducts.Single(p => p.ProductName == productVersionOne.ProductName).UpdateNumbers.Should().ContainInOrder(new[] { 3 });
-            actualProducts.Single(p => p.ProductName == productVersionTwo.ProductName).UpdateNumbers.Should().ContainInOrder(new[] { 2, 3, 4 });
+            actualProducts.Single(p => p.ProductName == productVersionOne.ProductName).UpdateNumbers.Should().Equals(new[] { 3 });
+            actualProducts.Single(p => p.ProductName == productVersionTwo.ProductName).UpdateNumbers.Should().Equals(new[] { 2, 3, 4 });
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 

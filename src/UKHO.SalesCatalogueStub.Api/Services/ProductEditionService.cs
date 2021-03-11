@@ -153,10 +153,18 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                      requestProduct.UpdateNumber > (productDbMatch.UpdateNumber ?? 0)))
                     continue;
 
-                var start = (productDbMatch.LastReissueUpdateNumber > 0)
+                int? start = 0;
+                if ((requestProduct.UpdateNumber ?? 0) == productDbMatch.LastReissueUpdateNumber)
+                {
+                    start = productDbMatch.LastReissueUpdateNumber + 1;
+                }
+                else
+                {
+                    start = (productDbMatch.LastReissueUpdateNumber > 0)
                     ? productDbMatch.LastReissueUpdateNumber
                     : !requestProduct.EditionNumber.HasValue || (requestProduct.EditionNumber < matchedProduct.EditionNumber)
                         ? 0 : requestProduct.UpdateNumber + 1 ?? 1;
+                }
 
                 var end = activeEditionUpdateNumber;
 
@@ -165,22 +173,21 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     case ProductEditionStatusEnum.Cancelled:
                         {
                             var updateNumber = requestProduct.UpdateNumber ?? 0;
+                            var editionNumber = requestProduct.EditionNumber ?? 0;
 
                             matchedProduct.Cancellation = new Cancellation
                             {
-                                EditionNumber = 0
+                                EditionNumber = 0,
+                                UpdateNumber = activeEditionUpdateNumber + 1
                             };
 
-                            if (requestProduct.EditionNumber == matchedProduct.EditionNumber && updateNumber == activeEditionUpdateNumber)
+                            if (editionNumber == matchedProduct.EditionNumber && updateNumber == activeEditionUpdateNumber)
                             {
                                 matchedProduct.UpdateNumbers = GetUpdates(start.Value, end);
-                                matchedProduct.Cancellation.UpdateNumber = activeEditionUpdateNumber + 1;
-                                matchedProduct.EditionNumber = null;
                             }
-                            else if (requestProduct.EditionNumber < matchedProduct.EditionNumber || updateNumber < activeEditionUpdateNumber)
+                            else if (editionNumber < matchedProduct.EditionNumber || updateNumber < activeEditionUpdateNumber)
                             {
-                                matchedProduct.UpdateNumbers = GetUpdates(start.Value, end);
-                                matchedProduct.Cancellation.UpdateNumber = activeEditionUpdateNumber + 1;
+                                matchedProduct.UpdateNumbers = activeEditionUpdateNumber == 0 ? new List<int?>() : GetUpdates(start.Value, end);
                             }
 
                             break;
