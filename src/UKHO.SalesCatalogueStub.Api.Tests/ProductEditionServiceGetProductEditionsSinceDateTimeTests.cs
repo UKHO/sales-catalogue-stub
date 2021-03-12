@@ -43,7 +43,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var expectedEditionNumber = 1;
             var expectedReissueNumber = 0;
 
-            SimpleProductEditionSetupByStatusCollection(expectedProductName, expectedEditionNumber,null, expectedReissueNumber,
+            SimpleProductEditionSetupByStatusCollection(expectedProductName, expectedEditionNumber, null, expectedReissueNumber,
                 new List<ProductEditionStatusEnum>
                 {
                     ProductEditionStatusEnum.Base
@@ -51,9 +51,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.ContainSingle();
+            productEditions.Products.Should().NotBeNull().And.ContainSingle();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
 
-            var productEdition = productEditions.Single();
+            var productEdition = productEditions.Products.Single();
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
@@ -77,13 +81,17 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.ContainSingle();
+            productEditions.Products.Should().NotBeNull().And.ContainSingle();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
 
-            var productEdition = productEditions.ElementAt(0);
+            var productEdition = productEditions.Products.Single();
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
-            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?>{ expectedUpdateNumber });
+            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { expectedUpdateNumber });
             productEdition.FileSize.Should().Be(600);
         }
 
@@ -103,13 +111,18 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.ContainSingle();
 
-            var productEdition = productEditions.ElementAt(0);
+            productEditions.Products.Should().NotBeNull().And.ContainSingle();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+
+            var productEdition = productEditions.Products.Single();
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
-            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?>{ expectedReissueNumber });
+            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { expectedReissueNumber });
             productEdition.FileSize.Should().Be(600);
         }
 
@@ -129,13 +142,17 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.ContainSingle();
+            productEditions.Products.Should().NotBeNull().And.ContainSingle();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
 
-            var productEdition = productEditions.ElementAt(0);
+            var productEdition = productEditions.Products.Single();
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
-            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?>{ });
+            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { });
             productEdition.FileSize.Should().Be(200);
             productEdition.Cancellation.Should().BeEquivalentTo(new Cancellation
             {
@@ -160,7 +177,11 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.BeEmpty();
+            productEditions.Products.Should().NotBeNull().And.BeEmpty();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
         }
 
         [Test]
@@ -181,13 +202,17 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.ContainSingle();
+            productEditions.Products.Should().NotBeNull().And.ContainSingle();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
 
-            var productEdition = productEditions.ElementAt(0);
+            var productEdition = productEditions.Products.Single();
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
-            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?>{ 3, 4, 5 });
+            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 3, 4, 5 });
             productEdition.FileSize.Should().Be(600);
         }
 
@@ -208,13 +233,17 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.ContainSingle();
+            productEditions.Products.Should().NotBeNull().And.ContainSingle();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
 
-            var productEdition = productEditions.ElementAt(0);
+            var productEdition = productEditions.Products.Single();
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
-            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?>{0, 1});
+            productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 0, 1 });
             productEdition.FileSize.Should().Be(200);
         }
 
@@ -235,9 +264,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.ContainSingle();
+            productEditions.Products.Should().NotBeNull().And.ContainSingle();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
 
-            var productEdition = productEditions.ElementAt(0);
+            var productEdition = productEditions.Products.Single();
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
@@ -262,9 +295,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.ContainSingle();
+            productEditions.Products.Should().NotBeNull().And.ContainSingle();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
 
-            var productEdition = productEditions.ElementAt(0);
+            var productEdition = productEditions.Products.Single();
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
@@ -290,9 +327,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.ContainSingle();
+            productEditions.Products.Should().NotBeNull().And.ContainSingle();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
 
-            var productEdition = productEditions.ElementAt(0);
+            var productEdition = productEditions.Products.Single();
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
@@ -317,9 +358,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.ContainSingle();
+            productEditions.Products.Should().NotBeNull().And.ContainSingle();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
 
-            var productEdition = productEditions.ElementAt(0);
+            var productEdition = productEditions.Products.Single();
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
@@ -337,7 +382,11 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         {
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.BeEmpty();
+            productEditions.Products.Should().NotBeNull().And.BeEmpty();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
         }
 
         [Test]
@@ -356,7 +405,11 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.BeEmpty();
+            productEditions.Products.Should().NotBeNull().And.BeEmpty();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
         }
 
         [Test]
@@ -395,7 +448,11 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.BeEmpty();
+            productEditions.Products.Should().NotBeNull().And.BeEmpty();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
         }
 
         [TestCase("2021-01-01", "2021-01-01")]
@@ -435,7 +492,11 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(sinceDateTime);
 
-            productEditions.Should().NotBeNull().And.BeEmpty();
+            productEditions.Products.Should().NotBeNull().And.BeEmpty();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
         }
 
         [Test]
@@ -462,9 +523,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.ContainSingle();
+            productEditions.Products.Should().NotBeNull().And.ContainSingle();
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
 
-            var productEdition = productEditions.ElementAt(0);
+            var productEdition = productEditions.Products.Single();
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
@@ -502,21 +567,26 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productEditions = await _service.GetProductEditionsSinceDateTime(DateTime.MinValue);
 
-            productEditions.Should().NotBeNull().And.HaveCount(2);
+            productEditions.Products.Should().NotBeNull().And.HaveCount(2);
 
-            var productEdition = productEditions.ElementAt(0);
+            var productEdition = productEditions.Products.ElementAt(0);
 
             productEdition.ProductName.Should().Be(expectedProductName);
             productEdition.EditionNumber.Should().Be(expectedEditionNumber);
             productEdition.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 0, 1, 2 });
             productEdition.FileSize.Should().Be(300);
 
-            var productEdition2 = productEditions.ElementAt(1);
+            var productEdition2 = productEditions.Products.ElementAt(1);
 
             productEdition2.ProductName.Should().Be(expectedProductName2);
             productEdition2.EditionNumber.Should().Be(expectedEditionNumber2);
             productEdition2.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 0, 1 });
             productEdition2.FileSize.Should().Be(200);
+
+            productEditions.ProductCounts.ReturnedProductCount.Should().Be(2);
+            productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
         }
 
         private void SimpleProductEditionSetupByStatusCollection(string productName, int editionNumber, int? updateNumber, int? reissueNumber, ICollection<ProductEditionStatusEnum> statusCollection)

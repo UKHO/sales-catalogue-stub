@@ -10,7 +10,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
     public interface IProductEditionService
     {
         Products GetProductEditions(List<string> products);
-        Task<Products> GetProductEditionsSinceDateTime(DateTime sinceDateTime);
+        Task<ProductResponse> GetProductEditionsSinceDateTime(DateTime sinceDateTime);
         Task<(Products, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions);
     }
 }

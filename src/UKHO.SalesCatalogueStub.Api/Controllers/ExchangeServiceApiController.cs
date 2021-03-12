@@ -46,7 +46,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         //[Authorize(AuthenticationSchemes = BearerAuthenticationHandler.SchemeName)]
         [ValidateModelState]
         [SwaggerOperation("GetProducts")]
-        [SwaggerResponse(statusCode: 200, type: typeof(Products), description: "A JSON body of product objects")]
+        [SwaggerResponse(statusCode: 200, type: typeof(ProductResponse), description: "A JSON body of product objects")]
         [SwaggerResponse(statusCode: 400, type: typeof(ErrorDescription), description: "Bad request.")]
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
@@ -60,7 +60,13 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
 
             var productEditions = await _productEditionService.GetProductEditionsSinceDateTime(sinceDateTime.Value);
 
-            return !productEditions.Any() ? StatusCode(304, default(ErrorDescription)) : StatusCode(200, JsonConvert.SerializeObject(productEditions, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }));
+            return !productEditions.Products.Any()
+                ? StatusCode(304, default(ErrorDescription))
+                : StatusCode(200, JsonConvert.SerializeObject(productEditions, Formatting.Indented,
+                        new JsonSerializerSettings()
+                        {
+                            NullValueHandling = NullValueHandling.Ignore
+                        }));
         }
 
         /// <summary>
