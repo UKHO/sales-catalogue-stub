@@ -7,6 +7,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using UKHO.SalesCatalogueStub.Api.EF;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
@@ -22,11 +23,11 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         private IProductEditionService _service;
 
         [Test]
-        public void
+        public async Task
             Calls_To_GetCatalogue_Should_Return_Expected_Model_Types()
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             serviceResponse.Should().AllBeOfType<EssDataInner>();
             serviceResponse.Should().BeOfType(typeof(EssData));
@@ -39,10 +40,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860")]
         [TestCase("JP44MON8")]
         [TestCase("MX300511")]
-        public void Calls_To_GetCatalogue_Should_Return_Expected_ProductName_For_Matched_Edition(string productName)
+        public async Task Calls_To_GetCatalogue_Should_Return_Expected_ProductName_For_Matched_Edition(string productName)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             serviceResponse.Single(a => a.ProductName == productName).ProductName.Should().Be(productName);
         }
@@ -60,10 +61,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         };
 
         [Test, TestCaseSource(nameof(GetCatalogueBaseCellIssueDateCases))]
-        public void Calls_To_GetCatalogue_Should_Return_Expected_BaseCellIssueDate_For_Matched_Edition(string productName, DateTime expected)
+        public async Task Calls_To_GetCatalogue_Should_Return_Expected_BaseCellIssueDate_For_Matched_Edition(string productName, DateTime expected)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             serviceResponse.Single(a => a.ProductName == productName).BaseCellIssueDate.Should().Be(expected);
         }
@@ -76,10 +77,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860", ExpectedResult = 23)]
         [TestCase("JP44MON8", ExpectedResult = 0)]
         [TestCase("MX300511", ExpectedResult = 0)]
-        public int? Calls_To_GetCatalogue_Should_Return_Expected_BaseCellEditionNumber_For_Matched_Edition(string productName)
+        public async Task<int?> Calls_To_GetCatalogue_Should_Return_Expected_BaseCellEditionNumber_For_Matched_Edition(string productName)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             return serviceResponse.Single(a => a.ProductName == productName).BaseCellEditionNumber;
         }
@@ -97,10 +98,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         };
 
         [Test, TestCaseSource(nameof(GetCatalogueIssueDateLatestUpdateCases))]
-        public void Calls_To_GetCatalogue_Should_Return_Expected_IssueDateLatestUpdate_For_Matched_Edition(string productName, DateTime expected)
+        public async Task Calls_To_GetCatalogue_Should_Return_Expected_IssueDateLatestUpdate_For_Matched_Edition(string productName, DateTime expected)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             serviceResponse.Single(a => a.ProductName == productName).IssueDateLatestUpdate.Should().Be(expected);
         }
@@ -113,10 +114,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860", ExpectedResult = 23)]
         [TestCase("JP44MON8", ExpectedResult = 2)]
         [TestCase("MX300511", ExpectedResult = 8)]
-        public int? Calls_To_GetCatalogue_Should_Return_Expected_LatestUpdateNumber_For_Matched_Edition(string productName)
+        public async Task<int?> Calls_To_GetCatalogue_Should_Return_Expected_LatestUpdateNumber_For_Matched_Edition(string productName)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             return serviceResponse.Single(a => a.ProductName == productName).LatestUpdateNumber;
         }
@@ -129,10 +130,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860", ExpectedResult = 2400)]
         [TestCase("JP44MON8", ExpectedResult = 300)]
         [TestCase("MX300511", ExpectedResult = 900)]
-        public int? Calls_To_GetCatalogue_Should_Return_Expected_FileSize_For_Matched_Edition(string productName)
+        public async Task<int?> Calls_To_GetCatalogue_Should_Return_Expected_FileSize_For_Matched_Edition(string productName)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             return serviceResponse.Single(a => a.ProductName == productName).FileSize;
         }
@@ -150,10 +151,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         };
 
         [Test, TestCaseSource(nameof(GetCatalogueLatitudeCases))]
-        public void Calls_To_GetCatalogue_Should_Return_Expected_Latitudes_For_Matched_Edition(string productName, double expectedNorthLatitude, double expectedEastLatitude, double expectedSouthLatitude, double expectedWestLatitude)
+        public async Task Calls_To_GetCatalogue_Should_Return_Expected_Latitudes_For_Matched_Edition(string productName, double expectedNorthLatitude, double expectedEastLatitude, double expectedSouthLatitude, double expectedWestLatitude)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             var productEdition = serviceResponse.Single(a => a.ProductName == productName);
 
@@ -172,10 +173,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860")]
         [TestCase("JP44MON8")]
         [TestCase("MX300511")]
-        public void Calls_To_GetCatalogue_Should_Return_DataCoverageCoordinates_As_Null_For_Matched_Edition(string productName)
+        public async Task Calls_To_GetCatalogue_Should_Return_DataCoverageCoordinates_As_Null_For_Matched_Edition(string productName)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             var productEdition = serviceResponse.Single(a => a.ProductName == productName);
 
@@ -192,10 +193,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860")]
         [TestCase("JP44MON8")]
         [TestCase("MX300511")]
-        public void Calls_To_GetCatalogue_Should_Return_True_As_Compression_Value_For_Matched_Edition(string productName)
+        public async Task Calls_To_GetCatalogue_Should_Return_True_As_Compression_Value_For_Matched_Edition(string productName)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             serviceResponse.Single(a => a.ProductName == productName).Compression.Should().BeTrue();
         }
@@ -208,10 +209,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860")]
         [TestCase("JP44MON8")]
         [TestCase("MX300511")]
-        public void Calls_To_GetCatalogue_Should_Return_True_As_Encryption_Value_For_Matched_Edition(string productName)
+        public async Task Calls_To_GetCatalogue_Should_Return_True_As_Encryption_Value_For_Matched_Edition(string productName)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             serviceResponse.Single(a => a.ProductName == productName).Encryption.Should().BeTrue();
         }
@@ -224,10 +225,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860", ExpectedResult = 15)]
         [TestCase("JP44MON8", ExpectedResult = 0)]
         [TestCase("MX300511", ExpectedResult = 0)]
-        public int? Calls_To_GetCatalogue_Should_Return_Expected_BaseCellUpdateNumber_For_Matched_Edition(string productName)
+        public async Task<int?> Calls_To_GetCatalogue_Should_Return_Expected_BaseCellUpdateNumber_For_Matched_Edition(string productName)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             return serviceResponse.Single(a => a.ProductName == productName).BaseCellUpdateNumber;
         }
@@ -240,10 +241,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860")]
         [TestCase("JP44MON8")]
         [TestCase("MX300511")]
-        public void Calls_To_GetCatalogue_Should_Return_Null_As_LastUpdateNumberPreviousEdition_For_Matched_Edition(string productName)
+        public async Task Calls_To_GetCatalogue_Should_Return_Null_As_LastUpdateNumberPreviousEdition_For_Matched_Edition(string productName)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             serviceResponse.Single(a => a.ProductName == productName).LastUpdateNumberPreviousEdition.Should().BeNull();
         }
@@ -256,10 +257,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860")]
         [TestCase("JP44MON8")]
         [TestCase("MX300511")]
-        public void Calls_To_GetCatalogue_Should_Return_An_Empty_Array_As_CancelledReplacements_For_Matched_Edition(string productName)
+        public async Task Calls_To_GetCatalogue_Should_Return_An_Empty_Array_As_CancelledReplacements_For_Matched_Edition(string productName)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             serviceResponse.Single(a => a.ProductName == productName).CancelledCellReplacements.Should().BeEquivalentTo(new List<string>());
         }
@@ -276,10 +277,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             new object[] { "MX300511", new DateTime(2022, 6, 1) },
         };
         [Test, TestCaseSource(nameof(GetCatalogueIssueDatePreviousUpdateCases))]
-        public void Calls_To_GetCatalogue_Should_Return_Expected_IssueDatePreviousUpdate_For_Matched_Edition(string productName, DateTime expected)
+        public async Task Calls_To_GetCatalogue_Should_Return_Expected_IssueDatePreviousUpdate_For_Matched_Edition(string productName, DateTime expected)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             serviceResponse.Single(a => a.ProductName == productName).IssueDatePreviousUpdate.Should().Be(expected);
         }
@@ -292,10 +293,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860", ExpectedResult = null)]
         [TestCase("JP44MON8", ExpectedResult = 9)]
         [TestCase("MX300511", ExpectedResult = 16)]
-        public int? Calls_To_GetCatalogue_Should_Return_Expected_CancelledEditionNumber_For_Matched_Edition(string productName)
+        public async Task<int?> Calls_To_GetCatalogue_Should_Return_Expected_CancelledEditionNumber_For_Matched_Edition(string productName)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             return serviceResponse.Single(a => a.ProductName == productName).CancelledEditionNumber;
         }
@@ -308,18 +309,18 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [TestCase("DE521860", ExpectedResult = "M2;B9")]
         [TestCase("JP44MON8", ExpectedResult = "M1;B1")]
         [TestCase("MX300511", ExpectedResult = "M2;B9")]
-        public string Calls_To_GetCatalogue_Should_Return_Expected_BaseCellLocation_For_Matched_Edition(string productName)
+        public async Task<string> Calls_To_GetCatalogue_Should_Return_Expected_BaseCellLocation_For_Matched_Edition(string productName)
         {
 
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
 
             return serviceResponse.Single(a => a.ProductName == productName).BaseCellLocation;
         }
 
         [Test]
-        public void Calls_To_GetCatalogue_Should_Return_Catalogue_In_Alphabetical_Order_1A_To_Z()
+        public async Task Calls_To_GetCatalogue_Should_Return_Catalogue_In_Alphabetical_Order_1A_To_Z()
         {
-            var serviceResponse = _service.GetCatalogue();
+            var serviceResponse = await _service.GetCatalogue();
             serviceResponse[0].ProductName.Should().Be("1U420222");
             serviceResponse[1].ProductName.Should().Be("AU220120");
             serviceResponse[2].ProductName.Should().Be("DE521860");

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UKHO.SalesCatalogueStub.Api.Controllers;
 using UKHO.SalesCatalogueStub.Api.Models;
 using UKHO.SalesCatalogueStub.Api.Services;
@@ -23,34 +24,34 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             CreateCatalogue();
         }
         [Test]
-        public void Calling_GetCatalogue_With_No_IsModifiedSince_Should_Return_Status_Code_200()
+        public async Task Calling_GetCatalogue_With_No_IsModifiedSince_Should_Return_Status_Code_200()
         {
             CreateLoaderStatus(new DateTime(2020, 03, 12), true);
-            var response = _catalogueApiController.GetCatalogue("AVCS", "ESS", null) as ObjectResult;
+            var response = await _catalogueApiController.GetCatalogue("AVCS", "ESS", null) as ObjectResult;
             response?.StatusCode.Should().Be(200);
             response.Should().NotBeNull();
         }
         [Test]
-        public void Calling_GetCatalogue_With_IsModifiedSince_Earlier_Than_Latest_DateEntered_Should_Return_Status_Code_200_Ok()
+        public async Task Calling_GetCatalogue_With_IsModifiedSince_Earlier_Than_Latest_DateEntered_Should_Return_Status_Code_200_Ok()
         {
             CreateLoaderStatus(new DateTime(2020, 03, 13), true);
-            var response = _catalogueApiController.GetCatalogue("AVCS", "ESS", new DateTime(2020, 03, 12)) as ObjectResult;
+            var response = await _catalogueApiController.GetCatalogue("AVCS", "ESS", new DateTime(2020, 03, 12)) as ObjectResult;
             response?.StatusCode.Should().Be(200);
             response.Should().NotBeNull();
         }
         [Test]
-        public void Calling_GetCatalogue_With_IsModifiedSince_Later_Than_Latest_DateEntered_Should_Return_Status_Code_304_Not_Modified()
+        public async Task Calling_GetCatalogue_With_IsModifiedSince_Later_Than_Latest_DateEntered_Should_Return_Status_Code_304_Not_Modified()
         {
             CreateLoaderStatus(new DateTime(2020, 03, 12), false);
-            var response = _catalogueApiController.GetCatalogue("AVCS", "ESS", new DateTime(2020, 03, 13)) as ObjectResult;
+            var response = await _catalogueApiController.GetCatalogue("AVCS", "ESS", new DateTime(2020, 03, 13)) as ObjectResult;
             response?.StatusCode.Should().Be(304);
             response.Should().NotBeNull();
         }
         [Test]
-        public void Calling_GetCatalogue_With_No_IsModifiedSince_Should_Return_Expected_Json_Response()
+        public async Task Calling_GetCatalogue_With_No_IsModifiedSince_Should_Return_Expected_Json_Response()
         {
             CreateLoaderStatus(new DateTime(2020, 03, 12), true);
-            var response = _catalogueApiController.GetCatalogue("AVCS", "ESS", null) as ObjectResult;
+            var response = await _catalogueApiController.GetCatalogue("AVCS", "ESS", null) as ObjectResult;
             const string expectedJson = "[\r\n  {\r\n    \"productName\": \"" + "IT400115\",\r\n    \"baseCellIssueDate\": \"2019-01-07T00:00:00\",\r\n    \"baseCellEditionNumber\": 4,\r\n    \"issueDateLatestUpdate\": \"2019-01-19T00:00:00\",\r\n    \"latestUpdateNumber\": 18,\r\n    \"fileSize\": 1900,\r\n    \"cellLimitSouthernmostLatitude\": 43.924,\r\n    \"cellLimitWesternmostLatitude\": 9.699,\r\n    \"cellLimitNorthernmostLatitude\": 44.1264675,\r\n    \"cellLimitEasternmostLatitude\": 10.1105547,\r\n    \"dataCoverageCoordinates\": [],\r\n    \"compression\": true,\r\n    \"encryption\": true,\r\n    \"baseCellUpdateNumber\": 0,\r\n    \"lastUpdateNumberPreviousEdition\": null,\r\n    \"baseCellLocation\": \"M1;B4\",\r\n    \"cancelledCellReplacements\": [],\r\n    \"issueDatePreviousUpdate\": \"2019-01-07T00:00:00\",\r\n    \"cancelledEditionNumber\": 0\r\n  },\r\n  {\r\n    \"productName\": \"RU4PFQN0\",\r\n    \"baseCellIssueDate\": \"2020-05-24T00:00:00\",\r\n    \"baseCellEditionNumber\": 4,\r\n    \"issueDateLatestUpdate\": \"2020-06-02T00:00:00\",\r\n    \"latestUpdateNumber\": 5,\r\n    \"fileSize\": 600,\r\n    \"cellLimitSouthernmostLatitude\": 53.2345,\r\n    \"cellLimitWesternmostLatitude\": 23.23,\r\n    \"cellLimitNorthernmostLatitude\": 54.2334,\r\n    \"cellLimitEasternmostLatitude\": 24.234,\r\n    \"dataCoverageCoordinates\": [],\r\n    \"compression\": true,\r\n    \"encryption\": true,\r\n    \"baseCellUpdateNumber\": 0,\r\n    \"lastUpdateNumberPreviousEdition\": null,\r\n    \"baseCellLocation\": \"M2;B6\",\r\n    \"cancelledCellReplacements\": [],\r\n    \"issueDatePreviousUpdate\": \"2020-06-02T00:00:00\",\r\n    \"cancelledEditionNumber\": 0\r\n  },\r\n  {\r\n    \"productName\": \"VE400102\",\r\n    \"baseCellIssueDate\": \"2021-02-12T00:00:00\",\r\n    \"baseCellEditionNumber\": 4,\r\n    \"issueDateLatestUpdate\": \"2021-03-08T00:00:00\",\r\n    \"latestUpdateNumber\": 2,\r\n    \"fileSize\": 300,\r\n    \"cellLimitSouthernmostLatitude\": 45.1111,\r\n    \"cellLimitWesternmostLatitude\": 39.5343,\r\n    \"cellLimitNorthernmostLatitude\": 46.2344,\r\n    \"cellLimitEasternmostLatitude\": 39.5655,\r\n    \"dataCoverageCoordinates\": [],\r\n    \"compression\": true,\r\n    \"encryption\": true,\r\n    \"baseCellUpdateNumber\": 0,\r\n    \"lastUpdateNumberPreviousEdition\": null,\r\n    \"baseCellLocation\": \"M2;B9\",\r\n    \"cancelledCellReplacements\": [],\r\n    \"issueDatePreviousUpdate\": \"2020-03-08T00:00:00\",\r\n    \"cancelledEditionNumber\": 0\r\n  },\r\n  {\r\n    \"productName\": \"DE521900\",\r\n    \"baseCellIssueDate\": \"2017-01-13T00:00:00\",\r\n    \"baseCellEditionNumber\": 0,\r\n    \"issueDateLatestUpdate\": \"2021-01-06T00:00:00\",\r\n    \"latestUpdateNumber\": 3,\r\n    \"fileSize\": 400,\r\n    \"cellLimitSouthernmostLatitude\": 53.3259999,\r\n    \"cellLimitWesternmostLatitude\": 7.1703318,\r\n    \"cellLimitNorthernmostLatitude\": 53.3701674,\r\n    \"cellLimitEasternmostLatitude\": 7.2286667,\r\n    \"dataCoverageCoordinates\": [],\r\n    \"compression\": true,\r\n    \"encryption\": true,\r\n    \"baseCellUpdateNumber\": 0,\r\n    \"lastUpdateNumberPreviousEdition\": null,\r\n    \"baseCellLocation\": \"M2;B8\",\r\n    \"cancelledCellReplacements\": [],\r\n    \"issueDatePreviousUpdate\": \"2017-01-13T00:00:00\",\r\n    \"cancelledEditionNumber\": 6\r\n  }\r\n]";
             response?.Value.Should().BeEquivalentTo(expectedJson);
             response.Should().NotBeNull();

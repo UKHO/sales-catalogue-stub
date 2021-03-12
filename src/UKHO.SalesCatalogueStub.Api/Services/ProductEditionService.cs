@@ -37,7 +37,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             _logger = logger;
         }
 
-        public Products GetProductEditions(List<string> products)
+        public async Task<Products> GetProductEditions(List<string> products)
         {
             if (products == null)
             {
@@ -58,7 +58,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     continue;
                 }
 
-                var activeEdition = _dbContext.ProductEditions.AsNoTracking().SingleOrDefault(a =>
+                var activeEdition = await _dbContext.ProductEditions.AsNoTracking().SingleOrDefaultAsync(a =>
                     a.EditionIdentifier == product &&
                     a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
                     _allowedProductStatus.Contains(a.LatestStatus));
@@ -212,11 +212,11 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return ifModifiedSince == null || ifModifiedSince < latestDateEntered;
         }
 
-        public EssData GetCatalogue()
+        public async Task<EssData> GetCatalogue()
         {
-            var editions = _dbContext.ProductEditions.Include(a => a.PidGeometry).Include(a => a.PidTombstone).AsNoTracking().Where(a =>
+            var editions = await _dbContext.ProductEditions.Include(a => a.PidGeometry).Include(a => a.PidTombstone).AsNoTracking().Where(a =>
                 a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
-                _allowedProductStatus.Contains(a.LatestStatus));
+                _allowedProductStatus.Contains(a.LatestStatus)).ToListAsync();
 
             var catalogue = new List<EssDataInner>();
 

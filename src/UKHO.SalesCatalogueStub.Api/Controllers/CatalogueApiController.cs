@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using UKHO.SalesCatalogueStub.Api.Attributes;
 using UKHO.SalesCatalogueStub.Api.Models;
 using UKHO.SalesCatalogueStub.Api.Services;
@@ -52,7 +53,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetCatalogue([FromRoute][Required] string productType, [FromRoute][Required] string catalogueType, [FromHeader] DateTime? ifModifiedSince)
+        public virtual async Task<IActionResult> GetCatalogue([FromRoute][Required] string productType, [FromRoute][Required] string catalogueType, [FromHeader] DateTime? ifModifiedSince)
         {
 
             var catalogueModified = _productEditionService.CheckIfCatalogueModified(ifModifiedSince, out var dateEntered);
@@ -62,7 +63,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
             {
                 return StatusCode(304, null);
             }
-            var catalogue = _productEditionService.GetCatalogue();
+            var catalogue = await _productEditionService.GetCatalogue();
             return StatusCode(200, JsonConvert.SerializeObject(catalogue, Formatting.Indented));
 
 
