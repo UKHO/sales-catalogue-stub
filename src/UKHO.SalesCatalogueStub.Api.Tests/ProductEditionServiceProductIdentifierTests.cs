@@ -185,13 +185,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void
+        public async Task
             Calls_To_GetProductEditions_With_A_Single_Matching_Product_Returns_Expected_Product_Edition_Details()
         {
             PopulateTestProductData();
             var productList = new List<string> { "JP54QNMK" };
 
-            var serviceResponse = _service.GetProductEditions(productList);
+            var serviceResponse = await _service.GetProductEditions(productList);
 
             serviceResponse.Should().BeEquivalentTo(new List<ProductsInner>
             {
