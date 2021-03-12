@@ -37,8 +37,8 @@ namespace UKHO.SalesCatalogueStub.Api.Models
         /// Where a requested product is not included in the returned Exchange Set, the product will be listed in the requestedProductNotInExchangeSet portion of the response along with a reason. The reason will be one of:    *  productWithdrawn (the product has been withdrawn from the AVCS service)    *  invalidProduct (the product is not part of the AVCS Service, i.e. is an invalid or unknown ENC)    *  noDataAvailableForCancelledProduct (the product has been cancelled, and is beyond the retention period. Cancelled cells within the retention period will be returned with the cancellation data in the exchange set) 
         /// </summary>
         /// <value>Where a requested product is not included in the returned Exchange Set, the product will be listed in the requestedProductNotInExchangeSet portion of the response along with a reason. The reason will be one of:    *  productWithdrawn (the product has been withdrawn from the AVCS service)    *  invalidProduct (the product is not part of the AVCS Service, i.e. is an invalid or unknown ENC)    *  noDataAvailableForCancelledProduct (the product has been cancelled, and is beyond the retention period. Cancelled cells within the retention period will be returned with the cancellation data in the exchange set) </value>
-        [DataMember(Name = "requestedProductsNotInExchangeSet")]
-        public List<RequestedProductsNotInExchangeSet> RequestedProductsNotInExchangeSet { get; set; }
+        [DataMember(Name = "requestedProductsNotReturned")]
+        public List<RequestedProductsNotReturned> RequestedProductsNotReturned { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -51,7 +51,7 @@ namespace UKHO.SalesCatalogueStub.Api.Models
             sb.Append("  RequestedProductCount: ").Append(RequestedProductCount).Append("\n");
             sb.Append("  ReturnedProductCount: ").Append(ReturnedProductCount).Append("\n");
             sb.Append("  RequestedProductsAlreadyUpToDateCount: ").Append(RequestedProductsAlreadyUpToDateCount).Append("\n");
-            sb.Append("  RequestedProductsNotInExchangeSet: ").Append(RequestedProductsNotInExchangeSet).Append("\n");
+            sb.Append("  RequestedProductsNotReturned: ").Append(RequestedProductsNotReturned).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -104,9 +104,9 @@ namespace UKHO.SalesCatalogueStub.Api.Models
                     RequestedProductsAlreadyUpToDateCount.Equals(other.RequestedProductsAlreadyUpToDateCount)
                 ) &&
                 (
-                    RequestedProductsNotInExchangeSet == other.RequestedProductsNotInExchangeSet ||
-                    RequestedProductsNotInExchangeSet != null &&
-                    RequestedProductsNotInExchangeSet.SequenceEqual(other.RequestedProductsNotInExchangeSet)
+                    RequestedProductsNotReturned == other.RequestedProductsNotReturned ||
+                    RequestedProductsNotReturned != null &&
+                    RequestedProductsNotReturned.SequenceEqual(other.RequestedProductsNotReturned)
                 );
         }
 
@@ -126,8 +126,8 @@ namespace UKHO.SalesCatalogueStub.Api.Models
                     hashCode = hashCode * 59 + ReturnedProductCount.GetHashCode();
                 if (RequestedProductsAlreadyUpToDateCount != null)
                     hashCode = hashCode * 59 + RequestedProductsAlreadyUpToDateCount.GetHashCode();
-                if (RequestedProductsNotInExchangeSet != null)
-                    hashCode = hashCode * 59 + RequestedProductsNotInExchangeSet.GetHashCode();
+                if (RequestedProductsNotReturned != null)
+                    hashCode = hashCode * 59 + RequestedProductsNotReturned.GetHashCode();
                 return hashCode;
             }
         }

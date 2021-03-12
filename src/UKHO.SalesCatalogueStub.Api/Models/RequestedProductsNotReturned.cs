@@ -10,7 +10,7 @@ namespace UKHO.SalesCatalogueStub.Api.Models
     /// 
     /// </summary>
     [DataContract]
-    public partial class RequestedProductsNotInExchangeSet : IEquatable<RequestedProductsNotInExchangeSet>
+    public partial class RequestedProductsNotReturned : IEquatable<RequestedProductsNotReturned>
     {
         /// <summary>
         /// Gets or Sets ProductName
@@ -39,7 +39,13 @@ namespace UKHO.SalesCatalogueStub.Api.Models
             /// Enum NoDataAvailableForCancelledProductEnum for noDataAvailableForCancelledProduct
             /// </summary>
             [EnumMember(Value = "noDataAvailableForCancelledProduct")]
-            NoDataAvailableForCancelledProductEnum = 2
+            NoDataAvailableForCancelledProductEnum = 2,
+            /// <summary>
+            /// Enum DuplicateProductEnum for duplicateProduct
+            /// </summary>
+            [EnumMember(Value = "duplicateProduct")]
+            DuplicateProductEnum = 3
+
         }
 
         /// <summary>
@@ -56,7 +62,7 @@ namespace UKHO.SalesCatalogueStub.Api.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class RequestedProductsNotInExchangeSet {\n");
+            sb.Append("class RequestedProductsNotReturned {\n");
             sb.Append("  ProductName: ").Append(ProductName).Append("\n");
             sb.Append("  Reason: ").Append(Reason).Append("\n");
             sb.Append("}\n");
@@ -81,15 +87,15 @@ namespace UKHO.SalesCatalogueStub.Api.Models
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((RequestedProductsNotInExchangeSet)obj);
+            return obj.GetType() == GetType() && Equals((RequestedProductsNotReturned)obj);
         }
 
         /// <summary>
-        /// Returns true if RequestedProductsNotInExchangeSet instances are equal
+        /// Returns true if RequestedProductsNotReturned instances are equal
         /// </summary>
-        /// <param name="other">Instance of RequestedProductsNotInExchangeSet to be compared</param>
+        /// <param name="other">Instance of RequestedProductsNotReturned to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(RequestedProductsNotInExchangeSet other)
+        public bool Equals(RequestedProductsNotReturned other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -128,12 +134,12 @@ namespace UKHO.SalesCatalogueStub.Api.Models
         #region Operators
 #pragma warning disable 1591
 
-        public static bool operator ==(RequestedProductsNotInExchangeSet left, RequestedProductsNotInExchangeSet right)
+        public static bool operator ==(RequestedProductsNotReturned left, RequestedProductsNotReturned right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(RequestedProductsNotInExchangeSet left, RequestedProductsNotInExchangeSet right)
+        public static bool operator !=(RequestedProductsNotReturned left, RequestedProductsNotReturned right)
         {
             return !Equals(left, right);
         }

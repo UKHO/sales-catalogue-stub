@@ -308,7 +308,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     ReturnedProductCount = 0,
                     RequestedProductCount = 0,
                     RequestedProductsAlreadyUpToDateCount = 0,
-                    RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>()
                 }
             };
 
