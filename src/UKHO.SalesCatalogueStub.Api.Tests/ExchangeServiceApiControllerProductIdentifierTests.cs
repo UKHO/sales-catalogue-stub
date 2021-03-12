@@ -45,6 +45,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             });
             var response = _exchangeServiceApiController.PostProductIdentifiers("AVCS", testData) as ObjectResult;
             response?.StatusCode.Should().Be(200);
+            response.Should().NotBeNull();
         }
 
         [Test]
@@ -73,6 +74,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             A.CallTo(() => _productRepo.GetProductEditions(testData)).Returns(testResponse);
             var response = _exchangeServiceApiController.PostProductIdentifiers("AVCS", testData) as ObjectResult;
             response?.Value.Should().BeEquivalentTo(expectedJson);
+            response.Should().NotBeNull();
         }
 
         [Test]
@@ -82,6 +84,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             A.CallTo(() => _productRepo.GetProductEditions(A<List<string>>.Ignored)).Returns(new Products());
             var response = _exchangeServiceApiController.PostProductIdentifiers(A.Dummy<string>(), dummyInput) as ObjectResult;
             response?.StatusCode.Should().Be(400);
+            response.Should().NotBeNull();
         }
 
         [Test]
@@ -94,6 +97,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             A.CallTo(() => _productRepo.GetProductEditions(testData)).Returns(new Products());
             var response = _exchangeServiceApiController.PostProductIdentifiers(A.Dummy<string>(), testData) as ObjectResult;
             response?.StatusCode.Should().Be(400);
+            response.Should().NotBeNull();
         }
 
         [Test]
