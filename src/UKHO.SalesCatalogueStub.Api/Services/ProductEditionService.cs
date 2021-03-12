@@ -210,9 +210,19 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return (matchedProducts, GetProductVersionResponseEnum.UpdatesFound);
         }
 
-        public async Task<Products> GetProductEditionsSinceDateTime(DateTime sinceDateTime)
+        public async Task<ProductResponse> GetProductEditionsSinceDateTime(DateTime sinceDateTime)
         {
-            var productsSinceDatetime = new Products();
+            var productResponse = new ProductResponse
+            {
+                Products = new Products(),
+                ProductCounts = new ProductCounts
+                {
+                    ReturnedProductCount = 0,
+                    RequestedProductCount = 0,
+                    RequestedProductsAlreadyUpToDateCount = 0,
+                    RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
+                }
+            };
 
             var lifecycleEvents = await _dbContext.LifecycleEvents
                 .Include(le => le.ProductEdition)
@@ -287,11 +297,12 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 productEdition.ProductName = product;
                 productEdition.FileSize = GetFileSize(activeEditionUpdateNumber);
 
-                productsSinceDatetime.Add(productEdition);
+                productResponse.Products.Add(productEdition);
+                productResponse.ProductCounts.ReturnedProductCount++;
 
             }
 
-            return productsSinceDatetime;
+            return productResponse;
         }
 
         private static List<int?> GetUpdates(int lastReissueUpdateNumber, int latestUpdateNumber)
