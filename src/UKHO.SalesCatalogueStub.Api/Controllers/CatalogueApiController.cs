@@ -62,7 +62,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
             {
                 return StatusCode(304);
             }
-            var catalogue = _productEditionService.GetCatalogue(ifModifiedSince);
+            var catalogue = _productEditionService.GetCatalogue();
             return StatusCode(200, JsonConvert.SerializeObject(catalogue, Formatting.Indented));
 
 
