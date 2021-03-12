@@ -97,20 +97,6 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             if (productVersions == null) throw new ArgumentNullException(nameof(productVersions));
 
             var distinctProducts = new List<ProductVersionsInner>();
-
-            var validProductVersions = productVersions
-                .Where(x => x != null && x.ProductName != null).ToList();
-
-            if (validProductVersions.Any())
-            {
-                distinctProducts = validProductVersions
-                           .GroupBy(item => item.ProductName.Trim(),
-                               StringComparer.OrdinalIgnoreCase)
-                           .Select(g => g.First())
-                           .ToList();
-            }
-
-            var productsInDatabase = false;
             var productResponse = new ProductResponse
             {
                 Products = new Products(),
@@ -123,8 +109,29 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 }
             };
 
-            // Awaiting confirmation whether we count requested with NULL productnames or not
-            productResponse.ProductCounts.RequestedProductCount = validProductVersions.Count;
+
+            var validProductVersions = productVersions
+                .Where(x => x != null && x.ProductName != null).ToList();
+            var numberOfNull = productVersions.Count - validProductVersions.Count;
+            for (int i = 0; i < numberOfNull; i++)
+            {
+                productResponse.ProductCounts.RequestedProductsNotReturned.Add(new RequestedProductsNotReturned
+                { ProductName = string.Empty, Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum });
+            }
+
+            if (validProductVersions.Any())
+            {
+                distinctProducts = validProductVersions
+                           .GroupBy(item => item.ProductName.Trim(),
+                               StringComparer.OrdinalIgnoreCase)
+                           .Select(g => g.First())
+                           .ToList();
+            }
+
+            var productsInDatabase = false;
+
+
+            productResponse.ProductCounts.RequestedProductCount = productVersions.Count;
 
             foreach (var requestProduct in distinctProducts)
             {
