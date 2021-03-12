@@ -92,7 +92,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return matchedProducts;
         }
 
-        public async Task<(Products, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions)
+        public async Task<(ProductResponse, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions)
         {
             if (productVersions == null) throw new ArgumentNullException(nameof(productVersions));
 
@@ -111,7 +111,20 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             }
 
             var productsInDatabase = false;
-            var matchedProducts = new Products();
+            var productResponse = new ProductResponse
+            {
+                Products = new Products(),
+                ProductCounts = new ProductCounts
+                {
+                    ReturnedProductCount = 0,
+                    RequestedProductCount = 0,
+                    RequestedProductsAlreadyUpToDateCount = 0,
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>()
+                }
+            };
+
+            // Awaiting confirmation whether we count requested with NULL productnames or not
+            productResponse.ProductCounts.RequestedProductCount = validProductVersions.Count;
 
             foreach (var requestProduct in distinctProducts)
             {
@@ -204,15 +217,20 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                         break;
                 }
 
-                matchedProducts.Add(matchedProduct);
+                productResponse.ProductCounts.ReturnedProductCount++;
+                productResponse.Products.Add(matchedProduct);
             }
 
-            if (matchedProducts.Count == 0)
+            if (!productResponse.Products.Any())
             {
-                return productsInDatabase ? (matchedProducts, GetProductVersionResponseEnum.NoUpdatesFound) : (matchedProducts, GetProductVersionResponseEnum.NoProductsFound);
+                return productsInDatabase ? (productResponse, GetProductVersionResponseEnum.NoUpdatesFound) : (productResponse, GetProductVersionResponseEnum.NoProductsFound);
             }
 
-            return (matchedProducts, GetProductVersionResponseEnum.UpdatesFound);
+
+            //actualProducts.ProductCounts.RequestedProductCount.Should().Be(1);
+            //actualProducts.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+
+            return (productResponse, GetProductVersionResponseEnum.UpdatesFound);
         }
 
         public async Task<(bool isModified, DateTime? dateEntered)> CheckIfCatalogueModified(DateTime? ifModifiedSince)

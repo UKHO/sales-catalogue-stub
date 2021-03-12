@@ -11,7 +11,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
     {
         Task<Products> GetProductEditions(List<string> products);
         Task<ProductResponse> GetProductEditionsSinceDateTime(DateTime sinceDateTime);
-        Task<(Products, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions);
+        Task<(ProductResponse, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions);
         Task<EssData> GetCatalogue();
         Task<(bool isModified, DateTime? dateEntered)> CheckIfCatalogueModified(DateTime? ifModifiedSince);
     }
