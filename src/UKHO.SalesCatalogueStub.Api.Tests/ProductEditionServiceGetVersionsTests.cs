@@ -39,11 +39,11 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         public async Task Test_GetProductVersions_When_MultipleProductsProvided_And_OneHasNullProductName_Return_RequestedProductsNotReturned_With_Empty_ProductName_And_ReasonInvalid()
         {
             // Arrange
-            var (_, productVersionOne, _) = CreateProduct("GB1", 2, 4, ProductEditionStatusEnum.Updated);
+            var (_, requestedProductVersionOne, _) = CreateProduct("GB1", 2, 4, ProductEditionStatusEnum.Updated);
 
-            productVersionOne.UpdateNumber--;
+            requestedProductVersionOne.UpdateNumber = 1;
 
-            var productVersionTwo = new ProductVersionsInner
+            var requestedProductVersionTwo = new ProductVersionsInner
             {
                 EditionNumber = 2,
                 UpdateNumber = 2,
@@ -51,12 +51,12 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             };
 
             // Act
-            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersionOne, productVersionTwo });
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { requestedProductVersionOne, requestedProductVersionTwo });
 
             // Assert
             actualProducts.Products.Should().NotBeNull().And.ContainSingle();
             actualProducts.ProductCounts.ReturnedProductCount.Should().Be(1);
-            actualProducts.ProductCounts.RequestedProductCount.Should().Be(1);
+            actualProducts.ProductCounts.RequestedProductCount.Should().Be(2);
             actualProducts.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
             actualProducts.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(1);
             actualProducts.ProductCounts.RequestedProductsNotReturned.Single().Should().BeEquivalentTo(
@@ -66,7 +66,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum
                 });
 
-            actualProducts.Products.First().UpdateNumbers.Should().Equal(new[] { 1, 2, 3, 4 });
+            actualProducts.Products.First().UpdateNumbers.Should().Equal(new[] { 2, 3, 4 });
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
