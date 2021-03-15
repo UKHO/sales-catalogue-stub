@@ -112,7 +112,9 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
             var validProductVersions = productVersions
                 .Where(x => x != null && x.ProductName != null).ToList();
+
             var numberOfNull = productVersions.Count - validProductVersions.Count;
+
             for (int i = 0; i < numberOfNull; i++)
             {
                 productResponse.ProductCounts.RequestedProductsNotReturned.Add(new RequestedProductsNotReturned
@@ -135,21 +137,39 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
             foreach (var requestProduct in distinctProducts)
             {
-                if (requestProduct.UpdateNumber.HasValue && !requestProduct.EditionNumber.HasValue) continue;
+
+                if (requestProduct.UpdateNumber.HasValue && !requestProduct.EditionNumber.HasValue)
+                {
+                    // Product requested not in DB
+                    productResponse.ProductCounts.RequestedProductsNotReturned.Add(
+                        new RequestedProductsNotReturned
+                        {
+                            ProductName = requestProduct.ProductName,
+                            Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum
+                        });
+
+                    continue;
+                }
 
                 var productDbMatch = await _dbContext.ProductEditions.AsNoTracking().SingleOrDefaultAsync(a =>
                     a.EditionIdentifier == requestProduct.ProductName &&
                     a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
                     _allowedProductStatus.Contains(a.LatestStatus));
 
-                if (productDbMatch == null) continue;
+                if (productDbMatch == null)
+                {
+                    // Product requested not in DB
+                    productResponse.ProductCounts.RequestedProductsNotReturned.Add(
+                        new RequestedProductsNotReturned
+                        {
+                            ProductName = requestProduct.ProductName,
+                            Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum
+                        });
+
+                    continue;
+                }
 
                 productsInDatabase = true;
-
-                // Reject where update number is provided without an edition number
-                if ((productDbMatch.EditionNumber == null) &&
-                    (productDbMatch.UpdateNumber != null))
-                    continue;
 
                 var activeEditionUpdateNumber = productDbMatch.UpdateNumber ?? 0;
                 var requestUpdateNumber = requestProduct.UpdateNumber ?? 0;
@@ -166,19 +186,36 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 if (requestUpdateNumber == 0 &&
                     matchedProduct.EditionNumber == requestEditionNumber &&
                     productDbMatch.LatestStatus == ProductEditionStatusEnum.Base)
+                {
+                    productResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount++;
+
                     continue;
+                }
 
                 // Reject where the provided and current are the same
                 if (productDbMatch.UpdateNumber == requestUpdateNumber &&
                     matchedProduct.EditionNumber == requestEditionNumber &&
                     productDbMatch.LatestStatus != ProductEditionStatusEnum.Cancelled)
+                {
+                    productResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount++;
+
                     continue;
+                }
 
                 // Reject where edition or update numbers are provided that are higher than current
                 if ((requestEditionNumber > matchedProduct.EditionNumber) ||
                     (requestEditionNumber == matchedProduct.EditionNumber &&
-                     requestUpdateNumber > (productDbMatch.UpdateNumber ?? 0)))
+                     requestUpdateNumber > (activeEditionUpdateNumber)))
+                {
+                    productResponse.ProductCounts.RequestedProductsNotReturned.Add(
+                        new RequestedProductsNotReturned
+                        {
+                            ProductName = requestProduct.ProductName,
+                            Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum
+                        });
+
                     continue;
+                }
 
                 int? start = 0;
                 if (requestUpdateNumber == productDbMatch.LastReissueUpdateNumber)
@@ -199,19 +236,40 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 {
                     case ProductEditionStatusEnum.Cancelled:
                         {
+                            var productCancelledDate = productDbMatch.LastUpdated.Value;
+                            var days = DateTime.Today.Subtract(productCancelledDate.Date).TotalDays;
+
+                            if (days > 365)
+                            {
+                                // Old product, do not return with data; just add to the RequestedProductsNotReturned
+                                productResponse.ProductCounts.RequestedProductsNotReturned.Add(
+                                    new RequestedProductsNotReturned
+                                    {
+                                        ProductName = requestProduct.ProductName,
+                                        Reason = RequestedProductsNotReturned.ReasonEnum.NoDataAvailableForCancelledProductEnum
+                                    });
+
+                                continue;
+
+                            }
+
                             matchedProduct.Cancellation = new Cancellation
                             {
                                 EditionNumber = 0,
                                 UpdateNumber = activeEditionUpdateNumber + 1
                             };
 
-                            if (requestEditionNumber == matchedProduct.EditionNumber && requestUpdateNumber == activeEditionUpdateNumber)
+                            if (requestEditionNumber == matchedProduct.EditionNumber &&
+                                requestUpdateNumber == activeEditionUpdateNumber)
                             {
                                 matchedProduct.UpdateNumbers = GetUpdates(start.Value, end);
                             }
-                            else if (requestEditionNumber < matchedProduct.EditionNumber || requestUpdateNumber < activeEditionUpdateNumber)
+                            else if (requestEditionNumber < matchedProduct.EditionNumber ||
+                                     requestUpdateNumber < activeEditionUpdateNumber)
                             {
-                                matchedProduct.UpdateNumbers = activeEditionUpdateNumber == 0 ? new List<int?>() : GetUpdates(start.Value, end);
+                                matchedProduct.UpdateNumbers = activeEditionUpdateNumber == 0
+                                    ? new List<int?>()
+                                    : GetUpdates(start.Value, end);
                             }
 
                             break;
@@ -233,9 +291,6 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 return productsInDatabase ? (productResponse, GetProductVersionResponseEnum.NoUpdatesFound) : (productResponse, GetProductVersionResponseEnum.NoProductsFound);
             }
 
-
-            //actualProducts.ProductCounts.RequestedProductCount.Should().Be(1);
-            //actualProducts.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
 
             return (productResponse, GetProductVersionResponseEnum.UpdatesFound);
         }

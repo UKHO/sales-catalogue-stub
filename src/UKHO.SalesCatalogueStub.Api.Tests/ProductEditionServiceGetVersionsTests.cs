@@ -70,44 +70,50 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
-        //[Test]
-        //public async Task Test_GetProductVersions_When_EditionProvidedIsCurrent_UpdateNumberNotProvided__NoReissues_Returns_AllUpdatesForCurrentEdition()
-        //{
-        //    // Arrange
-        //    var (_, productVersion, _) = CreateProduct("GB1", 2, 4, ProductEditionStatusEnum.Updated);
+        [Test]
+        public async Task Test_GetProductVersions_When_EditionProvidedIsCurrent_UpdateNumberNotProvided__NoReissues_Returns_AllUpdatesForCurrentEdition()
+        {
+            // Arrange
+            var (_, productVersion, _) = CreateProduct("GB1", 2, 4, ProductEditionStatusEnum.Updated);
 
-        //    productVersion.UpdateNumber = null;
+            productVersion.UpdateNumber = null;
 
-        //    // Act
-        //    var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
+            // Act
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
-        //    // Assert
-        //    actualProducts.Products.Should().NotBeNull().And.ContainSingle();
-        //    actualProducts.ProductCounts.ReturnedProductCount.Should().Be(1);
-        //    actualProducts.ProductCounts.RequestedProductCount.Should().Be(1);
-        //    actualProducts.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-        //    actualProducts.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
+            // Assert
+            actualProducts.Products.Should().NotBeNull().And.ContainSingle();
+            actualProducts.ProductCounts.ReturnedProductCount.Should().Be(1);
+            actualProducts.ProductCounts.RequestedProductCount.Should().Be(1);
+            actualProducts.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            actualProducts.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
-        //    actualProducts.Products.First().UpdateNumbers.Should().Equal(new[] { 1, 2, 3, 4 });
-        //    response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
-        //}
+            actualProducts.Products.First().UpdateNumbers.Should().Equal(new[] { 1, 2, 3, 4 });
+            response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
+        }
 
-        //[Test]
-        //public async Task Test_GetProductVersions_When_NoEditionOrUpdateNumbersProvided_And_NoReIssue_And_LatestStatusUpdated_Returns_AllUpdatesForCurrentEditionFromBase()
-        //{
-        //    // Arrange
-        //    var (_, productVersion, _) = CreateProduct("GB1", 2, 4, ProductEditionStatusEnum.Updated);
+        [Test]
+        public async Task Test_GetProductVersions_When_NoEditionOrUpdateNumbersProvided_And_NoReIssue_And_LatestStatusUpdated_Returns_AllUpdatesForCurrentEditionFromBase()
+        {
+            // Arrange
+            var (_, productVersion, _) = CreateProduct("GB1", 2, 4, ProductEditionStatusEnum.Updated);
 
-        //    productVersion.UpdateNumber = null;
-        //    productVersion.EditionNumber = null;
+            productVersion.UpdateNumber = null;
+            productVersion.EditionNumber = null;
 
-        //    // Act
-        //    var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
+            // Act
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
-        //    // Assert
-        //    actualProducts.First().UpdateNumbers.Should().Equals(new[] { 0, 1, 2, 3, 4 });
-        //    response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
-        //}
+            // Assert
+            actualProducts.Products.Should().NotBeNull().And.ContainSingle();
+            actualProducts.ProductCounts.ReturnedProductCount.Should().Be(1);
+            actualProducts.ProductCounts.RequestedProductCount.Should().Be(1);
+            actualProducts.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            actualProducts.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
+
+            actualProducts.Products.First().UpdateNumbers.Should().Equals(new[] { 0, 1, 2, 3, 4 });
+            response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
+        }
 
         //[Test]
         //public async Task Test_GetProductVersions_When_NoEditionOrUpdateProvided_And_LatestStatusBase_Returns_ZeroAsOnlyUpdate()
