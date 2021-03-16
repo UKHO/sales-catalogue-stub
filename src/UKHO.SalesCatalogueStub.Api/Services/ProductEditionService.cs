@@ -111,7 +111,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
 
             var validProductVersions = productVersions
-                .Where(x => x != null && x.ProductName != null).ToList();
+                .Where(x => x != null && !string.IsNullOrWhiteSpace(x.ProductName)).ToList();
 
             var numberOfNull = productVersions.Count - validProductVersions.Count;
 
