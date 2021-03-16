@@ -115,7 +115,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
             var numberOfNull = productVersions.Count - validProductVersions.Count;
 
-            for (int i = 0; i < numberOfNull; i++)
+            for (var i = 0; i < numberOfNull; i++)
             {
                 productResponse.ProductCounts.RequestedProductsNotReturned.Add(new RequestedProductsNotReturned
                 { ProductName = string.Empty, Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum });
