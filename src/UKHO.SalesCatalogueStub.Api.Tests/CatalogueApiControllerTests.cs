@@ -59,7 +59,6 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
         private void CreateLoaderStatus(DateTime? dateEntered, bool isModified)
         {
-            DateTime? lastModified;
             A.CallTo(() => _productRepo.CheckIfCatalogueModified(A<DateTime?>.Ignored))
                 .Returns(Task.FromResult((isModified, dateEntered)));
         }
