@@ -555,11 +555,12 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
-        [Test]
-        public async Task Test_GetProductVersions_When_CancelledCellIsOnlyUpdateSinceEdition_And_UpdateRequestedIsThatCancellation_Returns_Expected()
+        [TestCase(365)]
+        [TestCase(0)]
+        public async Task Test_GetProductVersions_When_CancelledCellIsOnlyUpdateSinceEdition_And_UpdateRequestedIsThatCancellation_Returns_Expected(int daysInPast)
         {
             // Arrange
-            var (_, productVersion, _) = CreateProduct("CA570179", 1, null, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null, lastUpdated: DateTime.Now.AddDays(-364));
+            var (_, productVersion, _) = CreateProduct("CA570179", 1, null, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null, lastUpdated: DateTime.Now.AddDays(-daysInPast));
 
             // Act
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
@@ -578,11 +579,12 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
         }
 
-        [Test]
-        public async Task Test_GetProductVersions_When_CancelledCellIsOnlyUpdateSinceEdition_And_UpdateRequestedIsThatCancellation_And_Cancellation_Occurred_Over_1_Year_Ago_Returns_NoProducts()
+        [TestCase(1000)]
+        [TestCase(366)]
+        public async Task Test_GetProductVersions_When_CancelledCellIsOnlyUpdateSinceEdition_And_UpdateRequestedIsThatCancellation_And_Cancellation_Occurred_Over_1_Year_Ago_Returns_NoProducts(int daysInPast)
         {
             // Arrange
-            var (_, productVersion, _) = CreateProduct("CA570179", 1, null, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null, lastUpdated: DateTime.Now.AddDays(-366));
+            var (_, productVersion, _) = CreateProduct("CA570179", 1, null, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null, lastUpdated: DateTime.Now.AddDays(-daysInPast));
 
             // Act
             var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
