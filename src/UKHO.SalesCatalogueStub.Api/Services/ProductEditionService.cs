@@ -434,9 +434,12 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             var serializer =
                 new XmlSerializer(typeof(Enc));
 
-            var stringReader = new StringReader(xmlString);
+            Enc enc;
 
-            var enc = (Enc)serializer.Deserialize(stringReader);
+            using var stringReader = new StringReader(xmlString);
+            {
+                enc = (Enc)serializer.Deserialize(stringReader);
+            }
 
             return enc;
         }
