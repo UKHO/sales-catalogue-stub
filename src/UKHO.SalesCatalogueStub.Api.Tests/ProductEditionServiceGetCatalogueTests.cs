@@ -22,6 +22,25 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         private SalesCatalogueStubDbContext _dbContext;
         private IProductEditionService _service;
 
+        [SetUp]
+        public void Setup()
+        {
+            var dbContextOptions = new DbContextOptionsBuilder<SalesCatalogueStubDbContext>()
+                .UseInMemoryDatabase(databaseName: "inmemory")
+                .Options;
+
+            _dbContext = new SalesCatalogueStubDbContext(dbContextOptions);
+            _service = new ProductEditionService(new SalesCatalogueStubDbContext(dbContextOptions), A.Fake<ILogger<ProductEditionService>>());
+
+            CreateCatalogue();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _dbContext.Database.EnsureDeleted();
+        }
+
         [Test]
         public async Task
             Calls_To_GetCatalogue_Should_Return_Expected_Model_Types()
@@ -366,25 +385,6 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             var catalogueModified = await _service.CheckIfCatalogueModified(ifModifiedSince);
             catalogueModified.isModified.Should().BeFalse();
             catalogueModified.dateEntered.Should().Be(latestDateEntered);
-        }
-
-        [SetUp]
-        public void Setup()
-        {
-            var dbContextOptions = new DbContextOptionsBuilder<SalesCatalogueStubDbContext>()
-                .UseInMemoryDatabase(databaseName: "inmemory")
-                .Options;
-
-            _dbContext = new SalesCatalogueStubDbContext(dbContextOptions);
-            _service = new ProductEditionService(new SalesCatalogueStubDbContext(dbContextOptions), A.Fake<ILogger<ProductEditionService>>());
-
-            CreateCatalogue();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _dbContext.Database.EnsureDeleted();
         }
 
         private void CreateLoaderStatus(DateTime dateEntered)
