@@ -603,87 +603,111 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             response.Should().Be(GetProductVersionResponseEnum.NoUpdatesFound);
         }
 
-        //[Test]
-        //public async Task Test_GetProductVersions_When_CancelledCellHasPreviousUpdatesForEdition_And_EditionRequestedIsBeforeEditionAndUpdateRequested_Returns_Expected()
-        //{
-        //    // Arrange
-        //    var (_, productVersion, _) = CreateProduct("US4WI21M", 16, 3, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
-        //    productVersion.EditionNumber = 1;
+        [Test]
+        public async Task Test_GetProductVersions_When_CancelledCellHasPreviousUpdatesForEdition_And_EditionRequestedIsBeforeEditionAndUpdateRequested_And_Cancellation_Occurred_Under_1_Year_Ago_Returns_Expected()
+        {
+            // Arrange
+            var (_, productVersion, _) = CreateProduct("US4WI21M", 16, 3, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null, lastUpdated: DateTime.Now.AddDays(-300));
+            productVersion.EditionNumber = 1;
 
-        //    // Act
-        //    var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
+            // Act
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
-        //    // Assert
-        //    actualProducts.Products.First().UpdateNumbers.Should().Equal(new[] { 0, 1, 2, 3 });
-        //    actualProducts.Products.First().EditionNumber.Should().Be(16);
-        //    actualProducts.Products.First().Cancellation.UpdateNumber.Should().Be(4);
-        //    actualProducts.Products.First().Cancellation.EditionNumber.Should().Be(0);
-        //    response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
-        //}
+            // Assert
+            actualProducts.Products.Should().HaveCount(1);
+            actualProducts.ProductCounts.ReturnedProductCount.Should().Be(1);
+            actualProducts.ProductCounts.RequestedProductCount.Should().Be(1);
+            actualProducts.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            actualProducts.ProductCounts.RequestedProductsNotReturned.Should().BeEmpty();
 
-        //[Test]
-        //public async Task Test_GetProductVersions_When_CancelledCellHasPreviousUpdatesForEdition_And_NoUpdateProvided_Returns_Expected()
-        //{
-        //    // Arrange
-        //    var (_, productVersion, _) = CreateProduct("US4WI21M", 16, 3, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
-        //    productVersion.UpdateNumber = null;
+            actualProducts.Products.First().UpdateNumbers.Should().Equal(new[] { 0, 1, 2, 3 });
+            actualProducts.Products.First().EditionNumber.Should().Be(16);
+            actualProducts.Products.First().Cancellation.UpdateNumber.Should().Be(4);
+            actualProducts.Products.First().Cancellation.EditionNumber.Should().Be(0);
+            response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
+        }
 
-        //    // Act
-        //    var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
+        [Test]
+        public async Task Test_GetProductVersions_When_CancelledCellHasPreviousUpdatesForEdition_And_NoUpdateProvided_And_Cancellation_Occurred_Under_1_Year_Ago_Returns_Expected()
+        {
+            // Arrange
+            var (_, productVersion, _) = CreateProduct("US4WI21M", 16, 3, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null, lastUpdated: DateTime.Now.AddDays(-300));
+            productVersion.UpdateNumber = null;
 
-        //    // Assert
-        //    actualProducts.Products.First().UpdateNumbers.Should().Equal(new[] { 1, 2, 3 });
-        //    actualProducts.Products.First().EditionNumber.Should().Be(16);
-        //    actualProducts.Products.First().Cancellation.UpdateNumber.Should().Be(4);
-        //    actualProducts.Products.First().Cancellation.EditionNumber.Should().Be(0);
-        //    response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
-        //}
+            // Act
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
-        //[Test]
-        //public async Task Test_GetProductVersions_When_CancelledCellIsOnlyUpdateSinceEdition_And_NoUpdateOrEditionProvided_Returns_Expected()
-        //{
-        //    // Arrange
-        //    var (_, productVersion, _) = CreateProduct("CA570179", 1, null, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null);
-        //    productVersion.UpdateNumber = null;
-        //    productVersion.EditionNumber = null;
+            // Assert
+            actualProducts.Products.Should().HaveCount(1);
+            actualProducts.ProductCounts.ReturnedProductCount.Should().Be(1);
+            actualProducts.ProductCounts.RequestedProductCount.Should().Be(1);
+            actualProducts.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            actualProducts.ProductCounts.RequestedProductsNotReturned.Should().BeEmpty();
 
-        //    // Act
-        //    var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
+            actualProducts.Products.First().UpdateNumbers.Should().Equal(new[] { 1, 2, 3 });
+            actualProducts.Products.First().EditionNumber.Should().Be(16);
+            actualProducts.Products.First().Cancellation.UpdateNumber.Should().Be(4);
+            actualProducts.Products.First().Cancellation.EditionNumber.Should().Be(0);
+            response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
+        }
 
-        //    // Assert
-        //    actualProducts.Products.First().UpdateNumbers.Should().HaveCount(0);
-        //    actualProducts.Products.First().EditionNumber.Should().Be(1);
-        //    actualProducts.Products.First().Cancellation.UpdateNumber.Should().Be(1);
-        //    actualProducts.Products.First().Cancellation.EditionNumber.Should().Be(0);
-        //    response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
-        //}
+        [Test]
+        public async Task Test_GetProductVersions_When_CancelledCellIsOnlyUpdateSinceEdition_And_NoUpdateOrEditionProvidedAnd_Cancellation_Occurred_Under_1_Year_Ago__Returns_Expected()
+        {
+            // Arrange
+            var (_, productVersion, _) = CreateProduct("CA570179", 1, null, ProductEditionStatusEnum.Cancelled, LastReissueUpdateNumber: null, lastUpdated: DateTime.Now.AddDays(-300));
+            productVersion.UpdateNumber = null;
+            productVersion.EditionNumber = null;
 
-        //[Test]
-        //public async Task Test_GetProductVersions_OnlyProductsRequestedAreReturned()
-        //{
-        //    // Arrange
-        //    var (_, productVersionOne, _) = CreateProduct("GB1", 2, 3, ProductEditionStatusEnum.Updated);
-        //    var (_, productVersionTwo, _) = CreateProduct("GB2", 3, 4, ProductEditionStatusEnum.Updated);
-        //    _ = CreateProduct("GB3", 2, 3, ProductEditionStatusEnum.Updated);
+            // Act
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersion });
 
-        //    productVersionOne.UpdateNumber = 2;
-        //    productVersionTwo.UpdateNumber = 1;
+            // Assert
+            actualProducts.Products.Should().HaveCount(1);
+            actualProducts.ProductCounts.ReturnedProductCount.Should().Be(1);
+            actualProducts.ProductCounts.RequestedProductCount.Should().Be(1);
+            actualProducts.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            actualProducts.ProductCounts.RequestedProductsNotReturned.Should().BeEmpty();
 
-        //    // Act
-        //    var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersionOne, productVersionTwo });
+            actualProducts.Products.First().UpdateNumbers.Should().HaveCount(0);
+            actualProducts.Products.First().EditionNumber.Should().Be(1);
+            actualProducts.Products.First().Cancellation.UpdateNumber.Should().Be(1);
+            actualProducts.Products.First().Cancellation.EditionNumber.Should().Be(0);
+            response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
+        }
 
-        //    // Assert
-        //    actualProducts.Products.Should().HaveCount(2);
-        //    actualProducts.Single(p => p.ProductName == productVersionOne.ProductName).UpdateNumbers.Should().Equal(new[] { 3 });
-        //    actualProducts.Single(p => p.ProductName == productVersionTwo.ProductName).UpdateNumbers.Should().Equal(new[] { 2, 3, 4 });
-        //    response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
-        //}
+        [Test]
+        public async Task Test_GetProductVersions_OnlyProductsRequestedAreReturned()
+        {
+            // Arrange
+            var (_, productVersionOne, _) = CreateProduct("GB1", 2, 3, ProductEditionStatusEnum.Updated);
+            var (_, productVersionTwo, _) = CreateProduct("GB2", 3, 4, ProductEditionStatusEnum.Updated);
+            _ = CreateProduct("GB3", 2, 3, ProductEditionStatusEnum.Updated);
 
-        //[Test]
-        //public void Test_Calls_To_GetProductEditions_With_Null_Throws_ArgumentNullException()
-        //{
-        //    _service.Invoking(async a => await a.GetProductVersions(null)).Should().Throw<ArgumentNullException>();
-        //}
+            productVersionOne.UpdateNumber = 2;
+            productVersionTwo.UpdateNumber = 1;
+
+            // Act
+            var (actualProducts, response) = await _service.GetProductVersions(new ProductVersions { productVersionOne, productVersionTwo });
+
+            // Assert
+            actualProducts.Products.Should().HaveCount(2);
+            actualProducts.ProductCounts.ReturnedProductCount.Should().Be(2);
+            actualProducts.ProductCounts.RequestedProductCount.Should().Be(2);
+            actualProducts.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            actualProducts.ProductCounts.RequestedProductsNotReturned.Should().BeEmpty();
+
+            actualProducts.Products.Should().HaveCount(2);
+            actualProducts.Products.Single(p => p.ProductName == productVersionOne.ProductName).UpdateNumbers.Should().Equal(new[] { 3 });
+            actualProducts.Products.Single(p => p.ProductName == productVersionTwo.ProductName).UpdateNumbers.Should().Equal(new[] { 2, 3, 4 });
+            response.Should().Be(GetProductVersionResponseEnum.UpdatesFound);
+        }
+
+        [Test]
+        public void Test_Calls_To_GetProductEditions_With_Null_Throws_ArgumentNullException()
+        {
+            _service.Invoking(async a => await a.GetProductVersions(null)).Should().Throw<ArgumentNullException>();
+        }
 
         private (Product, ProductVersionsInner, ProductsInner) CreateProduct(string productName, int editionNumber, int? updateNumber,
             ProductEditionStatusEnum latestStatus, int? LastReissueUpdateNumber = null, ProductTypeNameEnum productType = ProductTypeNameEnum.Avcs,
