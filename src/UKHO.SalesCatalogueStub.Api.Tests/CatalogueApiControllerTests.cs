@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UKHO.SalesCatalogueStub.Api.Controllers;
 using UKHO.SalesCatalogueStub.Api.Models;
 using UKHO.SalesCatalogueStub.Api.Services;
@@ -60,8 +60,8 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         private void CreateLoaderStatus(DateTime? dateEntered, bool isModified)
         {
             DateTime? lastModified;
-            A.CallTo(() => _productRepo.CheckIfCatalogueModified(A<DateTime?>.Ignored, out lastModified)).Returns(isModified).
-                AssignsOutAndRefParameters(dateEntered);
+            A.CallTo(() => _productRepo.CheckIfCatalogueModified(A<DateTime?>.Ignored))
+                .Returns(Task.FromResult((isModified, dateEntered)));
         }
 
         private void CreateCatalogue()

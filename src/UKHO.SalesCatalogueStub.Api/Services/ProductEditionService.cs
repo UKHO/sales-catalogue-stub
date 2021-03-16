@@ -1,13 +1,13 @@
 ﻿#pragma warning disable 1591
 
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using UKHO.SalesCatalogueStub.Api.EF;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 using UKHO.SalesCatalogueStub.Api.Models;
@@ -204,12 +204,12 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return (matchedProducts, GetProductVersionResponseEnum.UpdatesFound);
         }
 
-        public bool CheckIfCatalogueModified(DateTime? ifModifiedSince, out DateTime? dateEntered)
+        public async Task<(bool isModified, DateTime? dateEntered)> CheckIfCatalogueModified(DateTime? ifModifiedSince)
         {
-            var latestDateEntered = _dbContext.LoaderStatus.OrderByDescending(a => a.DateEntered).First(a => a.AreaName == AreaNameEnum.Main).DateEntered;
+            var latestLoaderStatus = await _dbContext.LoaderStatus.OrderByDescending(a => a.DateEntered).FirstAsync(a => a.AreaName == AreaNameEnum.Main);
 
-            dateEntered = latestDateEntered;
-            return ifModifiedSince == null || ifModifiedSince < latestDateEntered;
+            var dateEntered = latestLoaderStatus.DateEntered;
+            return (ifModifiedSince == null || ifModifiedSince < dateEntered, dateEntered);
         }
 
         public async Task<EssData> GetCatalogue()

@@ -1,10 +1,10 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using UKHO.SalesCatalogueStub.Api.Attributes;
 using UKHO.SalesCatalogueStub.Api.Models;
 using UKHO.SalesCatalogueStub.Api.Services;
@@ -56,10 +56,10 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         public virtual async Task<IActionResult> GetCatalogue([FromRoute][Required] string productType, [FromRoute][Required] string catalogueType, [FromHeader] DateTime? ifModifiedSince)
         {
 
-            var catalogueModified = _productEditionService.CheckIfCatalogueModified(ifModifiedSince, out var dateEntered);
-            Response?.Headers.Add("LastModified", dateEntered?.ToString());
+            var checkIfCatalogueModified = await _productEditionService.CheckIfCatalogueModified(ifModifiedSince);
+            Response?.Headers.Add("LastModified", checkIfCatalogueModified.dateEntered?.ToString());
 
-            if (!catalogueModified)
+            if (!checkIfCatalogueModified.isModified)
             {
                 return StatusCode(304, null);
             }

@@ -1,14 +1,14 @@
-﻿using FakeItEasy;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using FakeItEasy;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using UKHO.SalesCatalogueStub.Api.EF;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 using UKHO.SalesCatalogueStub.Api.Models;
@@ -342,11 +342,12 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             new object[] { null, new DateTime(2022, 6, 1) },
         };
         [Test, TestCaseSource(nameof(GetCatalogueIfModifiedSinceEarlierDateCases))]
-        public void Calls_To_CheckIfCatalogueModified_Should_Return_True_If_IfModifiedSince_Is_Earlier_Than_Latest_LoaderStatus_DateEntered_Or_Null(DateTime? ifModifiedSince, DateTime latestDateEntered)
+        public async Task Calls_To_CheckIfCatalogueModified_Should_Return_True_If_IfModifiedSince_Is_Earlier_Than_Latest_LoaderStatus_DateEntered_Or_Null(DateTime? ifModifiedSince, DateTime latestDateEntered)
         {
             CreateLoaderStatus(latestDateEntered);
-            _service.CheckIfCatalogueModified(ifModifiedSince, out var dateEntered).Should().BeTrue();
-            dateEntered.Should().Be(latestDateEntered);
+            var catalogueModified = await _service.CheckIfCatalogueModified(ifModifiedSince);
+            catalogueModified.isModified.Should().BeTrue();
+            catalogueModified.dateEntered.Should().Be(latestDateEntered);
         }
 
         private static readonly object[] GetCatalogueIfModifiedSinceLaterDateCases =
@@ -359,11 +360,12 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             new object[] { new DateTime(2021, 12, 14), new DateTime(2021, 12, 11) }
         };
         [Test, TestCaseSource(nameof(GetCatalogueIfModifiedSinceLaterDateCases))]
-        public void Calls_To_CheckIfCatalogueModified_Should_Return_False_If_IfModifiedSince_Is_Later_Than_Latest_LoaderStatus_DateEntered(DateTime? ifModifiedSince, DateTime latestDateEntered)
+        public async Task Calls_To_CheckIfCatalogueModified_Should_Return_False_If_IfModifiedSince_Is_Later_Than_Latest_LoaderStatus_DateEntered(DateTime? ifModifiedSince, DateTime latestDateEntered)
         {
             CreateLoaderStatus(latestDateEntered);
-            _service.CheckIfCatalogueModified(ifModifiedSince, out var dateEntered).Should().BeFalse();
-            dateEntered.Should().Be(latestDateEntered);
+            var catalogueModified = await _service.CheckIfCatalogueModified(ifModifiedSince);
+            catalogueModified.isModified.Should().BeFalse();
+            catalogueModified.dateEntered.Should().Be(latestDateEntered);
         }
 
         [SetUp]
