@@ -2,8 +2,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using UKHO.SalesCatalogueStub.Api.EF;
@@ -35,7 +37,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             _logger = logger;
         }
 
-        public Products GetProductEditions(List<string> products)
+        public async Task<Products> GetProductEditions(List<string> products)
         {
             if (products == null)
             {
@@ -56,7 +58,10 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     continue;
                 }
 
-                var activeEdition = GetActiveEdition(product);
+                var activeEdition = await _dbContext.ProductEditions.AsNoTracking().SingleOrDefaultAsync(a =>
+                    a.EditionIdentifier == product &&
+                    a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
+                    _allowedProductStatus.Contains(a.LatestStatus));
 
                 if (activeEdition != null)
                 {
@@ -65,7 +70,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     var productsInner = new ProductsInner
                     {
                         UpdateNumbers = updates,
-                        EditionNumber = Convert.ToInt32(activeEdition.EditionNumber),
+                        EditionNumber = activeEdition.EditionNumberAsInt,
                         FileSize = GetFileSize(activeEditionUpdateNumber),
                         ProductName = activeEdition.EditionIdentifier
                     };
@@ -210,6 +215,89 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return (matchedProducts, GetProductVersionResponseEnum.UpdatesFound);
         }
 
+        public async Task<(bool isModified, DateTime? dateEntered)> CheckIfCatalogueModified(DateTime? ifModifiedSince)
+        {
+            var latestLoaderStatus = await _dbContext.LoaderStatus.OrderByDescending(a => a.DateEntered).FirstAsync(a => a.AreaName == AreaNameEnum.Main);
+
+            var dateEntered = latestLoaderStatus.DateEntered;
+            return (ifModifiedSince == null || ifModifiedSince < dateEntered, dateEntered);
+        }
+
+        public async Task<EssData> GetCatalogue()
+        {
+            var editions = await _dbContext.ProductEditions.Include(a => a.PidGeometry).Include(a => a.PidTombstone).AsNoTracking().Where(a =>
+                a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
+                _allowedProductStatus.Contains(a.LatestStatus)).ToListAsync();
+
+            var catalogue = new List<EssDataInner>();
+
+            foreach (var edition in editions)
+            {
+                var isCancelled = edition.LatestStatus == ProductEditionStatusEnum.Cancelled;
+
+                var updateNumber = edition.UpdateNumber ?? 0;
+
+                var reissueNumber = edition.LastReissueUpdateNumber ?? 0;
+
+                Tuple<double?, double?, double?, double?> latitudes;
+
+                int? baseCdNumber;
+
+                if (isCancelled && edition.PidTombstone?.XmlData != null)
+                {
+                    var pidTombstone = DeserializePidTombstone(edition.PidTombstone.XmlData);
+                    latitudes = new Tuple<double?, double?, double?, double?>(
+                        pidTombstone.Metadata?.GeographicLimit?.BoundingBox?.NorthLimit,
+                        pidTombstone.Metadata?.GeographicLimit?.BoundingBox?.EastLimit,
+                        pidTombstone.Metadata?.GeographicLimit?.BoundingBox?.SouthLimit,
+                        pidTombstone.Metadata?.GeographicLimit?.BoundingBox?.WestLimit);
+
+                    baseCdNumber = pidTombstone.Metadata?.Cd?.Base;
+                }
+                else
+                {
+                    var geometry = edition.PidGeometry.SingleOrDefault(a => a.IsBoundingBox)?.Geom;
+
+                    latitudes = new Tuple<double?, double?, double?, double?>(
+                       geometry?.EnvelopeInternal?.MaxX,
+                       geometry?.EnvelopeInternal?.MaxY,
+                       geometry?.EnvelopeInternal?.MinX,
+                       geometry?.EnvelopeInternal?.MinY);
+
+                    baseCdNumber = edition.BaseCd;
+                }
+
+                catalogue.Add(
+                    new EssDataInner()
+                    {
+                        ProductName = edition.EditionIdentifier,
+                        BaseCellIssueDate = edition.BaseIssueDate,
+                        BaseCellEditionNumber = isCancelled ? 0 : edition.EditionNumberAsInt,
+                        IssueDateLatestUpdate = edition.LastUpdateIssueDate,
+                        LatestUpdateNumber = edition.UpdateNumber,
+                        FileSize = GetFileSize(updateNumber),
+                        CellLimitNorthernmostLatitude = Convert.ToDecimal(latitudes.Item1),
+                        CellLimitEasternmostLatitude = Convert.ToDecimal(latitudes.Item2),
+                        CellLimitSouthernmostLatitude = Convert.ToDecimal(latitudes.Item3),
+                        CellLimitWesternmostLatitude = Convert.ToDecimal(latitudes.Item4),
+                        DataCoverageCoordinates = new List<DataCoverageCoordinate> { new DataCoverageCoordinate { Latitude = null, Longitude = null } },
+                        Compression = true,
+                        Encryption = true,
+                        BaseCellUpdateNumber = reissueNumber,
+                        LastUpdateNumberPreviousEdition = null,
+                        CancelledCellReplacements = new List<string>(),
+                        IssueDatePreviousUpdate = edition.BaseIssueDate,
+                        CancelledEditionNumber = isCancelled ? edition.EditionNumberAsInt : (int?)null,
+                        BaseCellLocation = GetBaseCellLocation(baseCdNumber)
+
+                    });
+            };
+
+            var essData = new EssData();
+            essData.AddRange(catalogue.OrderBy(a => a.ProductName));
+            return essData;
+        }
+
         public async Task<ProductResponse> GetProductEditionsSinceDateTime(DateTime sinceDateTime)
         {
             var productResponse = new ProductResponse
@@ -313,17 +401,8 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             {
                 productUpdates.Add(i);
             }
+
             return productUpdates;
-        }
-
-        private ProductEdition GetActiveEdition(string productName)
-        {
-            var productMatch = _dbContext.ProductEditions.AsNoTracking().SingleOrDefault(a =>
-                a.EditionIdentifier == productName &&
-                a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
-                _allowedProductStatus.Contains(a.LatestStatus));
-
-            return productMatch;
         }
 
         private static int GetFileSize(int latestUpdateNumber)
@@ -338,6 +417,31 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 EditionNumber = 0,
                 UpdateNumber = latestUpdateNumber + 1
             };
+        }
+
+        private static string GetBaseCellLocation(int? baseCdNumber)
+        {
+            if (baseCdNumber == null)
+            {
+                return null;
+            }
+
+            return baseCdNumber <= 5 ? $"M1;B{baseCdNumber}" : $"M2;B{baseCdNumber}";
+        }
+
+        private static Enc DeserializePidTombstone(string xmlString)
+        {
+            var serializer =
+                new XmlSerializer(typeof(Enc));
+
+            Enc enc;
+
+            using var stringReader = new StringReader(xmlString);
+            {
+                enc = (Enc)serializer.Deserialize(stringReader);
+            }
+
+            return enc;
         }
     }
 }

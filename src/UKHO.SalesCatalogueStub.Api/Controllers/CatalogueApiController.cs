@@ -1,11 +1,13 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
-using System.ComponentModel.DataAnnotations;
 using UKHO.SalesCatalogueStub.Api.Attributes;
 using UKHO.SalesCatalogueStub.Api.Models;
+using UKHO.SalesCatalogueStub.Api.Services;
 
 namespace UKHO.SalesCatalogueStub.Api.Controllers
 {
@@ -16,6 +18,17 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
     [Authorize(Roles = "CatalogueReader")]
     public class CatalogueApiController : ControllerBase
     {
+        private readonly IProductEditionService _productEditionService;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="productEditionService"></param>
+        public CatalogueApiController(IProductEditionService productEditionService)
+        {
+            _productEditionService = productEditionService;
+        }
+
         /// <summary>
         /// Get the data for a catalogue
         /// </summary>
@@ -40,38 +53,20 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual IActionResult GetCatalogue([FromRoute][Required] string productType, [FromRoute][Required] string catalogueType, [FromHeader] DateTime? ifModifiedSince)
+        public virtual async Task<IActionResult> GetCatalogue([FromRoute][Required] string productType, [FromRoute][Required] string catalogueType, [FromHeader] DateTime? ifModifiedSince)
         {
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(InlineResponse200));
 
-            //TODO: Uncomment the next line to return response 304 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(304);
+            var checkIfCatalogueModified = await _productEditionService.CheckIfCatalogueModified(ifModifiedSince);
+            Response?.Headers.Add("LastModified", checkIfCatalogueModified.dateEntered?.ToString());
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(ErrorDescription));
+            if (!checkIfCatalogueModified.isModified)
+            {
+                return StatusCode(304, null);
+            }
+            var catalogue = await _productEditionService.GetCatalogue();
+            return StatusCode(200, JsonConvert.SerializeObject(catalogue, Formatting.Indented));
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401);
 
-            //TODO: Uncomment the next line to return response 403 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(403);
-
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 406 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(406, default(DefaultErrorResponse));
-
-            //TODO: Uncomment the next line to return response 500 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(500, default(DefaultErrorResponse));
-            string exampleJson = null;
-            exampleJson = "\"\"";
-
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<InlineResponse200>(exampleJson)
-            : default(InlineResponse200);            //TODO: Change the data returned
-            return new ObjectResult(example);
         }
     }
 }

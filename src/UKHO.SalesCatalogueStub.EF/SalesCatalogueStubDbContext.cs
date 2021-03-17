@@ -1,7 +1,7 @@
-﻿using System;
-using Microsoft.Azure.Services.AppAuthentication;
+﻿using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 
 namespace UKHO.SalesCatalogueStub.Api.EF
@@ -27,9 +27,11 @@ namespace UKHO.SalesCatalogueStub.Api.EF
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductEdition> ProductEditions { get; set; }
         public DbSet<LifecycleEvent> LifecycleEvents { get; set; }
-
+        public DbSet<PidGeometry> PidGeometries { get; set; }
         public DbSet<EventType> EventTypes { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
+        public DbSet<PidTombstone> PidTombstone { get; set; }
+        public DbSet<LoaderStatus> LoaderStatus { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -59,6 +61,13 @@ namespace UKHO.SalesCatalogueStub.Api.EF
                 .HasConversion(
                     v => v.ToString(),
                     v => (ProductEditionStatusEnum)Enum.Parse(typeof(ProductEditionStatusEnum), v));
+
+            modelBuilder
+                .Entity<LoaderStatus>()
+                .Property(e => e.AreaName)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (AreaNameEnum)Enum.Parse(typeof(AreaNameEnum), v));
 
         }
     }

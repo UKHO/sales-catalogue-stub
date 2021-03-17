@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UKHO.SalesCatalogueStub.Api.Controllers;
 using UKHO.SalesCatalogueStub.Api.Models;
 using UKHO.SalesCatalogueStub.Api.Services;
@@ -24,7 +25,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         }
 
         [Test]
-        public void Calling_PostProductIdentifiers_With_At_Least_One_Matching_Product_Should_Return_Status_Code_200()
+        public async Task Calling_PostProductIdentifiers_With_At_Least_One_Matching_Product_Should_Return_Status_Code_200()
         {
             var testData = new List<string>
             {
@@ -43,12 +44,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     UpdateNumbers = new List<int?> {1, 2, 3}
                 }
             });
-            var response = _exchangeServiceApiController.PostProductIdentifiers("AVCS", testData) as ObjectResult;
+            var response = await _exchangeServiceApiController.PostProductIdentifiers("AVCS", testData) as ObjectResult;
             response?.StatusCode.Should().Be(200);
+            response.Should().NotBeNull();
         }
 
         [Test]
-        public void Calling_PostProductIdentifiers_With_A_Product_List_Should_Return_Expected_Json_Response()
+        public async Task Calling_PostProductIdentifiers_With_A_Product_List_Should_Return_Expected_Json_Response()
         {
             var testData = new List<string>
             {
@@ -71,29 +73,32 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             const string expectedJson = "[\r\n  {\r\n    \"productName\": \"AU220120\",\r\n    \"editionNumber\": 1,\r\n    \"updateNumbers\": [\r\n      1,\r\n      2,\r\n      3\r\n    ],\r\n    \"fileSize\": 100\r\n  },\r\n  {\r\n    \"productName\": \"EG3GOA01\",\r\n    \"editionNumber\": 1,\r\n    \"updateNumbers\": [\r\n      1,\r\n      2,\r\n      3\r\n    ],\r\n    \"fileSize\": 100\r\n  }\r\n]";
             A.CallTo(() => _productRepo.GetProductEditions(testData)).Returns(testResponse);
-            var response = _exchangeServiceApiController.PostProductIdentifiers("AVCS", testData) as ObjectResult;
+            var response = await _exchangeServiceApiController.PostProductIdentifiers("AVCS", testData) as ObjectResult;
             response?.Value.Should().BeEquivalentTo(expectedJson);
+            response.Should().NotBeNull();
         }
 
         [Test]
-        public void Calling_PostProductIdentifiers_With_No_Matching_Products_Should_Return_Status_Code_400()
+        public async Task Calling_PostProductIdentifiers_With_No_Matching_Products_Should_Return_Status_Code_400()
         {
             var dummyInput = A.CollectionOfDummy<string>(1).ToList();
             A.CallTo(() => _productRepo.GetProductEditions(A<List<string>>.Ignored)).Returns(new Products());
-            var response = _exchangeServiceApiController.PostProductIdentifiers(A.Dummy<string>(), dummyInput) as ObjectResult;
+            var response = await _exchangeServiceApiController.PostProductIdentifiers(A.Dummy<string>(), dummyInput) as ObjectResult;
             response?.StatusCode.Should().Be(400);
+            response.Should().NotBeNull();
         }
 
         [Test]
-        public void Calling_PostProductIdentifiers_With_List_Of_Null_Should_Return_Status_Code_400()
+        public async Task Calling_PostProductIdentifiers_With_List_Of_Null_Should_Return_Status_Code_400()
         {
             var testData = new List<string>
             {
                 null
             };
             A.CallTo(() => _productRepo.GetProductEditions(testData)).Returns(new Products());
-            var response = _exchangeServiceApiController.PostProductIdentifiers(A.Dummy<string>(), testData) as ObjectResult;
+            var response = await _exchangeServiceApiController.PostProductIdentifiers(A.Dummy<string>(), testData) as ObjectResult;
             response?.StatusCode.Should().Be(400);
+            response.Should().NotBeNull();
         }
 
         [Test]
