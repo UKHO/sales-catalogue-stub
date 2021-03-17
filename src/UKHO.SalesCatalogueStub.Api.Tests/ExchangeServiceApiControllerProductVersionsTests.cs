@@ -26,7 +26,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         public async Task Test_Calling_PostProductVersions_With_No_Matching_Products_Should_Return_Status_Code_400()
         {
             var dummyInput = A.Dummy<ProductVersions>();
-            A.CallTo(() => _productEditionService.GetProductVersions(A<ProductVersions>.Ignored)).Returns((new Products(), GetProductVersionResponseEnum.NoProductsFound));
+            A.CallTo(() => _productEditionService.GetProductVersions(A<ProductVersions>.Ignored)).Returns((new ProductResponse(), GetProductVersionResponseEnum.NoProductsFound));
             var response = await _exchangeServiceApiController.PostProductVersions(A.Dummy<string>(), dummyInput) as ObjectResult;
             response?.StatusCode.Should().Be(400);
         }
@@ -36,7 +36,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         {
             var dummyInput = A.Dummy<ProductVersions>();
             //A.CollectionOfDummy<ProductVersionsInner>(1).ToList();
-            A.CallTo(() => _productEditionService.GetProductVersions(A<ProductVersions>.Ignored)).Returns((new Products(), GetProductVersionResponseEnum.NoUpdatesFound));
+            A.CallTo(() => _productEditionService.GetProductVersions(A<ProductVersions>.Ignored)).Returns((new ProductResponse(), GetProductVersionResponseEnum.NoUpdatesFound));
             var response = await _exchangeServiceApiController.PostProductVersions(A.Dummy<string>(), dummyInput) as ObjectResult;
             response?.StatusCode.Should().Be(304);
         }
@@ -48,7 +48,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             {
                 null
             };
-            A.CallTo(() => _productEditionService.GetProductVersions(testData)).Returns((new Products(), GetProductVersionResponseEnum.NoProductsFound));
+            A.CallTo(() => _productEditionService.GetProductVersions(testData)).Returns((new ProductResponse(), GetProductVersionResponseEnum.NoProductsFound));
             var response = await _exchangeServiceApiController.PostProductVersions(A.Dummy<string>(), testData) as ObjectResult;
             response?.StatusCode.Should().Be(400);
         }
@@ -56,20 +56,33 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         [Test]
         public async Task Test_Calling_PostProductVersions_With_At_Least_One_Matching_Product_Should_Return_Status_Code_200()
         {
-            var productVersions = A.Dummy<ProductVersions>();
-            A.CallTo(() => _productEditionService.GetProductVersions(productVersions)).Returns((new Products
+
+            var productResponse = new ProductResponse
             {
-                new ProductsInner()
+                ProductCounts = new ProductCounts
                 {
-                    EditionNumber = 1, FileSize = 100, ProductName = "AU220120",
-                    UpdateNumbers = new List<int?> {1, 2, 3}
+                    RequestedProductCount = 0,
+                    RequestedProductsAlreadyUpToDateCount = 0,
+                    ReturnedProductCount = 2,
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>()
                 },
-                new ProductsInner()
+                Products = new Products
                 {
-                    EditionNumber = 1, FileSize = 100, ProductName = "EG3GOA01",
-                    UpdateNumbers = new List<int?> {1, 2, 3}
+                    new ProductsInner()
+                    {
+                        EditionNumber = 1, FileSize = 100, ProductName = "AU220120",
+                        UpdateNumbers = new List<int?> {1, 2, 3}
+                    },
+                    new ProductsInner()
+                    {
+                        EditionNumber = 1, FileSize = 100, ProductName = "EG3GOA01",
+                        UpdateNumbers = new List<int?> {1, 2, 3}
+                    }
                 }
-            }, GetProductVersionResponseEnum.UpdatesFound));
+            };
+            // ProductResponse
+            var productVersions = A.Dummy<ProductVersions>();
+            A.CallTo(() => _productEditionService.GetProductVersions(productVersions)).Returns((productResponse, GetProductVersionResponseEnum.UpdatesFound));
             var response = await _exchangeServiceApiController.PostProductVersions(A.Dummy<string>(), productVersions) as ObjectResult;
             response?.StatusCode.Should().Be(200);
         }
@@ -79,22 +92,32 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         {
             var productVersions = A.Dummy<ProductVersions>();
 
-            var testResponse = new Products
+            var productResponse = new ProductResponse
             {
-                new ProductsInner
+                ProductCounts = new ProductCounts
                 {
-                    EditionNumber = 1, FileSize = 100, ProductName = "AU220120",
-                    UpdateNumbers = new List<int?> {1, 2, 3}
+                    RequestedProductCount = 0,
+                    RequestedProductsAlreadyUpToDateCount = 0,
+                    ReturnedProductCount = 2,
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>()
                 },
-                new ProductsInner
+                Products = new Products
                 {
-                    EditionNumber = 1, FileSize = 100, ProductName = "EG3GOA01",
-                    UpdateNumbers = new List<int?> {1, 2, 3}
+                    new ProductsInner()
+                    {
+                        EditionNumber = 1, FileSize = 100, ProductName = "AU220120",
+                        UpdateNumbers = new List<int?> {1, 2, 3}
+                    },
+                    new ProductsInner()
+                    {
+                        EditionNumber = 1, FileSize = 100, ProductName = "EG3GOA01",
+                        UpdateNumbers = new List<int?> {1, 2, 3}
+                    }
                 }
             };
-
-            const string expectedJson = "[\r\n  {\r\n    \"productName\": \"AU220120\",\r\n    \"editionNumber\": 1,\r\n    \"updateNumbers\": [\r\n      1,\r\n      2,\r\n      3\r\n    ],\r\n    \"fileSize\": 100\r\n  },\r\n  {\r\n    \"productName\": \"EG3GOA01\",\r\n    \"editionNumber\": 1,\r\n    \"updateNumbers\": [\r\n      1,\r\n      2,\r\n      3\r\n    ],\r\n    \"fileSize\": 100\r\n  }\r\n]";
-            A.CallTo(() => _productEditionService.GetProductVersions(productVersions)).Returns((testResponse, GetProductVersionResponseEnum.UpdatesFound));
+            const string expectedJson =
+                "{\r\n  \"products\": [\r\n    {\r\n      \"productName\": \"AU220120\",\r\n      \"editionNumber\": 1,\r\n      \"updateNumbers\": [\r\n        1,\r\n        2,\r\n        3\r\n      ],\r\n      \"fileSize\": 100\r\n    },\r\n    {\r\n      \"productName\": \"EG3GOA01\",\r\n      \"editionNumber\": 1,\r\n      \"updateNumbers\": [\r\n        1,\r\n        2,\r\n        3\r\n      ],\r\n      \"fileSize\": 100\r\n    }\r\n  ],\r\n  \"productCounts\": {\r\n    \"requestedProductCount\": 0,\r\n    \"returnedProductCount\": 2,\r\n    \"requestedProductsAlreadyUpToDateCount\": 0,\r\n    \"requestedProductsNotReturned\": []\r\n  }\r\n}";
+            A.CallTo(() => _productEditionService.GetProductVersions(productVersions)).Returns((productResponse, GetProductVersionResponseEnum.UpdatesFound));
             var response = await _exchangeServiceApiController.PostProductVersions(A.Dummy<string>(), productVersions) as ObjectResult;
             response?.Value.Should().BeEquivalentTo(expectedJson);
         }

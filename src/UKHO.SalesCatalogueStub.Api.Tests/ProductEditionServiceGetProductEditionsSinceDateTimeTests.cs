@@ -55,7 +55,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
             var productEdition = productEditions.Products.Single();
 
@@ -85,7 +85,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
             var productEdition = productEditions.Products.Single();
 
@@ -116,7 +116,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
             var productEdition = productEditions.Products.Single();
 
@@ -146,7 +146,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
             var productEdition = productEditions.Products.Single();
 
@@ -181,7 +181,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
         }
 
         [Test]
@@ -206,7 +206,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
             var productEdition = productEditions.Products.Single();
 
@@ -237,7 +237,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
             var productEdition = productEditions.Products.Single();
 
@@ -268,7 +268,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
             var productEdition = productEditions.Products.Single();
 
@@ -299,7 +299,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
             var productEdition = productEditions.Products.Single();
 
@@ -331,7 +331,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
             var productEdition = productEditions.Products.Single();
 
@@ -362,7 +362,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
             var productEdition = productEditions.Products.Single();
 
@@ -386,7 +386,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
         }
 
         [Test]
@@ -409,7 +409,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
         }
 
         [Test]
@@ -452,7 +452,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
         }
 
         [TestCase("2021-01-01", "2021-01-01")]
@@ -496,7 +496,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
         }
 
         [Test]
@@ -527,7 +527,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(1);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
             var productEdition = productEditions.Products.Single();
 
@@ -586,7 +586,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             productEditions.ProductCounts.ReturnedProductCount.Should().Be(2);
             productEditions.ProductCounts.RequestedProductCount.Should().Be(0);
             productEditions.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            productEditions.ProductCounts.RequestedProductsNotInExchangeSet.Should().HaveCount(0);
+            productEditions.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
         }
 
         private void SimpleProductEditionSetupByStatusCollection(string productName, int editionNumber, int? updateNumber, int? reissueNumber, ICollection<ProductEditionStatusEnum> statusCollection)

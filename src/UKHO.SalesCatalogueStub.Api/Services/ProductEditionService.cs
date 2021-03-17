@@ -92,14 +92,34 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             return matchedProducts;
         }
 
-        public async Task<(Products, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions)
+        public async Task<(ProductResponse, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions)
         {
             if (productVersions == null) throw new ArgumentNullException(nameof(productVersions));
 
             var distinctProducts = new List<ProductVersionsInner>();
+            var productResponse = new ProductResponse
+            {
+                Products = new Products(),
+                ProductCounts = new ProductCounts
+                {
+                    ReturnedProductCount = 0,
+                    RequestedProductCount = 0,
+                    RequestedProductsAlreadyUpToDateCount = 0,
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>()
+                }
+            };
+
 
             var validProductVersions = productVersions
-                .Where(x => x != null && x.ProductName != null).ToList();
+                .Where(x => x != null && !string.IsNullOrWhiteSpace(x.ProductName)).ToList();
+
+            var numberOfNull = productVersions.Count - validProductVersions.Count;
+
+            for (var i = 0; i < numberOfNull; i++)
+            {
+                productResponse.ProductCounts.RequestedProductsNotReturned.Add(new RequestedProductsNotReturned
+                { ProductName = string.Empty, Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum });
+            }
 
             if (validProductVersions.Any())
             {
@@ -111,25 +131,45 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             }
 
             var productsInDatabase = false;
-            var matchedProducts = new Products();
+
+
+            productResponse.ProductCounts.RequestedProductCount = productVersions.Count;
 
             foreach (var requestProduct in distinctProducts)
             {
-                if (requestProduct.UpdateNumber.HasValue && !requestProduct.EditionNumber.HasValue) continue;
+
+                if (requestProduct.UpdateNumber.HasValue && !requestProduct.EditionNumber.HasValue)
+                {
+                    // Product requested not in DB
+                    productResponse.ProductCounts.RequestedProductsNotReturned.Add(
+                        new RequestedProductsNotReturned
+                        {
+                            ProductName = requestProduct.ProductName,
+                            Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum
+                        });
+
+                    continue;
+                }
 
                 var productDbMatch = await _dbContext.ProductEditions.AsNoTracking().SingleOrDefaultAsync(a =>
                     a.EditionIdentifier == requestProduct.ProductName &&
                     a.Product.ProductType.Name == ProductTypeNameEnum.Avcs &&
                     _allowedProductStatus.Contains(a.LatestStatus));
 
-                if (productDbMatch == null) continue;
+                if (productDbMatch == null)
+                {
+                    // Product requested not in DB
+                    productResponse.ProductCounts.RequestedProductsNotReturned.Add(
+                        new RequestedProductsNotReturned
+                        {
+                            ProductName = requestProduct.ProductName,
+                            Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum
+                        });
+
+                    continue;
+                }
 
                 productsInDatabase = true;
-
-                // Reject where update number is provided without an edition number
-                if ((productDbMatch.EditionNumber == null) &&
-                    (productDbMatch.UpdateNumber != null))
-                    continue;
 
                 var activeEditionUpdateNumber = productDbMatch.UpdateNumber ?? 0;
                 var requestUpdateNumber = requestProduct.UpdateNumber ?? 0;
@@ -146,19 +186,36 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 if (requestUpdateNumber == 0 &&
                     matchedProduct.EditionNumber == requestEditionNumber &&
                     productDbMatch.LatestStatus == ProductEditionStatusEnum.Base)
+                {
+                    productResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount++;
+
                     continue;
+                }
 
                 // Reject where the provided and current are the same
                 if (productDbMatch.UpdateNumber == requestUpdateNumber &&
                     matchedProduct.EditionNumber == requestEditionNumber &&
                     productDbMatch.LatestStatus != ProductEditionStatusEnum.Cancelled)
+                {
+                    productResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount++;
+
                     continue;
+                }
 
                 // Reject where edition or update numbers are provided that are higher than current
                 if ((requestEditionNumber > matchedProduct.EditionNumber) ||
                     (requestEditionNumber == matchedProduct.EditionNumber &&
-                     requestUpdateNumber > (productDbMatch.UpdateNumber ?? 0)))
+                     requestUpdateNumber > (activeEditionUpdateNumber)))
+                {
+                    productResponse.ProductCounts.RequestedProductsNotReturned.Add(
+                        new RequestedProductsNotReturned
+                        {
+                            ProductName = requestProduct.ProductName,
+                            Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum
+                        });
+
                     continue;
+                }
 
                 int? start = 0;
                 if (requestUpdateNumber == productDbMatch.LastReissueUpdateNumber)
@@ -179,19 +236,40 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 {
                     case ProductEditionStatusEnum.Cancelled:
                         {
+                            var productCancelledDate = productDbMatch.LastUpdated.Value;
+                            var days = DateTime.Today.Subtract(productCancelledDate.Date).TotalDays;
+
+                            if (days > 365)
+                            {
+                                // Old product, do not return with data; just add to the RequestedProductsNotReturned
+                                productResponse.ProductCounts.RequestedProductsNotReturned.Add(
+                                    new RequestedProductsNotReturned
+                                    {
+                                        ProductName = requestProduct.ProductName,
+                                        Reason = RequestedProductsNotReturned.ReasonEnum.NoDataAvailableForCancelledProductEnum
+                                    });
+
+                                continue;
+
+                            }
+
                             matchedProduct.Cancellation = new Cancellation
                             {
                                 EditionNumber = 0,
                                 UpdateNumber = activeEditionUpdateNumber + 1
                             };
 
-                            if (requestEditionNumber == matchedProduct.EditionNumber && requestUpdateNumber == activeEditionUpdateNumber)
+                            if (requestEditionNumber == matchedProduct.EditionNumber &&
+                                requestUpdateNumber == activeEditionUpdateNumber)
                             {
                                 matchedProduct.UpdateNumbers = GetUpdates(start.Value, end);
                             }
-                            else if (requestEditionNumber < matchedProduct.EditionNumber || requestUpdateNumber < activeEditionUpdateNumber)
+                            else if (requestEditionNumber < matchedProduct.EditionNumber ||
+                                     requestUpdateNumber < activeEditionUpdateNumber)
                             {
-                                matchedProduct.UpdateNumbers = activeEditionUpdateNumber == 0 ? new List<int?>() : GetUpdates(start.Value, end);
+                                matchedProduct.UpdateNumbers = activeEditionUpdateNumber == 0
+                                    ? new List<int?>()
+                                    : GetUpdates(start.Value, end);
                             }
 
                             break;
@@ -204,15 +282,17 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                         break;
                 }
 
-                matchedProducts.Add(matchedProduct);
+                productResponse.ProductCounts.ReturnedProductCount++;
+                productResponse.Products.Add(matchedProduct);
             }
 
-            if (matchedProducts.Count == 0)
+            if (!productResponse.Products.Any())
             {
-                return productsInDatabase ? (matchedProducts, GetProductVersionResponseEnum.NoUpdatesFound) : (matchedProducts, GetProductVersionResponseEnum.NoProductsFound);
+                return productsInDatabase ? (productResponse, GetProductVersionResponseEnum.NoUpdatesFound) : (productResponse, GetProductVersionResponseEnum.NoProductsFound);
             }
 
-            return (matchedProducts, GetProductVersionResponseEnum.UpdatesFound);
+
+            return (productResponse, GetProductVersionResponseEnum.UpdatesFound);
         }
 
         public async Task<(bool isModified, DateTime? dateEntered)> CheckIfCatalogueModified(DateTime? ifModifiedSince)
@@ -308,7 +388,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                     ReturnedProductCount = 0,
                     RequestedProductCount = 0,
                     RequestedProductsAlreadyUpToDateCount = 0,
-                    RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>()
                 }
             };
 

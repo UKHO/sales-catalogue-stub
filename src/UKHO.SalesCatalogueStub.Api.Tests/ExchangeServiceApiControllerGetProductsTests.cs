@@ -33,7 +33,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     RequestedProductCount = 0,
                     RequestedProductsAlreadyUpToDateCount = 0,
                     ReturnedProductCount = 2,
-                    RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>()
                 },
                 Products = new Products
                 {
@@ -65,7 +65,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                     RequestedProductCount = 0,
                     RequestedProductsAlreadyUpToDateCount = 0,
                     ReturnedProductCount = 2,
-                    RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>()
                 },
                 Products = new Products
                 {
@@ -84,7 +84,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             A.CallTo(() => _productRepo.GetProductEditionsSinceDateTime(A<DateTime>.Ignored)).Returns(productResponse);
             const string expectedJson =
-                "{\r\n  \"products\": [\r\n    {\r\n      \"productName\": \"AU220120\",\r\n      \"editionNumber\": 1,\r\n      \"updateNumbers\": [\r\n        1,\r\n        2,\r\n        3\r\n      ],\r\n      \"fileSize\": 100\r\n    },\r\n    {\r\n      \"productName\": \"EG3GOA01\",\r\n      \"editionNumber\": 1,\r\n      \"updateNumbers\": [\r\n        1,\r\n        2,\r\n        3\r\n      ],\r\n      \"fileSize\": 100\r\n    }\r\n  ],\r\n  \"productCounts\": {\r\n    \"requestedProductCount\": 0,\r\n    \"returnedProductCount\": 2,\r\n    \"requestedProductsAlreadyUpToDateCount\": 0,\r\n    \"requestedProductsNotInExchangeSet\": []\r\n  }\r\n}";
+                "{\r\n  \"products\": [\r\n    {\r\n      \"productName\": \"AU220120\",\r\n      \"editionNumber\": 1,\r\n      \"updateNumbers\": [\r\n        1,\r\n        2,\r\n        3\r\n      ],\r\n      \"fileSize\": 100\r\n    },\r\n    {\r\n      \"productName\": \"EG3GOA01\",\r\n      \"editionNumber\": 1,\r\n      \"updateNumbers\": [\r\n        1,\r\n        2,\r\n        3\r\n      ],\r\n      \"fileSize\": 100\r\n    }\r\n  ],\r\n  \"productCounts\": {\r\n    \"requestedProductCount\": 0,\r\n    \"returnedProductCount\": 2,\r\n    \"requestedProductsAlreadyUpToDateCount\": 0,\r\n    \"requestedProductsNotReturned\": []\r\n  }\r\n}";
             var response = await _exchangeServiceApiController.GetProducts("AVCS", A.Dummy<DateTime>()) as ObjectResult;
             response?.Value.Should().BeEquivalentTo(expectedJson);
         }

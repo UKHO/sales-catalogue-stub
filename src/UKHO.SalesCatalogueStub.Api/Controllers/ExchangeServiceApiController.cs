@@ -135,7 +135,7 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
                 GetProductVersionResponseEnum.UpdatesFound => StatusCode(200,
                     JsonConvert.SerializeObject(products, Formatting.Indented,
                         new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore })),
-                _ => StatusCode(400, default(ErrorDescription))
+                _ => throw new NotImplementedException()
             };
         }
     }
