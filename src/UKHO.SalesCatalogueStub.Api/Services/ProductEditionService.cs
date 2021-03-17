@@ -236,7 +236,8 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 {
                     case ProductEditionStatusEnum.Cancelled:
                         {
-                            var productCancelledDate = productDbMatch.LastUpdateIssueDate.Value;
+                            var productCancelledDate = productDbMatch.LastUpdateIssueDate ?? productDbMatch.EditionDate;
+                            
                             var days = DateTime.Today.Subtract(productCancelledDate.Date).TotalDays;
 
                             if (days > 365)
