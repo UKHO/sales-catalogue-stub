@@ -1,7 +1,7 @@
 ﻿#pragma warning disable 1591
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 
 namespace UKHO.SalesCatalogueStub.Api.Middleware
 {
@@ -19,20 +19,20 @@ namespace UKHO.SalesCatalogueStub.Api.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            try
+            await _next(context);
+
+            if (context.Response.StatusCode == 500)
             {
-                await _next(context);
+                return;
             }
-            finally
-            {
-                _logger.LogInformation(
-                    "Request {host} {method} {url} {queryString} => Status Code {statusCode}",
-                    context.Request?.Host,
-                    context.Request?.Method,
-                    context.Request?.Path.Value,
-                    context.Request?.QueryString,
-                    context.Response?.StatusCode);
-            }
+
+            _logger.LogInformation(
+                "Request {host} {method} {url} {queryString} => Status Code {statusCode}",
+                context.Request?.Host,
+                context.Request?.Method,
+                context.Request?.Path.Value,
+                context.Request?.QueryString,
+                context.Response?.StatusCode);
         }
 
     }
