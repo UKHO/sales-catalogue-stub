@@ -65,8 +65,13 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
             foreach (var product in distinctProducts)
             {
-                if (product == null)
+                if (string.IsNullOrWhiteSpace(product))
                 {
+                    productResponse.ProductCounts.RequestedProductsNotReturned.Add(new RequestedProductsNotReturned
+                    {
+                        ProductName = string.Empty,
+                        Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum
+                    });
                     continue;
                 }
 
@@ -89,24 +94,27 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
                     if (activeEdition.LatestStatus == ProductEditionStatusEnum.Cancelled)
                     {
-                        var productCancelledDate = activeEdition.LastUpdated.Value;
-                        var days = DateTime.Today.Subtract(productCancelledDate.Date).TotalDays;
-
-                        if (days > 365)
+                        if (activeEdition.LastUpdateIssueDate.HasValue)
                         {
-                            // Old product, do not return with data; just add to the RequestedProductsNotReturned
-                            productResponse.ProductCounts.RequestedProductsNotReturned.Add(
-                                new RequestedProductsNotReturned
-                                {
-                                    ProductName = product,
-                                    Reason = RequestedProductsNotReturned.ReasonEnum.NoDataAvailableForCancelledProductEnum
-                                });
+                            var productCancelledDate = activeEdition.LastUpdateIssueDate.Value;
 
-                            continue;
+                            var days = DateTime.Today.Subtract(productCancelledDate.Date).TotalDays;
 
+                            if (days > 365)
+                            {
+                                // Old product, do not return with data; just add to the RequestedProductsNotReturned
+                                productResponse.ProductCounts.RequestedProductsNotReturned.Add(
+                                    new RequestedProductsNotReturned
+                                    {
+                                        ProductName = product,
+                                        Reason = RequestedProductsNotReturned.ReasonEnum
+                                            .NoDataAvailableForCancelledProductEnum
+                                    });
+
+                                continue;
+
+                            }
                         }
-
-
 
                         productsInner.Cancellation = GetCancellation(activeEditionUpdateNumber);
                     }
@@ -125,6 +133,7 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                         $"{nameof(ProductEditionService)} no match found for product {product}");
                 }
             }
+
 
             return productResponse;
         }

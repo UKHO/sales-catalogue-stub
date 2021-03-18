@@ -47,7 +47,6 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(0);
             serviceResponse.ProductCounts.RequestedProductCount.Should().Be(1);
             serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            serviceResponse.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
         }
 
         [Test]
@@ -75,7 +74,6 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(0);
             serviceResponse.ProductCounts.RequestedProductCount.Should().Be(1);
             serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
-            serviceResponse.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
         }
 
         [Test]
@@ -335,7 +333,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                         EditionNumber = editionNumber.ToString(),
                         UpdateNumber = updateNumber,
                         LastReissueUpdateNumber = lastReissueUpdateNumber,
-                        LastUpdated = DateTime.Now.AddDays(daysSinceUpdate)
+                        LastUpdateIssueDate = DateTime.Now.AddDays(daysSinceUpdate)
                     }
                 },
                 ProductType = new ProductType { Name = productType }
