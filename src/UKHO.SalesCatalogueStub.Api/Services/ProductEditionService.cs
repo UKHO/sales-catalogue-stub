@@ -236,21 +236,26 @@ namespace UKHO.SalesCatalogueStub.Api.Services
                 {
                     case ProductEditionStatusEnum.Cancelled:
                         {
-                            var productCancelledDate = productDbMatch.LastUpdated.Value;
-                            var days = DateTime.Today.Subtract(productCancelledDate.Date).TotalDays;
-
-                            if (days > 365)
+                            if (productDbMatch.LastUpdateIssueDate.HasValue)
                             {
-                                // Old product, do not return with data; just add to the RequestedProductsNotReturned
-                                productResponse.ProductCounts.RequestedProductsNotReturned.Add(
-                                    new RequestedProductsNotReturned
-                                    {
-                                        ProductName = requestProduct.ProductName,
-                                        Reason = RequestedProductsNotReturned.ReasonEnum.NoDataAvailableForCancelledProductEnum
-                                    });
+                                var productCancelledDate = productDbMatch.LastUpdateIssueDate.Value;
 
-                                continue;
+                                var days = DateTime.Today.Subtract(productCancelledDate.Date).TotalDays;
 
+                                if (days > 365)
+                                {
+                                    // Old product, do not return with data; just add to the RequestedProductsNotReturned
+                                    productResponse.ProductCounts.RequestedProductsNotReturned.Add(
+                                        new RequestedProductsNotReturned
+                                        {
+                                            ProductName = requestProduct.ProductName,
+                                            Reason = RequestedProductsNotReturned.ReasonEnum
+                                                .NoDataAvailableForCancelledProductEnum
+                                        });
+
+                                    continue;
+
+                                }
                             }
 
                             matchedProduct.Cancellation = new Cancellation

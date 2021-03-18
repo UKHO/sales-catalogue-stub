@@ -724,7 +724,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                         EditionNumber = editionNumber.ToString(),
                         UpdateNumber = updateNumber,
                         LastReissueUpdateNumber = LastReissueUpdateNumber,
-                        LastUpdated = lastUpdated
+                        LastUpdateIssueDate = lastUpdated
                     }
                 },
                 ProductType = new ProductType { Name = productType }
