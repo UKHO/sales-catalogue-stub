@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Annotations;
 using UKHO.SalesCatalogueStub.Api.Attributes;
 using UKHO.SalesCatalogueStub.Api.Models;
 using UKHO.SalesCatalogueStub.Api.Services;
@@ -95,9 +95,9 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual async Task<IActionResult> PostProductIdentifiers([FromRoute][Required] string productType, [FromBody] List<string> body)
         {
-            var productVersions = await _productEditionService.GetProductEditions(body);
+            var productVersions = await _productEditionService.GetProductIdentifiers(body);
 
-            return !productVersions.Any() ? StatusCode(400, default(ErrorDescription)) : StatusCode(200, JsonConvert.SerializeObject(productVersions, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }));
+            return !productVersions.Products.Any() ? StatusCode(400, default(ErrorDescription)) : StatusCode(200, JsonConvert.SerializeObject(productVersions, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }));
         }
 
         /// <summary>

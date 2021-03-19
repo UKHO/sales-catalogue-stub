@@ -1,12 +1,12 @@
-﻿using FakeItEasy;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using FakeItEasy;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using UKHO.SalesCatalogueStub.Api.EF;
 using UKHO.SalesCatalogueStub.Api.EF.Models;
 using UKHO.SalesCatalogueStub.Api.Models;
@@ -41,9 +41,26 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         {
             PopulateTestProductData();
 
-            var serviceResponse = await _service.GetProductEditions(new List<string> { "" });
+            var serviceResponse = await _service.GetProductIdentifiers(new List<string> { "" });
 
-            serviceResponse.Count.Should().Be(0);
+            serviceResponse.Products.Should().NotBeNull().And.BeEmpty();
+            serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(0);
+            serviceResponse.ProductCounts.RequestedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+        }
+
+        [Test]
+        public async Task Calls_To_GetProductEditions_With_An_Invalid_Product_And_1_Valid_Returns_1_Product_Edition_Matches_And_1_Count_Reason()
+        {
+            PopulateTestProductData();
+
+            var serviceResponse = await _service.GetProductIdentifiers(new List<string> { "", "AU220120" });
+
+            serviceResponse.Products.Should().NotBeNull().And.HaveCount(1);
+            serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductCount.Should().Be(2);
+            serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            serviceResponse.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(1);
         }
 
         [Test]
@@ -51,16 +68,19 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         {
             PopulateTestProductData();
 
-            var serviceResponse = await _service.GetProductEditions(new List<string> { null });
+            var serviceResponse = await _service.GetProductIdentifiers(new List<string> { null });
 
-            serviceResponse.Count.Should().Be(0);
+            serviceResponse.Products.Should().NotBeNull().And.BeEmpty();
+            serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(0);
+            serviceResponse.ProductCounts.RequestedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
         }
 
         [Test]
         public void Calls_To_GetProductEditions_With_Null_Throws_ArgumentNullException()
         {
             PopulateTestProductData();
-            _service.Invoking(a => a.GetProductEditions(null)).Should().Throw<ArgumentNullException>();
+            _service.Invoking(a => a.GetProductIdentifiers(null)).Should().Throw<ArgumentNullException>();
         }
 
         [Test]
@@ -70,7 +90,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             // Add duplicate
             CreateProduct("EG3GOA01", 2, null, 0, ProductEditionStatusEnum.Base);
 
-            _service.Invoking(a => a.GetProductEditions(new List<string> { "EG3GOA01" })).Should()
+            _service.Invoking(a => a.GetProductIdentifiers(new List<string> { "EG3GOA01" })).Should()
                 .Throw<InvalidOperationException>();
         }
 
@@ -79,8 +99,13 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         {
             PopulateTestProductData();
 
-            var serviceResponse = await _service.GetProductEditions(new List<string> { "EG3GOA01", "EG3GOA01 ", "Eg3goa01", "EG3GOA01  " });
-            serviceResponse.Count.Should().Be(1);
+            var serviceResponse = await _service.GetProductIdentifiers(new List<string> { "EG3GOA01", "EG3GOA01 ", "Eg3goa01", "EG3GOA01  " });
+
+            serviceResponse.Products.Should().NotBeNull().And.HaveCount(1);
+            serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductCount.Should().Be(4);
+            serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            serviceResponse.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
         }
 
 
@@ -97,9 +122,15 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         {
             CreateProduct(productName, editionNumber, updateNumber, lastReissueUpdateNumber, latestStatus, productType);
 
-            var serviceResponse = await _service.GetProductEditions(new List<string> { productName });
+            var serviceResponse = await _service.GetProductIdentifiers(new List<string> { productName });
 
-            return serviceResponse.First().UpdateNumbers.Count;
+            serviceResponse.Products.Should().NotBeNull().And.HaveCount(1);
+            serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            serviceResponse.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
+
+            return serviceResponse.Products.First().UpdateNumbers.Count;
         }
 
         private static readonly object[] ProductEditionUpdateListCases =
@@ -121,9 +152,15 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         {
             CreateProduct(productName, editionNumber, updateNumber, lastReissueUpdateNumber, latestStatus, productType);
 
-            var serviceResponse = await _service.GetProductEditions(new List<string> { productName });
+            var serviceResponse = await _service.GetProductIdentifiers(new List<string> { productName });
 
-            serviceResponse.First().UpdateNumbers.Should().ContainInOrder(expected);
+            serviceResponse.Products.Should().NotBeNull().And.HaveCount(1);
+            serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            serviceResponse.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
+
+            serviceResponse.Products.First().UpdateNumbers.Should().ContainInOrder(expected);
         }
 
         private static readonly object[] ProductEditionCancellationCases =
@@ -136,17 +173,48 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
         [Test, TestCaseSource(nameof(ProductEditionCancellationCases))]
         public async Task
-            Calls_To_GetProductEditions_With_A_Matching_Cancelled_Product_Returns_A_Product_Edition_With_Cancellation_Details(
+            Calls_To_GetProductEditions_With_A_Matching_Cancelled_Product_Cancelled_In_Last_12Months_Returns_A_Product_Edition_With_Cancellation_Details(
                 string productName, int expectedEditionNumber, int expectedUpdateNumber)
         {
             PopulateTestProductData();
 
-            var serviceResponse = await _service.GetProductEditions(new List<string> { productName });
+            var serviceResponse = await _service.GetProductIdentifiers(new List<string> { productName });
 
-            var cancellation = serviceResponse.Single().Cancellation;
+            var cancellation = serviceResponse.Products.Single().Cancellation;
+
+            serviceResponse.Products.Should().NotBeNull().And.HaveCount(1);
+            serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            serviceResponse.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(0);
 
             cancellation.EditionNumber.Should().Be(expectedEditionNumber);
             cancellation.UpdateNumber.Should().Be(expectedUpdateNumber);
+        }
+
+        [TestCase("GB340060", 21, 1, 0, ProductEditionStatusEnum.Cancelled, -366, 0, 2)]
+        [TestCase("DE521860", 6, 1, 0, ProductEditionStatusEnum.Cancelled, -366, 0, 2)]
+        [TestCase("AU5143P1", 5, 10, 0, ProductEditionStatusEnum.Cancelled, -366, 0, 11)]
+        [TestCase("AU5164P1", 5, 14, 5, ProductEditionStatusEnum.Cancelled, -366, 0, 15)]
+        public async Task
+            Calls_To_GetProductEditions_With_A_Matching_Cancelled_Product_Cancelled_Greater_Than_12Months_Ago_Returns_Entry_In_Reasons(
+                string productName, int editionNumber, int updateNumber, int lastReissueNumber,
+                ProductEditionStatusEnum latestStatus, int daysSinceCancelled, int expectedEditionNumber,
+                int expectedUpdateNumber)
+        {
+            CreateProduct(productName, editionNumber, updateNumber, lastReissueNumber, latestStatus, ProductTypeNameEnum.Avcs, daysSinceCancelled);
+
+            var serviceResponse = await _service.GetProductIdentifiers(new List<string> { productName });
+
+            serviceResponse.Products.Should().NotBeNull().And.HaveCount(0);
+            serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(0);
+            serviceResponse.ProductCounts.RequestedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            serviceResponse.ProductCounts.RequestedProductsNotReturned.Should().HaveCount(1);
+
+            var reasons = serviceResponse.ProductCounts.RequestedProductsNotReturned.First();
+            reasons.ProductName.Should().Be(productName);
+            reasons.Reason.Should().Be(RequestedProductsNotReturned.ReasonEnum.NoDataAvailableForCancelledProductEnum);
         }
 
         private static readonly object[] ProductEditionWithoutCancellationCases =
@@ -164,24 +232,29 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
         {
             PopulateTestProductData();
 
-            var serviceResponse = await _service.GetProductEditions(new List<string> { productName });
+            var serviceResponse = await _service.GetProductIdentifiers(new List<string> { productName });
 
-            var cancellation = serviceResponse.Single().Cancellation;
+            var cancellation = serviceResponse.Products.Single().Cancellation;
+
+            serviceResponse.Products.Should().NotBeNull().And.HaveCount(1);
+            serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            serviceResponse.ProductCounts.RequestedProductsNotReturned.Should().BeEmpty();
 
             cancellation.Should().Be(null);
         }
 
         [Test]
-        public async Task
-            Calls_To_GetProductEditions_Should_Return_Expected_Model_Types()
+        public async Task Calls_To_GetProductEditions_Should_Return_Expected_Model_Types()
         {
             PopulateTestProductData();
             var productList = new List<string> { "JP54QNMK" };
 
-            var serviceResponse = await _service.GetProductEditions(productList);
+            var serviceResponse = await _service.GetProductIdentifiers(productList);
 
-            serviceResponse.Should().AllBeOfType<ProductsInner>();
-            serviceResponse.Should().BeOfType(typeof(Products));
+            serviceResponse.Products.Should().AllBeOfType<ProductsInner>();
+            serviceResponse.Should().BeOfType(typeof(ProductResponse));
         }
 
         [Test]
@@ -191,9 +264,15 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             PopulateTestProductData();
             var productList = new List<string> { "JP54QNMK" };
 
-            var serviceResponse = await _service.GetProductEditions(productList);
+            var serviceResponse = await _service.GetProductIdentifiers(productList);
 
-            serviceResponse.Should().BeEquivalentTo(new List<ProductsInner>
+            serviceResponse.Products.Should().NotBeNull().And.HaveCount(1);
+            serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductCount.Should().Be(1);
+            serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            serviceResponse.ProductCounts.RequestedProductsNotReturned.Should().BeEmpty();
+
+            serviceResponse.Products.Should().BeEquivalentTo(new List<ProductsInner>
             {
                 new ProductsInner()
                 {
@@ -214,10 +293,16 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
             var productList = new List<string> { "JP54QNMK", "AU5143P1" };
 
-            var serviceResponse = await _service.GetProductEditions(productList);
+            var serviceResponse = await _service.GetProductIdentifiers(productList);
 
-            var jpProduct = serviceResponse.Single(a => a.ProductName == "JP54QNMK");
-            var auProduct = serviceResponse.Single(a => a.ProductName == "AU5143P1");
+            var jpProduct = serviceResponse.Products.Single(a => a.ProductName == "JP54QNMK");
+            var auProduct = serviceResponse.Products.Single(a => a.ProductName == "AU5143P1");
+
+            serviceResponse.Products.Should().NotBeNull().And.HaveCount(2);
+            serviceResponse.ProductCounts.ReturnedProductCount.Should().Be(2);
+            serviceResponse.ProductCounts.RequestedProductCount.Should().Be(2);
+            serviceResponse.ProductCounts.RequestedProductsAlreadyUpToDateCount.Should().Be(0);
+            serviceResponse.ProductCounts.RequestedProductsNotReturned.Should().BeEmpty();
 
             jpProduct.UpdateNumbers.Should().BeEquivalentTo(new List<int?> { 7 });
             jpProduct.Cancellation.Should().BeNull();
@@ -235,7 +320,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
 
 
         private void CreateProduct(string productName, int? editionNumber, int? updateNumber, int? lastReissueUpdateNumber,
-            ProductEditionStatusEnum latestStatus, ProductTypeNameEnum productType = ProductTypeNameEnum.Avcs)
+            ProductEditionStatusEnum latestStatus, ProductTypeNameEnum productType = ProductTypeNameEnum.Avcs, int daysSinceUpdate = 0)
         {
             var newProduct = new Product
             {
@@ -247,7 +332,8 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                         EditionIdentifier = productName,
                         EditionNumber = editionNumber.ToString(),
                         UpdateNumber = updateNumber,
-                        LastReissueUpdateNumber = lastReissueUpdateNumber
+                        LastReissueUpdateNumber = lastReissueUpdateNumber,
+                        LastUpdateIssueDate = DateTime.Now.AddDays(daysSinceUpdate)
                     }
                 },
                 ProductType = new ProductType { Name = productType }
@@ -264,10 +350,10 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
             CreateProduct("1U420222", 1, 5, 3, ProductEditionStatusEnum.Updated);
             CreateProduct("JP54QNMK", 12, 7, 7, ProductEditionStatusEnum.Reissued);
             CreateProduct("JP44MON8", 12, 5, 5, ProductEditionStatusEnum.Reissued);
-            CreateProduct("GB340060", 21, 1, 0, ProductEditionStatusEnum.Cancelled);
-            CreateProduct("DE521860", 6, 1, 0, ProductEditionStatusEnum.Cancelled);
-            CreateProduct("AU5143P1", 5, 10, 0, ProductEditionStatusEnum.Cancelled);
-            CreateProduct("AU5164P1", 5, 14, 5, ProductEditionStatusEnum.Cancelled);
+            CreateProduct("GB340060", 21, 1, 0, ProductEditionStatusEnum.Cancelled, ProductTypeNameEnum.Avcs, -300);
+            CreateProduct("DE521860", 6, 1, 0, ProductEditionStatusEnum.Cancelled, ProductTypeNameEnum.Avcs, -300);
+            CreateProduct("AU5143P1", 5, 10, 0, ProductEditionStatusEnum.Cancelled, ProductTypeNameEnum.Avcs, -300);
+            CreateProduct("AU5164P1", 5, 14, 5, ProductEditionStatusEnum.Cancelled, ProductTypeNameEnum.Avcs, -300);
         }
     }
 }

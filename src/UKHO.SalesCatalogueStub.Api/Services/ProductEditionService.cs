@@ -37,12 +37,24 @@ namespace UKHO.SalesCatalogueStub.Api.Services
             _logger = logger;
         }
 
-        public async Task<Products> GetProductEditions(List<string> products)
+        public async Task<ProductResponse> GetProductIdentifiers(List<string> products)
         {
             if (products == null)
             {
                 throw new ArgumentNullException(nameof(products));
             }
+
+            var productResponse = new ProductResponse
+            {
+                Products = new Products(),
+                ProductCounts = new ProductCounts
+                {
+                    ReturnedProductCount = 0,
+                    RequestedProductCount = products.Count,
+                    RequestedProductsAlreadyUpToDateCount = 0,
+                    RequestedProductsNotReturned = new List<RequestedProductsNotReturned>()
+                }
+            };
 
             var distinctProducts = products
                 .GroupBy(item => item?.Trim(), StringComparer.OrdinalIgnoreCase)
@@ -53,8 +65,13 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
             foreach (var product in distinctProducts)
             {
-                if (product == null)
+                if (string.IsNullOrWhiteSpace(product))
                 {
+                    productResponse.ProductCounts.RequestedProductsNotReturned.Add(new RequestedProductsNotReturned
+                    {
+                        ProductName = string.Empty,
+                        Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum
+                    });
                     continue;
                 }
 
@@ -77,19 +94,48 @@ namespace UKHO.SalesCatalogueStub.Api.Services
 
                     if (activeEdition.LatestStatus == ProductEditionStatusEnum.Cancelled)
                     {
+                        if (activeEdition.LastUpdateIssueDate.HasValue)
+                        {
+                            var productCancelledDate = activeEdition.LastUpdateIssueDate.Value;
+
+                            var days = DateTime.Today.Subtract(productCancelledDate.Date).TotalDays;
+
+                            if (days > 365)
+                            {
+                                // Old product, do not return with data; just add to the RequestedProductsNotReturned
+                                productResponse.ProductCounts.RequestedProductsNotReturned.Add(
+                                    new RequestedProductsNotReturned
+                                    {
+                                        ProductName = product,
+                                        Reason = RequestedProductsNotReturned.ReasonEnum
+                                            .NoDataAvailableForCancelledProductEnum
+                                    });
+
+                                continue;
+
+                            }
+                        }
+
                         productsInner.Cancellation = GetCancellation(activeEditionUpdateNumber);
                     }
 
-                    matchedProducts.Add(productsInner);
+                    productResponse.Products.Add(productsInner);
+                    productResponse.ProductCounts.ReturnedProductCount++;
                 }
                 else
                 {
+                    productResponse.ProductCounts.RequestedProductsNotReturned.Add(new RequestedProductsNotReturned
+                    {
+                        ProductName = product,
+                        Reason = RequestedProductsNotReturned.ReasonEnum.InvalidProductEnum
+                    });
                     _logger.LogInformation(
                         $"{nameof(ProductEditionService)} no match found for product {product}");
                 }
             }
 
-            return matchedProducts;
+
+            return productResponse;
         }
 
         public async Task<(ProductResponse, GetProductVersionResponseEnum)> GetProductVersions(ProductVersions productVersions)
