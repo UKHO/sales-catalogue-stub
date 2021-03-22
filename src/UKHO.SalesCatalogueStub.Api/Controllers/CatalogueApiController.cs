@@ -55,18 +55,18 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
         public virtual async Task<IActionResult> GetCatalogue([FromRoute][Required] string productType, [FromRoute][Required] string catalogueType, [FromHeader] DateTime? ifModifiedSince)
         {
-
             var checkIfCatalogueModified = await _productEditionService.CheckIfCatalogueModified(ifModifiedSince);
+
             Response?.Headers.Add("LastModified", checkIfCatalogueModified.dateEntered?.ToString());
 
             if (!checkIfCatalogueModified.isModified)
             {
                 return StatusCode(304, null);
             }
+
             var catalogue = await _productEditionService.GetCatalogue();
+
             return StatusCode(200, JsonConvert.SerializeObject(catalogue, Formatting.Indented));
-
-
         }
     }
 }
