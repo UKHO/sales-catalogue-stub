@@ -76,11 +76,22 @@ namespace UKHO.SalesCatalogueStub.Api
                     // Use [ValidateModelState] on Actions to actually validate it in C# as well!
                     c.OperationFilter<GeneratePathParamsValidationFilter>();
 
-                    c.AddSecurityDefinition("jwtBearerAuth", new OpenApiSecurityScheme
+                    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                     {
+                        Description = "JWT Authorization header using the Bearer scheme.",
                         Type = SecuritySchemeType.Http,
-                        Scheme = "bearer",
-                        BearerFormat = "JWT"
+                        Scheme = "bearer"
+                    });
+
+                    c.AddSecurityRequirement(new OpenApiSecurityRequirement{
+                        {
+                            new OpenApiSecurityScheme{
+                                Reference = new OpenApiReference{
+                                    Id = "Bearer",
+                                    Type = ReferenceType.SecurityScheme
+                                }
+                            }, new List<string>()
+                        }
                     });
                 });
 

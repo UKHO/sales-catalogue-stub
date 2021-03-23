@@ -1,6 +1,6 @@
-﻿using NetTopologySuite.Geometries;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using NetTopologySuite.Geometries;
 
 namespace UKHO.SalesCatalogueStub.Api.EF.Models
 {
