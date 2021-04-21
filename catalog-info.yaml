@@ -2,8 +2,14 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: sales-catalogue-stub
+  description: A temporary service to enable the creation of the ADDS Exchange Set Service
   annotations:
     github.com/project-slug: UKHO/sales-catalogue-stub
 spec:
-  type: other
-  lifecycle: unknown
+  type: service
+  lifecycle: experimental
+  owner: Tamatoa
+  system: ADDS
+  providesApis:
+    - CatalogueApi
+    - ExchangeServiceApi
