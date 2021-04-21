@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sales-catalogue-stub
+  annotations:
+    github.com/project-slug: UKHO/sales-catalogue-stub
+spec:
+  type: other
+  lifecycle: unknown
