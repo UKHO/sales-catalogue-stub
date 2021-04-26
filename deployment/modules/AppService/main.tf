@@ -1,5 +1,6 @@
 locals {
-  basename = "M-${var.servicename}-${var.role}-${var.deploy_environment}-appservice"
+  basename       = "M-${var.servicename}-${var.role}-${var.deploy_environment}-appservice"
+  ipRestrictions = ["${var.eng_outgoing_ip}/32", "${var.ukho_main_outgoing_ip}/32", "59.160.23.25", "210.18.83.151", "81.145.145.150"]
 }
 
 data "azurerm_virtual_network" "vnet" {
@@ -8,9 +9,9 @@ data "azurerm_virtual_network" "vnet" {
 }
 
 data "azurerm_subnet" "subnet" {
-  name                = var.spoke_subnet_name
+  name                 = var.spoke_subnet_name
   virtual_network_name = data.azurerm_virtual_network.vnet.name
-  resource_group_name = var.spoke_rg
+  resource_group_name  = var.spoke_rg
 }
 
 resource "azurerm_app_service" "main" {
@@ -30,9 +31,9 @@ resource "azurerm_app_service" "main" {
       }
     }
     dynamic "ip_restriction" {
-      for_each = ["${var.eng_outgoing_ip}/32", "${var.ukho_main_outgoing_ip}/32"] 
+      for_each = local.ipRestrictions
       content {
-        ip_address  = ip_restriction.value
+        ip_address = ip_restriction.value
       }
     }
   }
@@ -59,8 +60,8 @@ resource "azurerm_app_service" "main" {
 
 resource "azurerm_key_vault_access_policy" "kvpolicy" {
   key_vault_id = var.key_vault_id
-  tenant_id = azurerm_app_service.main.identity.0.tenant_id
-  object_id = azurerm_app_service.main.identity.0.principal_id
+  tenant_id    = azurerm_app_service.main.identity.0.tenant_id
+  object_id    = azurerm_app_service.main.identity.0.principal_id
   secret_permissions = [
     "get",
     "list",
