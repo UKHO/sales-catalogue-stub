@@ -1,6 +1,6 @@
 locals {
   basename       = "M-${var.servicename}-${var.role}-${var.deploy_environment}-appservice"
-  ipRestrictions = ["${var.eng_outgoing_ip}/32", "${var.ukho_main_outgoing_ip}/32", var.mastekIp1, var.mastekIp2, var.mastekIp3]
+  ipRestrictions = ["${var.eng_outgoing_ip}/32", "${var.ukho_main_outgoing_ip}/32", "${var.mastekIp1}/32", "${var.mastekIp2}/32", "${var.mastekIp3}/32"]
 }
 
 data "azurerm_virtual_network" "vnet" {
