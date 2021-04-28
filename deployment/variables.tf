@@ -1,18 +1,18 @@
 variable "MAIN_LOCATION" {
-  type    = string
+  type = string
 }
 variable "DEPLOY_ENVIRONMENT" {
-  type    = string
+  type = string
 }
 variable "ENV_CONTEXT" {
-  type    = string
+  type = string
 }
 variable "SERVICENAME" {
-  type    = string
+  type = string
 }
 
 variable "WEBSITE_DNS_SERVER" {
-  type    = string
+  type = string
 }
 variable "API_ENG_OUTGOING_IP" {
   type = string
@@ -38,5 +38,17 @@ variable "KV_ACCESS_POLICY_GROUP_OBJECT_ID" {
 }
 
 variable "KV_ACCESS_POLICY_PIPELINE_OBJECT_ID" {
+  type = string
+}
+
+variable "API-MASTEK-IP-1" {
+  type = string
+}
+
+variable "API-MASTEK-IP-2" {
+  type = string
+}
+
+variable "API-MASTEK-IP-3" {
   type = string
 }
