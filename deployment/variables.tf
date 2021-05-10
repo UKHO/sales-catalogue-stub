@@ -52,3 +52,7 @@ variable "API-MASTEK-IP-2" {
 variable "API-MASTEK-IP-3" {
   type = string
 }
+
+variable "API-MASTEK-IP-JUMP-BOX" {
+  type = string
+}

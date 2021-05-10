@@ -87,6 +87,7 @@ module "app_service" {
   mastekIp1                = var.API-MASTEK-IP-1
   mastekIp2                = var.API-MASTEK-IP-2
   mastekIp3                = var.API-MASTEK-IP-3
+  mastekJumpbox            = var.API-MASTEK-IP-JUMP-BOX
 }
 
 module "event_hub_rg" {
