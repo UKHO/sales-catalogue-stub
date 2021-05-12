@@ -55,6 +55,7 @@ stages:
                     TF_VAR_API-MASTEK-IP-1: $(TERRAFORM-API-MASTEK-IP-1) 
                     TF_VAR_API-MASTEK-IP-2: $(TERRAFORM-API-MASTEK-IP-2) 
                     TF_VAR_API-MASTEK-IP-3: $(TERRAFORM-API-MASTEK-IP-3) 
+                    TF_VAR_API-MASTEK-IP-JUMP-BOX: $(TERRAFORM-API-MASTEK-IP-JUMP-BOX) 
                     STORAGE_ACCOUNT_NAME: $(TERRAFORM-STORAGE-ACCOUNT-NAME)
                     RESOURCE_GROUP_NAME: $(TERRAFORM-RESOURCE-GROUP-NAME)
                 - bash: |
@@ -86,6 +87,7 @@ stages:
                     TF_VAR_API-MASTEK-IP-1: $(TERRAFORM-API-MASTEK-IP-1) 
                     TF_VAR_API-MASTEK-IP-2: $(TERRAFORM-API-MASTEK-IP-2) 
                     TF_VAR_API-MASTEK-IP-3: $(TERRAFORM-API-MASTEK-IP-3) 
+                    TF_VAR_API-MASTEK-IP-JUMP-BOX: $(TERRAFORM-API-MASTEK-IP-JUMP-BOX) 
 
   - stage: QA
     dependsOn: []
@@ -138,6 +140,7 @@ stages:
                     TF_VAR_API-MASTEK-IP-1: $(TERRAFORM-API-MASTEK-IP-1) 
                     TF_VAR_API-MASTEK-IP-2: $(TERRAFORM-API-MASTEK-IP-2) 
                     TF_VAR_API-MASTEK-IP-3: $(TERRAFORM-API-MASTEK-IP-3) 
+                    TF_VAR_API-MASTEK-IP-JUMP-BOX: $(TERRAFORM-API-MASTEK-IP-JUMP-BOX) 
                     STORAGE_ACCOUNT_NAME: $(TERRAFORM-STORAGE-ACCOUNT-NAME)
                     RESOURCE_GROUP_NAME: $(TERRAFORM-RESOURCE-GROUP-NAME)
                 - bash: |
@@ -169,3 +172,4 @@ stages:
                     TF_VAR_API-MASTEK-IP-1: $(TERRAFORM-API-MASTEK-IP-1) 
                     TF_VAR_API-MASTEK-IP-2: $(TERRAFORM-API-MASTEK-IP-2) 
                     TF_VAR_API-MASTEK-IP-3: $(TERRAFORM-API-MASTEK-IP-3) 
+                    TF_VAR_API-MASTEK-IP-JUMP-BOX: $(TERRAFORM-API-MASTEK-IP-JUMP-BOX) 

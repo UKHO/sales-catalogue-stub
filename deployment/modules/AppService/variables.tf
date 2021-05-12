@@ -79,3 +79,6 @@ variable "mastekIp2" {
 variable "mastekIp3" {
   type = string
 }
+variable "mastekJumpbox" {
+  type = string
+}
