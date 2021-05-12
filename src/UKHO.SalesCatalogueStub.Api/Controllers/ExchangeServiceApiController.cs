@@ -51,7 +51,8 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual async Task<IActionResult> GetProducts([FromRoute][Required] string productType, [FromQuery] DateTime? sinceDateTime)
+        public virtual async Task<IActionResult> GetProducts([FromRoute][Required] string productType,
+            [FromQuery] DateTime? sinceDateTime)
         {
             if (!sinceDateTime.HasValue)
             {
@@ -60,13 +61,17 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
 
             var productEditions = await _productEditionService.GetProductEditionsSinceDateTime(sinceDateTime.Value);
 
-            return !productEditions.Products.Any()
-                ? StatusCode(304, default(ErrorDescription))
-                : StatusCode(200, JsonConvert.SerializeObject(productEditions, Formatting.Indented,
-                        new JsonSerializerSettings()
-                        {
-                            NullValueHandling = NullValueHandling.Ignore
-                        }));
+
+            if (!productEditions.Products.Any())
+            {
+                StatusCode(304, default(ErrorDescription));
+            }
+
+            return new JsonResult(productEditions, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            })
+            { StatusCode = 200 };
         }
 
         /// <summary>
@@ -93,11 +98,21 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual async Task<IActionResult> PostProductIdentifiers([FromRoute][Required] string productType, [FromBody] List<string> body)
+        public virtual async Task<IActionResult> PostProductIdentifiers([FromRoute][Required] string productType,
+            [FromBody] List<string> body)
         {
             var productVersions = await _productEditionService.GetProductIdentifiers(body);
 
-            return !productVersions.Products.Any() ? StatusCode(400, default(ErrorDescription)) : StatusCode(200, JsonConvert.SerializeObject(productVersions, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }));
+            if (!productVersions.Products.Any())
+            {
+                StatusCode(400, default(ErrorDescription));
+            }
+
+            return new JsonResult(productVersions, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            })
+            { StatusCode = 200 };
         }
 
         /// <summary>
@@ -124,7 +139,8 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(DefaultErrorResponse), description: "Not found.")]
         [SwaggerResponse(statusCode: 406, type: typeof(DefaultErrorResponse), description: "Not acceptable.")]
         [SwaggerResponse(statusCode: 500, type: typeof(DefaultErrorResponse), description: "Internal Server Error.")]
-        public virtual async Task<IActionResult> PostProductVersions([FromRoute][Required] string productType, [FromBody] ProductVersions body)
+        public virtual async Task<IActionResult> PostProductVersions([FromRoute][Required] string productType,
+            [FromBody] ProductVersions body)
         {
             var (products, response) = await _productEditionService.GetProductVersions(body);
 
@@ -132,9 +148,11 @@ namespace UKHO.SalesCatalogueStub.Api.Controllers
             {
                 GetProductVersionResponseEnum.NoProductsFound => StatusCode(400, default(ErrorDescription)),
                 GetProductVersionResponseEnum.NoUpdatesFound => StatusCode(304, default(ErrorDescription)),
-                GetProductVersionResponseEnum.UpdatesFound => StatusCode(200,
-                    JsonConvert.SerializeObject(products, Formatting.Indented,
-                        new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore })),
+                GetProductVersionResponseEnum.UpdatesFound => new JsonResult(products, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                })
+                { StatusCode = 200 },
                 _ => throw new NotImplementedException()
             };
         }
