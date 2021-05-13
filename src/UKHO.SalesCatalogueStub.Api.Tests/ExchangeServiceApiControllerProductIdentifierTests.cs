@@ -54,7 +54,7 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                 "AU220120", "EG3GOA01"
             };
             A.CallTo(() => _productRepo.GetProductIdentifiers(testData)).Returns(productResponse);
-            var response = await _exchangeServiceApiController.PostProductIdentifiers("AVCS", testData) as ObjectResult;
+            var response = await _exchangeServiceApiController.PostProductIdentifiers("AVCS", testData) as JsonResult;
             response?.StatusCode.Should().Be(200);
             response.Should().NotBeNull();
         }
@@ -91,11 +91,9 @@ namespace UKHO.SalesCatalogueStub.Api.Tests
                 }
             };
 
-            const string expectedJson =
-                "{\r\n  \"products\": [\r\n    {\r\n      \"productName\": \"AU220120\",\r\n      \"editionNumber\": 1,\r\n      \"updateNumbers\": [\r\n        1,\r\n        2,\r\n        3\r\n      ],\r\n      \"fileSize\": 100\r\n    },\r\n    {\r\n      \"productName\": \"EG3GOA01\",\r\n      \"editionNumber\": 1,\r\n      \"updateNumbers\": [\r\n        1,\r\n        2,\r\n        3\r\n      ],\r\n      \"fileSize\": 100\r\n    }\r\n  ],\r\n  \"productCounts\": {\r\n    \"requestedProductCount\": 0,\r\n    \"returnedProductCount\": 2,\r\n    \"requestedProductsAlreadyUpToDateCount\": 0,\r\n    \"requestedProductsNotReturned\": []\r\n  }\r\n}";
             A.CallTo(() => _productRepo.GetProductIdentifiers(testData)).Returns(productResponse);
-            var response = await _exchangeServiceApiController.PostProductIdentifiers("AVCS", testData) as ObjectResult;
-            response?.Value.Should().BeEquivalentTo(expectedJson);
+            var response = await _exchangeServiceApiController.PostProductIdentifiers("AVCS", testData) as JsonResult;
+            response?.Value.Should().BeOfType<ProductResponse>();
             response.Should().NotBeNull();
         }
 
