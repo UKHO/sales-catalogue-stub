@@ -84,10 +84,6 @@ module "app_service" {
   spoke_vnet_name          = var.SPOKE_VNET_NAME
   spoke_subnet_name        = var.SPOKE_SUBNET_NAME
   spoke_rg                 = var.SPOKE_RG
-  mastekIp1                = var.API-MASTEK-IP-1
-  mastekIp2                = var.API-MASTEK-IP-2
-  mastekIp3                = var.API-MASTEK-IP-3
-  mastekJumpbox            = var.API-MASTEK-IP-JUMP-BOX
 }
 
 module "event_hub_rg" {

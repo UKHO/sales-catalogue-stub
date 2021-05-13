@@ -1,6 +1,5 @@
 locals {
   basename       = "M-${var.servicename}-${var.role}-${var.deploy_environment}-appservice"
-  ipRestrictions = ["${var.eng_outgoing_ip}/32", "${var.ukho_main_outgoing_ip}/32", "${var.mastekIp1}/32", "${var.mastekIp2}/32", "${var.mastekIp3}/32", "${var.mastekJumpbox}/32"]
 }
 
 data "azurerm_virtual_network" "vnet" {
@@ -30,12 +29,7 @@ resource "azurerm_app_service" "main" {
         virtual_network_subnet_id = ip_restriction.value.id
       }
     }
-    dynamic "ip_restriction" {
-      for_each = local.ipRestrictions
-      content {
-        ip_address = ip_restriction.value
-      }
-    }
+   
   }
 
   app_settings = {
