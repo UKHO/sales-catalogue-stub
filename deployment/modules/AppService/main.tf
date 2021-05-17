@@ -23,13 +23,6 @@ resource "azurerm_app_service" "main" {
   site_config {
     dotnet_framework_version = var.dotnet_framework_version
     always_on                = var.always_on
-    dynamic "ip_restriction" {
-      for_each = [data.azurerm_subnet.subnet]
-      content {
-        virtual_network_subnet_id = ip_restriction.value.id
-      }
-    }
-   
   }
 
   app_settings = {
