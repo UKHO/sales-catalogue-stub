@@ -41,7 +41,7 @@ resource "azurerm_app_service" "main" {
     dynamic "ip_restriction" {
       for_each = var.deploy_environment == "QA" ? local.serviceTags : []
       content {
-        service_tag = serviceTags.value
+        service_tag = ip_restriction.value
       }
     }
   }
