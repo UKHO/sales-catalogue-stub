@@ -32,16 +32,16 @@ resource "azurerm_app_service" "main" {
       }
     }
     dynamic "ip_restriction" {
-      for_each = var.deploy_environment == "DEV" ? local.serviceTags : []
+      for_each = var.deploy_environment == "DEV" ? local.ipRestrictions : []
       content {
-        ip_address = serviceTags.value
+        ip_address = ip_restriction.value
       }
     }
 
     dynamic "ip_restriction" {
       for_each = var.deploy_environment == "QA" ? local.serviceTags : []
       content {
-        service_tag = ip_restriction.value
+        service_tag = serviceTags.value
       }
     }
   }
