@@ -38,11 +38,17 @@ resource "azurerm_app_service" "main" {
       }
     }
 
-    dynamic "ip_restriction" {
-      for_each = var.deploy_environment == "QA" ? local.serviceTags : []
-      content {
-        service_tag = ip_restriction.value
-      }
+    # dynamic "ip_restriction" {
+    #   for_each = var.deploy_environment == "QA" ? local.serviceTags : []
+    #   content {
+    #     service_tag = ip_restriction.value
+    #   }
+    # }
+
+    ip_restriction {
+      service_tag = "AzureFrontDoor.Backend"
+      name        = "allow-azurefrontdoor"
+      action      = "Allow"
     }
   }
 
