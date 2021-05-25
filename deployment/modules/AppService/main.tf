@@ -22,7 +22,6 @@ resource "azurerm_app_service" "main" {
   https_only          = var.https_only
 
   site_config {
-    count = var.deploy_environment == "DEV" ? 1 : 0
     dotnet_framework_version = var.dotnet_framework_version
     always_on                = var.always_on
     dynamic "ip_restriction" {
@@ -32,18 +31,11 @@ resource "azurerm_app_service" "main" {
       }
     }
     dynamic "ip_restriction" {
-      for_each = local.ipRestrictions
+      for_each = var.deploy_environment == "DEV" ? local.ipRestrictions : {}
       content {
         ip_address = ip_restriction.value
       }
     }
-  }
-
-  site_config {
-    count = var.deploy_environment == "QA" ? 1 : 0
-    dotnet_framework_version = var.dotnet_framework_version
-    always_on                = var.always_on
-    
   }
 
   app_settings = {
