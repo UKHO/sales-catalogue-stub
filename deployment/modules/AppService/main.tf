@@ -1,6 +1,6 @@
 locals {
   basename       = "M-${var.servicename}-${var.role}-${var.deploy_environment}-appservice"
-  ipRestrictions = ["${var.eng_outgoing_ip}/32", "${var.ukho_main_outgoing_ip}/32", "${var.mastekIp1}/32", "${var.mastekIp2}/32", "${var.mastekIp3}/32", "${var.mastekJumpbox}/32"]
+  ipRestrictions = ["${var.eng_outgoing_ip}/32", "${var.ukho_main_outgoing_ip}/32"]
   serviceTags = ["AzureFrontDoor.Backend"]
 }
 

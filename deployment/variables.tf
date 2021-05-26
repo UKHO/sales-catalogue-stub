@@ -40,19 +40,3 @@ variable "KV_ACCESS_POLICY_GROUP_OBJECT_ID" {
 variable "KV_ACCESS_POLICY_PIPELINE_OBJECT_ID" {
   type = string
 }
-
-variable "API-MASTEK-IP-1" {
-  type = string
-}
-
-variable "API-MASTEK-IP-2" {
-  type = string
-}
-
-variable "API-MASTEK-IP-3" {
-  type = string
-}
-
-variable "API-MASTEK-IP-JUMP-BOX" {
-  type = string
-}
