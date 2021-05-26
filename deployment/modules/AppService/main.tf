@@ -32,7 +32,7 @@ resource "azurerm_app_service" "main" {
       }
     }
     dynamic "ip_restriction" {
-      for_each = var.deploy_environment == "DEV" ? local.ipRestrictions : []
+      for_each = local.ipRestrictions
       content {
         ip_address = ip_restriction.value
       }
