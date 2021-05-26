@@ -1,6 +1,7 @@
 locals {
   basename       = "M-${var.servicename}-${var.role}-${var.deploy_environment}-appservice"
-  ipRestrictions = ["${var.eng_outgoing_ip}/32", "${var.ukho_main_outgoing_ip}/32", "${var.mastekIp1}/32", "${var.mastekIp2}/32", "${var.mastekIp3}/32", "${var.mastekJumpbox}/32"]
+  ipRestrictions = ["${var.eng_outgoing_ip}/32", "${var.ukho_main_outgoing_ip}/32"]
+  serviceTags = ["AzureFrontDoor.Backend"]
 }
 
 data "azurerm_virtual_network" "vnet" {
@@ -34,6 +35,13 @@ resource "azurerm_app_service" "main" {
       for_each = local.ipRestrictions
       content {
         ip_address = ip_restriction.value
+      }
+    }
+
+    dynamic "ip_restriction" {
+      for_each = var.deploy_environment == "QA" ? local.serviceTags : []
+      content {
+        service_tag = ip_restriction.value
       }
     }
   }

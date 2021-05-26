@@ -70,15 +70,3 @@ variable "spoke_subnet_name" {
 variable "spoke_rg" {
   type = string
 }
-variable "mastekIp1" {
-  type = string
-}
-variable "mastekIp2" {
-  type = string
-}
-variable "mastekIp3" {
-  type = string
-}
-variable "mastekJumpbox" {
-  type = string
-}
