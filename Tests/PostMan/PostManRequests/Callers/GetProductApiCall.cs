@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -11,7 +12,8 @@ namespace PostManRequests.Callers
         //defined Tuple here T1 & T2
         public async Task<(ProductResponse Response, HttpStatusCode StatusCode)> GetProductHttpClientAsync(
             string tokenResult,
-            string getProductUri)
+            string getProductUri
+            )
         {
             HttpResponseMessage response;
             using (HttpClient client = new HttpClient())
@@ -25,5 +27,16 @@ namespace PostManRequests.Callers
             ProductResponse result = JsonConvert.DeserializeObject<ProductResponse>(responseContent);
             return (result, response.StatusCode);
         }
+
+        public string GetProductUri(string baseUri, DateTime sinceDateTime )
+        {
+            var getProductUri = $"{baseUri}/v1/productData/AVCS/";
+            var getProductUriParams = "products?sinceDateTime=";
+            //sinceDateTime = DateTime.Now - TimeSpan.FromDays(14);
+            string sinceDateTimeAsString = sinceDateTime.ToString("yyyy-MM-dd");
+            return $"{getProductUri}{getProductUriParams}{sinceDateTimeAsString}";
+
+        }
+
     }
 }
