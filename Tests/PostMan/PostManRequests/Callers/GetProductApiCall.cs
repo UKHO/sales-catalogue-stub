@@ -28,6 +28,9 @@ namespace PostManRequests.Callers
             return (result, response.StatusCode);
         }
 
+
+
+
         public string GetProductUri(string baseUri, DateTime sinceDateTime )
         {
             var getProductUri = $"{baseUri}/v1/productData/AVCS/";

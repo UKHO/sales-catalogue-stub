@@ -27,8 +27,10 @@ namespace PostManTests
         public async Task Test_The_Get_Product_With_An_Invalid_Token_Returns_Unauthorised()
         {
             GetProductApiCall newgetproduct = new GetProductApiCall();
+
             var productUri =
                 newgetproduct.GetProductUri(configuration.SiteBaseUrl, DateTime.Now - TimeSpan.FromDays(14));
+
             (ProductResponse ProductResponse, HttpStatusCode StatusCode) result =
                 await newgetproduct.GetProductHttpClientAsync("InvalidToken", productUri);
             result.ProductResponse.Should().BeNull();
