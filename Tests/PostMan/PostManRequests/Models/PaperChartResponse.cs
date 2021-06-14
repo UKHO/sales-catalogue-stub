@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PostManRequests.Models
 {
-    public class GetPaperChartResponse
+    public class PaperChartResponse
 
     {
         public string Url { get; set; }

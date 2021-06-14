@@ -27,7 +27,6 @@ namespace PostManTests
         public async Task Test_The_Get_Product_With_An_Invalid_Token_Returns_Unauthorised()
         {
             GetProductApiCall newgetproduct = new GetProductApiCall();
-
             var productUri =
                 newgetproduct.GetProductUri(configuration.SiteBaseUrl, DateTime.Now - TimeSpan.FromDays(14));
 
@@ -51,27 +50,27 @@ namespace PostManTests
             result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
-        [Test]
-        public async Task Test_The_Get_Product_Returns_Status_Code_OK()
-        {
-            string tokenresult = _newaccesstoken.GetAcessToken();
-            GetProductApiCall newuri = new GetProductApiCall();
-            (ProductResponse ProductResponse, HttpStatusCode StatusCode) uriresult =
-                await newuri.GetProductHttpClientAsync(tokenresult, productUri);
-            uriresult.StatusCode.Should().Be(HttpStatusCode.OK);
-        }
+        //[Test]
+        //public async Task Test_The_Get_Product_Returns_Status_Code_OK()
+        //{
+        //    string tokenresult = _newaccesstoken.GetAcessToken();
+        //    GetProductApiCall newuri = new GetProductApiCall();
+        //    (ProductResponse ProductResponse, HttpStatusCode StatusCode) uriresult =
+        //        await newuri.GetProductHttpClientAsync(tokenresult, productUri);
+        //    uriresult.StatusCode.Should().Be(HttpStatusCode.OK);
+        //}
 
-        [Test]
-        public async Task Test_The_Get_Product_Returns_Same_Amount_Of_Products_In_Product_Count()
-        {
-            string tokenresult = _newaccesstoken.GetAcessToken();
-            GetProductApiCall newuri = new GetProductApiCall();
-            (ProductResponse ProductResponse, HttpStatusCode StatusCode) uriresult =
-                await newuri.GetProductHttpClientAsync(tokenresult, productUri);
-            uriresult.StatusCode.Should().Be(HttpStatusCode.OK);
-            int count = uriresult.ProductResponse.products.Count;
-            uriresult.ProductResponse.productCounts.returnedProductCount.Should().Be(count);
-        }
+        //[Test]
+        //public async Task Test_The_Get_Product_Returns_Same_Amount_Of_Products_In_Product_Count()
+        //{
+        //    string tokenresult = _newaccesstoken.GetAcessToken();
+        //    GetProductApiCall newuri = new GetProductApiCall();
+        //    (ProductResponse ProductResponse, HttpStatusCode StatusCode) uriresult =
+        //        await newuri.GetProductHttpClientAsync(tokenresult, productUri);
+        //    uriresult.StatusCode.Should().Be(HttpStatusCode.OK);
+        //    int count = uriresult.ProductResponse.products.Count;
+        //    uriresult.ProductResponse.productCounts.returnedProductCount.Should().Be(count);
+        //}
 
         [Test]
         public async Task Test_The_Get_Product_Request_With_No_Dates_Returns_Bad_Request()
@@ -95,28 +94,29 @@ namespace PostManTests
             uriresult.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
-        [Test]
-        public async Task Test_The_Get_Product_Request_With_Bad_Token_Returns_Unauthorised()
-        {
-            GetProductApiCall newuri = new GetProductApiCall();
+        //[Test]
+        //public async Task Test_The_Get_Product_Request_With_Bad_Token_Returns_Unauthorised()
+        //{
+        //    GetProductApiCall newuri = new GetProductApiCall();
 
-            (ProductResponse ProductResponse, HttpStatusCode StatusCode) uriresult =
-                await newuri.GetProductHttpClientAsync("InvalidToken", productUri);
-            uriresult.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        }
+        //    (ProductResponse ProductResponse, HttpStatusCode StatusCode) uriresult =
+        //        await newuri.GetProductHttpClientAsync("InvalidToken", productUri);
+        //    uriresult.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        //}
 
-        [Test]
-        public async Task Test_The_Get_Product_Product_Counts_Returns_A_200OK_And_Least_One_Product()
-        {
-            string tokenResult = _newaccesstoken.GetAcessToken();
-            GetProductApiCall newgetproduct = new GetProductApiCall();
-            (ProductResponse ProductResponse, HttpStatusCode StatusCode) result =
-                await newgetproduct.GetProductHttpClientAsync(tokenResult, productUri);
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-            result.ProductResponse.productCounts.returnedProductCount.Should().BeGreaterThan(1);
-            result.ProductResponse.products.Should().NotBeNullOrEmpty();
-            result.ProductResponse.products.Should().OnlyContain(cell => cell.fileSize >= 0);
-            result.ProductResponse.products.Should().OnlyContain(cell => cell.fileSize <= 10000);
-        }
+        //[Test]
+        //public async Task Test_The_Get_Product_Product_Counts_Returns_A_200OK_And_Least_One_Product()
+        //{
+        //    string tokenResult = _newaccesstoken.GetAcessToken();
+        //    GetProductApiCall newgetproduct = new GetProductApiCall();
+        //    (ProductResponse ProductResponse, HttpStatusCode StatusCode) result =
+        //        await newgetproduct.GetProductHttpClientAsync(tokenResult, productUri);
+        //    result.StatusCode.Should().Be(HttpStatusCode.OK);
+        //    result.ProductResponse.productCounts.returnedProductCount.Should().BeGreaterThan(1);
+        //    result.ProductResponse.products.Should().NotBeNullOrEmpty();
+        //    result.ProductResponse.products.Should().OnlyContain(cell => cell.fileSize >= 0);
+        //    result.ProductResponse.products.Should().OnlyContain(cell => cell.fileSize <= 10000);
+        //}
     }
 }
+    
