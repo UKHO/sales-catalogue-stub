@@ -8,6 +8,7 @@ using PostManRequests.Models;
 
 namespace PostManTests
 {
+    [TestFixture]
     public class GetProductsTests
 
     {

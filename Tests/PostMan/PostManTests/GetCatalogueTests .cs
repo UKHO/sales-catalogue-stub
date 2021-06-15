@@ -9,6 +9,7 @@ using PostManRequests.Models;
 
 namespace PostManTests
 {
+    [TestFixture]
     public class GetCatalogueTests
     {
         private PostManTestsConfig configuration;

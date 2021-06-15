@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace PostManTests
 {
+    [TestFixture]
     public class GetPaperChartTests
-
     {
         [SetUp]
         public void Setup()
